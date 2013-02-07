@@ -1,0 +1,5 @@
+/build
+/Debug
+/*.ncb
+/*.user
+/*.suo

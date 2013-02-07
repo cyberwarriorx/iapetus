@@ -13,11 +13,9 @@ set(iapetus_SOURCES
 	ui/font.c ui/font8x8.c ui/font8x16.c ui/gui.c ui/text.c
 	video/vdpinit.c video/scrscr.c video/rotscr.c video/vdp1.c video/pal.c)
 
-
 set(CMAKE_C_FLAGS "-O2 -Wall -m2 -DREENTRANT_SYSCALLS_PROVIDED")
 
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${iapetus_SOURCES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION "lib")
-install(FILES $(iapetus_SOURCES) DESTINATION "include")
-
+install(DIRECTORY "" DESTINATION "include" FILES_MATCHING PATTERN "*.h")

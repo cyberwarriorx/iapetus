@@ -23,7 +23,7 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="cd build &amp;&amp; make VERBOSE=1"
+				BuildCommandLine="cd build &amp;&amp; make"
 				ReBuildCommandLine="cd build &amp;&amp; make clean &amp;&amp; make"
 				CleanCommandLine="cd build &amp;&amp; make clean"
 				Output="libiapetus.a"
