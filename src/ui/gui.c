@@ -1,4 +1,4 @@
-/*  Copyright 2006-2009 Theo Berkau
+/*  Copyright 2006-2009, 2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -21,14 +21,14 @@
 #include "../iapetus.h"
 #include "gui.h"
 
-void GuiClearScr(font_struct *font)
+void gui_clear_scr(font_struct *font)
 {
    vdp_disp_off();
-   VdpClearScreen(font);
+   vdp_clear_screen(font);
    vdp_disp_on();
 }
 
-int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char *title, int flags, int num_lines)
+int gui_do_menu(menu_item_struct *menu, font_struct *font, int x, int y, const char *title, int flags, int num_lines)
 {
    int cursel=0;
    int nummenu=0;
@@ -46,7 +46,7 @@ int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char
    VDP2_REG_PRISD = 0x0101;
 
    // Make sure current screen is clear
-   GuiWindowInit();
+   gui_window_init();
 
    // Figure out how many menu items there are, and get the longest one
    for (;;)
@@ -80,10 +80,10 @@ int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char
       y = height - win_height - y;
    }
 
-   GuiWindowDraw(x, y, win_width, win_height, 0, RGB16(26, 26, 25) | 0x8000);
+   gui_window_draw(x, y, win_width, win_height, 0, RGB16(26, 26, 25) | 0x8000);
 
    // Draw title
-   VdpPrintf(font, x+6, y+5, 15, "%s", title);
+   vdp_printf(font, x+6, y+5, 15, "%s", title);
 
    menux = x + 6;
    menuy = y + 5 + 8 + 5;
@@ -93,44 +93,44 @@ int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char
    {
       if (num_lines != -1 && i >= num_lines)
          break;
-      VdpPrintf(font, menux + (1 * 8) + 1, menuy + (i * 8)+1, 0x10, (char *)menu[i].name);
-      VdpPrintf(font, menux + (1 * 8), menuy + (i * 8), 0xF, (char *)menu[i].name);
+      vdp_printf(font, menux + (1 * 8) + 1, menuy + (i * 8)+1, 0x10, (char *)menu[i].name);
+      vdp_printf(font, menux + (1 * 8), menuy + (i * 8), 0xF, (char *)menu[i].name);
    }
 
    // Add Selected Menu Item(should always be first item) sprite to draw list
-   VdpPrintf(font, menux, menuy+(cursel * 8), 0xF, ">");
+   vdp_printf(font, menux, menuy+(cursel * 8), 0xF, ">");
 
    for (;;)
    {
       vdp_vsync(); 
 
       // poll joypad(if menu item is selected, return)
-      if (per[0].butpushonce & PAD_UP)
+      if (per[0].but_push_once & PAD_UP)
       {
-         VdpPrintf(font, menux, menuy + (cursel * 8), 0, ">");
+         vdp_printf(font, menux, menuy + (cursel * 8), 0, ">");
 
          if (cursel != 0)
             cursel--;
          else
             cursel = (nummenu - 1);
 
-         VdpPrintf(font, menux, menuy + (cursel * 8), 0xF, ">");
+         vdp_printf(font, menux, menuy + (cursel * 8), 0xF, ">");
       }
-      else if (per[0].butpushonce & PAD_DOWN)
+      else if (per[0].but_push_once & PAD_DOWN)
       {
-         VdpPrintf(font, menux, menuy + (cursel * 8), 0x0, ">");
+         vdp_printf(font, menux, menuy + (cursel * 8), 0x0, ">");
 
          if (cursel != (nummenu - 1))
             cursel++;
          else
             cursel = (nummenu - 1);
 
-         VdpPrintf(font, menux, menuy + (cursel * 8), 0xF, ">");
+         vdp_printf(font, menux, menuy + (cursel * 8), 0xF, ">");
       }
 
-      if (per[0].butpushonce & PAD_A)
+      if (per[0].but_push_once & PAD_A)
       {
-         GuiClearScr(font);
+         gui_clear_scr(font);
 
          vdp_start_draw_kist();
          vdp_end_draw_list();
@@ -139,9 +139,9 @@ int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char
             menu[cursel].func();
          return cursel;
       }
-      else if (per[0].butpushonce & PAD_B)
+      else if (per[0].but_push_once & PAD_B)
       {
-         GuiClearScr(font);
+         gui_clear_scr(font);
 
          vdp_start_draw_kist();
          vdp_end_draw_list();
@@ -153,13 +153,13 @@ int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char
 
 //////////////////////////////////////////////////////////////////////////////
 
-void GuiWindowInit(void)
+void gui_window_init(void)
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void GuiWindowDraw(int x, int y, int width, int height, u16 fgcolor, u16 bgcolor)
+void gui_window_draw(int x, int y, int width, int height, u16 fgcolor, u16 bgcolor)
 {
    sprite_struct localcoord;
    sprite_struct sprite;

@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -19,23 +19,23 @@
 
 #include "../iapetus.h"
 
-extern vdp2settings_struct vdp2settings;
+extern vdp2_settings_struct vdp2_settings;
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_set_rotation_table(screen_settings_struct *settings, int num, rottbl_struct *tbl)
 {
-   volatile u16 *outtbl=(volatile u16 *)(0x20000000 | settings->parameteraddr | (num * 0x80));
-   volatile u16 *intbl=(volatile u16 *)tbl;
+   volatile u16 *out_tbl=(volatile u16 *)(0x20000000 | settings->parameter_addr | (num * 0x80));
+   volatile u16 *in_tbl=(volatile u16 *)tbl;
    int i;
    
    for (i = 0; i < sizeof(rottbl_struct) / 2; i++)
-      outtbl[i] = intbl[i];
+      out_tbl[i] = in_tbl[i];
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void InitRotationTable(u32 addr)
+void init_rotation_table(u32 addr)
 {
    volatile rottbl_struct *tbl=(volatile rottbl_struct *)(0x20000000 | addr);
    tbl->Xst = 0;
@@ -51,11 +51,11 @@ void InitRotationTable(u32 addr)
    tbl->D = 0;
    tbl->E = (1 << 16);
    tbl->F = 0;
-   tbl->Px = vdp2settings.screenwidth / 2;
-   tbl->Py = vdp2settings.screenheight / 2;
+   tbl->Px = vdp2_settings.screen_width / 2;
+   tbl->Py = vdp2_settings.screen_height / 2;
    tbl->Pz = 0; // doesn't seem to matter
-   tbl->Cx = vdp2settings.screenwidth / 2;
-   tbl->Cy = vdp2settings.screenheight / 2;
+   tbl->Cx = vdp2_settings.screen_width / 2;
+   tbl->Cy = vdp2_settings.screen_height / 2;
    tbl->Cz = 0;
    tbl->Mx = 0;
    tbl->My = 0;
@@ -99,47 +99,47 @@ static u16 CalcRDBSbit(int bank, int type)
 
 int vdp_rbg0_init(screen_settings_struct *settings)
 {
-   vdp2settings.BGON.part.rbg0enab = 1;
+   vdp2_settings.BGON.part.rbg0_enab = 1;
 
    // Normalize rotation settings
-   switch (settings->rotationmode)
+   switch (settings->rotation_mode)
    {
       case 0: // Rotation Parameter A
          // Set only rotation parameter A
          // Set Screen-Over to a default value
-         vdp2settings.PLSZ.part.raovr = 0;
-         vdp2settings.MPOFR.part.ramp = settings->mapoffset;
-         InitRotationTable(settings->parameteraddr);
+         vdp2_settings.PLSZ.part.raovr = 0;
+         vdp2_settings.MPOFR.part.ramp = settings->map_offset;
+         init_rotation_table(settings->parameter_addr);
 
-         if (!settings->isbitmap)
+         if (!settings->is_bitmap)
          {
-            vdp2settings.PLSZ.part.raplsz = settings->planesize & 0x3;
+            vdp2_settings.PLSZ.part.raplsz = settings->plane_size & 0x3;
 
             // The following could probably be optimized
-            vdp2settings.MPABRA.part.rampa = settings->map[0];
-            vdp2settings.MPABRA.part.rampb = settings->map[1];
-            vdp2settings.MPCDRA.part.rampc = settings->map[2];
-            vdp2settings.MPCDRA.part.rampd = settings->map[3];
-            vdp2settings.MPEFRA.part.rampe = settings->map[4];
-            vdp2settings.MPEFRA.part.rampf = settings->map[5];
-            vdp2settings.MPGHRA.part.rampg = settings->map[6];
-            vdp2settings.MPGHRA.part.ramph = settings->map[7];
-            vdp2settings.MPIJRA.part.rampi = settings->map[8];
-            vdp2settings.MPIJRA.part.rampj = settings->map[9];
-            vdp2settings.MPKLRA.part.rampk = settings->map[10];
-            vdp2settings.MPKLRA.part.rampl = settings->map[11];
-            vdp2settings.MPMNRA.part.rampm = settings->map[12];
-            vdp2settings.MPMNRA.part.rampn = settings->map[13];
-            vdp2settings.MPOPRA.part.rampo = settings->map[14];
-            vdp2settings.MPOPRA.part.rampp = settings->map[15];
-            VDP2_REG_MPABRA = vdp2settings.MPABRA.all;
-            VDP2_REG_MPCDRA = vdp2settings.MPCDRA.all;
-            VDP2_REG_MPEFRA = vdp2settings.MPEFRA.all;
-            VDP2_REG_MPGHRA = vdp2settings.MPGHRA.all;
-            VDP2_REG_MPIJRA = vdp2settings.MPIJRA.all;
-            VDP2_REG_MPKLRA = vdp2settings.MPKLRA.all;
-            VDP2_REG_MPMNRA = vdp2settings.MPMNRA.all;
-            VDP2_REG_MPOPRA = vdp2settings.MPOPRA.all;
+            vdp2_settings.MPABRA.part.rampa = settings->map[0];
+            vdp2_settings.MPABRA.part.rampb = settings->map[1];
+            vdp2_settings.MPCDRA.part.rampc = settings->map[2];
+            vdp2_settings.MPCDRA.part.rampd = settings->map[3];
+            vdp2_settings.MPEFRA.part.rampe = settings->map[4];
+            vdp2_settings.MPEFRA.part.rampf = settings->map[5];
+            vdp2_settings.MPGHRA.part.rampg = settings->map[6];
+            vdp2_settings.MPGHRA.part.ramph = settings->map[7];
+            vdp2_settings.MPIJRA.part.rampi = settings->map[8];
+            vdp2_settings.MPIJRA.part.rampj = settings->map[9];
+            vdp2_settings.MPKLRA.part.rampk = settings->map[10];
+            vdp2_settings.MPKLRA.part.rampl = settings->map[11];
+            vdp2_settings.MPMNRA.part.rampm = settings->map[12];
+            vdp2_settings.MPMNRA.part.rampn = settings->map[13];
+            vdp2_settings.MPOPRA.part.rampo = settings->map[14];
+            vdp2_settings.MPOPRA.part.rampp = settings->map[15];
+            VDP2_REG_MPABRA = vdp2_settings.MPABRA.all;
+            VDP2_REG_MPCDRA = vdp2_settings.MPCDRA.all;
+            VDP2_REG_MPEFRA = vdp2_settings.MPEFRA.all;
+            VDP2_REG_MPGHRA = vdp2_settings.MPGHRA.all;
+            VDP2_REG_MPIJRA = vdp2_settings.MPIJRA.all;
+            VDP2_REG_MPKLRA = vdp2_settings.MPKLRA.all;
+            VDP2_REG_MPMNRA = vdp2_settings.MPMNRA.all;
+            VDP2_REG_MPOPRA = vdp2_settings.MPOPRA.all;
          }
          break;
       case 1: // Rotation B
@@ -147,136 +147,136 @@ int vdp_rbg0_init(screen_settings_struct *settings)
       case 3: // Switched via rotation parameter window
          // Set both Rotation Parameter A & B
          // Set Screen-Over to a default value
-         vdp2settings.PLSZ.part.raovr = vdp2settings.PLSZ.part.rbovr = 0;
-         vdp2settings.MPOFR.part.ramp = vdp2settings.MPOFR.part.rbmp = settings->mapoffset;
-         InitRotationTable(settings->parameteraddr);
-         InitRotationTable(settings->parameteraddr+0x80);
+         vdp2_settings.PLSZ.part.raovr = vdp2_settings.PLSZ.part.rbovr = 0;
+         vdp2_settings.MPOFR.part.ramp = vdp2_settings.MPOFR.part.rbmp = settings->map_offset;
+         init_rotation_table(settings->parameter_addr);
+         init_rotation_table(settings->parameter_addr+0x80);
 
-         if (!settings->isbitmap)
+         if (!settings->is_bitmap)
          {
-            vdp2settings.PLSZ.part.raplsz = vdp2settings.PLSZ.part.rbplsz = settings->planesize & 0x3;
+            vdp2_settings.PLSZ.part.raplsz = vdp2_settings.PLSZ.part.rbplsz = settings->plane_size & 0x3;
 
             // The following could probably be optimized
-            vdp2settings.MPABRA.part.rampa = settings->map[0];
-            vdp2settings.MPABRA.part.rampb = settings->map[1];
-            vdp2settings.MPCDRA.part.rampc = settings->map[2];
-            vdp2settings.MPCDRA.part.rampd = settings->map[3];
-            vdp2settings.MPEFRA.part.rampe = settings->map[4];
-            vdp2settings.MPEFRA.part.rampf = settings->map[5];
-            vdp2settings.MPGHRA.part.rampg = settings->map[6];
-            vdp2settings.MPGHRA.part.ramph = settings->map[7];
-            vdp2settings.MPIJRA.part.rampi = settings->map[8];
-            vdp2settings.MPIJRA.part.rampj = settings->map[9];
-            vdp2settings.MPKLRA.part.rampk = settings->map[10];
-            vdp2settings.MPKLRA.part.rampl = settings->map[11];
-            vdp2settings.MPMNRA.part.rampm = settings->map[12];
-            vdp2settings.MPMNRA.part.rampn = settings->map[13];
-            vdp2settings.MPOPRA.part.rampo = settings->map[14];
-            vdp2settings.MPOPRA.part.rampp = settings->map[15];
-            VDP2_REG_MPABRA = vdp2settings.MPABRA.all;
-            VDP2_REG_MPCDRA = vdp2settings.MPCDRA.all;
-            VDP2_REG_MPEFRA = vdp2settings.MPEFRA.all;
-            VDP2_REG_MPGHRA = vdp2settings.MPGHRA.all;
-            VDP2_REG_MPIJRA = vdp2settings.MPIJRA.all;
-            VDP2_REG_MPKLRA = vdp2settings.MPKLRA.all;
-            VDP2_REG_MPMNRA = vdp2settings.MPMNRA.all;
-            VDP2_REG_MPOPRA = vdp2settings.MPOPRA.all;
+            vdp2_settings.MPABRA.part.rampa = settings->map[0];
+            vdp2_settings.MPABRA.part.rampb = settings->map[1];
+            vdp2_settings.MPCDRA.part.rampc = settings->map[2];
+            vdp2_settings.MPCDRA.part.rampd = settings->map[3];
+            vdp2_settings.MPEFRA.part.rampe = settings->map[4];
+            vdp2_settings.MPEFRA.part.rampf = settings->map[5];
+            vdp2_settings.MPGHRA.part.rampg = settings->map[6];
+            vdp2_settings.MPGHRA.part.ramph = settings->map[7];
+            vdp2_settings.MPIJRA.part.rampi = settings->map[8];
+            vdp2_settings.MPIJRA.part.rampj = settings->map[9];
+            vdp2_settings.MPKLRA.part.rampk = settings->map[10];
+            vdp2_settings.MPKLRA.part.rampl = settings->map[11];
+            vdp2_settings.MPMNRA.part.rampm = settings->map[12];
+            vdp2_settings.MPMNRA.part.rampn = settings->map[13];
+            vdp2_settings.MPOPRA.part.rampo = settings->map[14];
+            vdp2_settings.MPOPRA.part.rampp = settings->map[15];
+            VDP2_REG_MPABRA = vdp2_settings.MPABRA.all;
+            VDP2_REG_MPCDRA = vdp2_settings.MPCDRA.all;
+            VDP2_REG_MPEFRA = vdp2_settings.MPEFRA.all;
+            VDP2_REG_MPGHRA = vdp2_settings.MPGHRA.all;
+            VDP2_REG_MPIJRA = vdp2_settings.MPIJRA.all;
+            VDP2_REG_MPKLRA = vdp2_settings.MPKLRA.all;
+            VDP2_REG_MPMNRA = vdp2_settings.MPMNRA.all;
+            VDP2_REG_MPOPRA = vdp2_settings.MPOPRA.all;
 
-            vdp2settings.MPABRB.part.rbmpa = settings->map[0];
-            vdp2settings.MPABRB.part.rbmpb = settings->map[1];
-            vdp2settings.MPCDRB.part.rbmpc = settings->map[2];
-            vdp2settings.MPCDRB.part.rbmpd = settings->map[3];
-            vdp2settings.MPEFRB.part.rbmpe = settings->map[4];
-            vdp2settings.MPEFRB.part.rbmpf = settings->map[5];
-            vdp2settings.MPGHRB.part.rbmpg = settings->map[6];
-            vdp2settings.MPGHRB.part.rbmph = settings->map[7];
-            vdp2settings.MPIJRB.part.rbmpi = settings->map[8];
-            vdp2settings.MPIJRB.part.rbmpj = settings->map[9];
-            vdp2settings.MPKLRB.part.rbmpk = settings->map[10];
-            vdp2settings.MPKLRB.part.rbmpl = settings->map[11];
-            vdp2settings.MPMNRB.part.rbmpm = settings->map[12];
-            vdp2settings.MPMNRB.part.rbmpn = settings->map[13];
-            vdp2settings.MPOPRB.part.rbmpo = settings->map[14];
-            vdp2settings.MPOPRB.part.rbmpp = settings->map[15];
-            VDP2_REG_MPABRB = vdp2settings.MPABRB.all;
-            VDP2_REG_MPCDRB = vdp2settings.MPCDRB.all;
-            VDP2_REG_MPEFRB = vdp2settings.MPEFRB.all;
-            VDP2_REG_MPGHRB = vdp2settings.MPGHRB.all;
-            VDP2_REG_MPIJRB = vdp2settings.MPIJRB.all;
-            VDP2_REG_MPKLRB = vdp2settings.MPKLRB.all;
-            VDP2_REG_MPMNRB = vdp2settings.MPMNRB.all;
-            VDP2_REG_MPOPRB = vdp2settings.MPOPRB.all;
+            vdp2_settings.MPABRB.part.rbmpa = settings->map[0];
+            vdp2_settings.MPABRB.part.rbmpb = settings->map[1];
+            vdp2_settings.MPCDRB.part.rbmpc = settings->map[2];
+            vdp2_settings.MPCDRB.part.rbmpd = settings->map[3];
+            vdp2_settings.MPEFRB.part.rbmpe = settings->map[4];
+            vdp2_settings.MPEFRB.part.rbmpf = settings->map[5];
+            vdp2_settings.MPGHRB.part.rbmpg = settings->map[6];
+            vdp2_settings.MPGHRB.part.rbmph = settings->map[7];
+            vdp2_settings.MPIJRB.part.rbmpi = settings->map[8];
+            vdp2_settings.MPIJRB.part.rbmpj = settings->map[9];
+            vdp2_settings.MPKLRB.part.rbmpk = settings->map[10];
+            vdp2_settings.MPKLRB.part.rbmpl = settings->map[11];
+            vdp2_settings.MPMNRB.part.rbmpm = settings->map[12];
+            vdp2_settings.MPMNRB.part.rbmpn = settings->map[13];
+            vdp2_settings.MPOPRB.part.rbmpo = settings->map[14];
+            vdp2_settings.MPOPRB.part.rbmpp = settings->map[15];
+            VDP2_REG_MPABRB = vdp2_settings.MPABRB.all;
+            VDP2_REG_MPCDRB = vdp2_settings.MPCDRB.all;
+            VDP2_REG_MPEFRB = vdp2_settings.MPEFRB.all;
+            VDP2_REG_MPGHRB = vdp2_settings.MPGHRB.all;
+            VDP2_REG_MPIJRB = vdp2_settings.MPIJRB.all;
+            VDP2_REG_MPKLRB = vdp2_settings.MPKLRB.all;
+            VDP2_REG_MPMNRB = vdp2_settings.MPMNRB.all;
+            VDP2_REG_MPOPRB = vdp2_settings.MPOPRB.all;
          }
          break;
       default: break;
    }
 
-   VDP2_REG_RPMD = settings->rotationmode;
+   VDP2_REG_RPMD = settings->rotation_mode;
 
    // RAMCTL's RDBS bits need to be set here(rs's equivalent to the vram access cycles)
    VDP2_REG_RAMCTL &= 0xFF00;
-   VDP2_REG_RAMCTL |= CalcRDBSbit(settings->mapoffset, 0x3); // |
+   VDP2_REG_RAMCTL |= CalcRDBSbit(settings->map_offset, 0x3); // |
 //                      CalcRDBSbit((settings->parameteraddr & 0x7FFFF) >> 17, 0x1);
 
    // Reset Parameter Read Enable settings here
 
    // Rotation Parameter Table Address
-   vdp2settings.RPTA = settings->parameteraddr >> 1;
-   VDP2_REG_RPTAU = vdp2settings.RPTA >> 16;
-   VDP2_REG_RPTAL = vdp2settings.RPTA;
+   vdp2_settings.RPTA = settings->parameter_addr >> 1;
+   VDP2_REG_RPTAU = vdp2_settings.RPTA >> 16;
+   VDP2_REG_RPTAL = vdp2_settings.RPTA;
 
    // Adjust Priority(set to a default value)
    vdp_set_priority(SCREEN_RBG0, 1);
       
-   vdp2settings.CHCTLB.all &= 0x00FF;
-   vdp2settings.CHCTLB.part.r0chcn = settings->color & 0x7;
+   vdp2_settings.CHCTLB.all &= 0x00FF;
+   vdp2_settings.CHCTLB.part.r0chcn = settings->color & 0x7;
 
    // If Bitmap, set bitmap settings
-   if (settings->isbitmap)
+   if (settings->is_bitmap)
    {
       // Bitmap Enabled
-      vdp2settings.CHCTLB.all |= (settings->bitmapsize << 9) | 0x200;
+      vdp2_settings.CHCTLB.all |= (settings->bitmap_size << 9) | 0x200;
 
       // Special/Extra settings
-      vdp2settings.BMPNB.part.r0bmpr = settings->specialpriority & 0x1;
-      vdp2settings.BMPNB.part.r0bmcc = settings->specialcolorcalc & 0x1;
-      vdp2settings.BMPNB.part.r0bmp = settings->extrapalettenum & 0x7;
-      VDP2_REG_BMPNB = vdp2settings.BMPNB.all;
+      vdp2_settings.BMPNB.part.r0bmpr = settings->special_priority & 0x1;
+      vdp2_settings.BMPNB.part.r0bmcc = settings->special_color_calc & 0x1;
+      vdp2_settings.BMPNB.part.r0bmp = settings->extra_palette_num & 0x7;
+      VDP2_REG_BMPNB = vdp2_settings.BMPNB.all;
    }
    else
    {
       // Tile Enabled
-      vdp2settings.CHCTLB.part.r0chsz |= settings->charsize & 0x1;
-      if (settings->patternnamesize & 0x1)
+      vdp2_settings.CHCTLB.part.r0chsz |= settings->char_size & 0x1;
+      if (settings->pattern_name_size & 0x1)
       {
          // 1 Word
-         vdp2settings.PNCR.part.r0pnb = 1;
-         vdp2settings.PNCR.part.r0cnsm = settings->flipfunction;
-         vdp2settings.PNCR.part.r0spr = settings->specialpriority;
-         vdp2settings.PNCR.part.r0scc = settings->specialcolorcalc;
-         vdp2settings.PNCR.part.r0splt = settings->extrapalettenum;
-         vdp2settings.PNCR.part.r0scn = settings->extracharnum;
+         vdp2_settings.PNCR.part.r0pnb = 1;
+         vdp2_settings.PNCR.part.r0cnsm = settings->flip_function;
+         vdp2_settings.PNCR.part.r0spr = settings->special_priority;
+         vdp2_settings.PNCR.part.r0scc = settings->special_color_calc;
+         vdp2_settings.PNCR.part.r0splt = settings->extra_palette_num;
+         vdp2_settings.PNCR.part.r0scn = settings->extra_char_num;
       }
       else
          // 2 Words
-         vdp2settings.PNCR.part.r0pnb = 0;
+         vdp2_settings.PNCR.part.r0pnb = 0;
 
       // Pattern Name Control Register
-      VDP2_REG_PNCR = vdp2settings.PNCR.all;
+      VDP2_REG_PNCR = vdp2_settings.PNCR.all;
    }
 
-   VDP2_REG_PLSZ = vdp2settings.PLSZ.all;
+   VDP2_REG_PLSZ = vdp2_settings.PLSZ.all;
 
-   vdp2settings.BGON.part.rbg0transenab = settings->transparentbit;
+   vdp2_settings.BGON.part.rbg0_trans_enab = settings->transparent_bit;
 
    // Map offset Register
-   VDP2_REG_MPOFR = vdp2settings.MPOFR.all;
+   VDP2_REG_MPOFR = vdp2_settings.MPOFR.all;
 
    // Character Control Register
-   VDP2_REG_CHCTLB = vdp2settings.CHCTLB.all;
+   VDP2_REG_CHCTLB = vdp2_settings.CHCTLB.all;
 
    // Enable Screen
-   VDP2_REG_BGON = vdp2settings.BGON.all;
+   VDP2_REG_BGON = vdp2_settings.BGON.all;
 
    return VDP_ERR_OK;
 }
@@ -285,10 +285,10 @@ int vdp_rbg0_init(screen_settings_struct *settings)
 
 void vdp_rbg0_deinit(void)
 {
-   vdp2settings.BGON.part.rbg0enab = 0;
+   vdp2_settings.BGON.part.rbg0_enab = 0;
 
    // Disable Screen
-   VDP2_REG_BGON = vdp2settings.BGON.all;
+   VDP2_REG_BGON = vdp2_settings.BGON.all;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -296,16 +296,16 @@ void vdp_rbg0_deinit(void)
 int vdp_rbg1_init(screen_settings_struct *settings)
 {
    // First make sure RBG0 is enabled
-   if (!vdp2settings.BGON.part.rbg0enab)
+   if (!vdp2_settings.BGON.part.rbg0_enab)
       return VDP_ERR_CONFLICT;
 
-   vdp2settings.BGON.part.rbg1enab = 1;
+   vdp2_settings.BGON.part.rbg1_enab = 1;
 
    // Disable all scroll screens
-   vdp2settings.BGON.part.nbg0enab = 0;
-   vdp2settings.BGON.part.nbg1enab = 0;
-   vdp2settings.BGON.part.nbg2enab = 0;
-   vdp2settings.BGON.part.nbg3enab = 0;
+   vdp2_settings.BGON.part.nbg0_enab = 0;
+   vdp2_settings.BGON.part.nbg1_enab = 0;
+   vdp2_settings.BGON.part.nbg2_enab = 0;
+   vdp2_settings.BGON.part.nbg3_enab = 0;
 
    // Force RBG0 to use parameter A
    VDP2_REG_RPMD = 0;
@@ -316,95 +316,95 @@ int vdp_rbg1_init(screen_settings_struct *settings)
    // Normalize rotation settings
 
    // Set Screen-Over to a default value
-   vdp2settings.PLSZ.part.rbovr = 0;
-   vdp2settings.MPOFR.part.rbmp = settings->mapoffset;
+   vdp2_settings.PLSZ.part.rbovr = 0;
+   vdp2_settings.MPOFR.part.rbmp = settings->map_offset;
 
    // Reset Parameter Read Enable settings here(not sure if it's needed for RBG1)
 
    // Initialize table
-   InitRotationTable((vdp2settings.RPTA << 1) + 0x80);
+   init_rotation_table((vdp2_settings.RPTA << 1) + 0x80);
 
    // Adjust Priority(set to a default value)
    vdp_set_priority(SCREEN_RBG1, 1);
       
    // RBG1 uses some of the same registers as NBG0
-   vdp2settings.CHCTLA.all &= 0xFF00;
-   vdp2settings.CHCTLA.part.n0chcn = settings->color & 0x7;
+   vdp2_settings.CHCTLA.all &= 0xFF00;
+   vdp2_settings.CHCTLA.part.n0chcn = settings->color & 0x7;
 
    // If Bitmap, set bitmap settings
-   if (settings->isbitmap)
+   if (settings->is_bitmap)
    {
       // Bitmap Enabled
-      vdp2settings.CHCTLA.all |= (settings->bitmapsize << 1) | 0x2;
+      vdp2_settings.CHCTLA.all |= (settings->bitmap_size << 1) | 0x2;
 
       // Special/Extra settings
-      vdp2settings.BMPNA.part.n0bmpr = settings->specialpriority & 0x1;
-      vdp2settings.BMPNA.part.n0bmcc = settings->specialcolorcalc & 0x1;
-      vdp2settings.BMPNA.part.n0bmp = settings->extrapalettenum & 0x7;
-      VDP2_REG_BMPNA = vdp2settings.BMPNA.all;
+      vdp2_settings.BMPNA.part.n0bmpr = settings->special_priority & 0x1;
+      vdp2_settings.BMPNA.part.n0bmcc = settings->special_color_calc & 0x1;
+      vdp2_settings.BMPNA.part.n0bmp = settings->extra_palette_num & 0x7;
+      VDP2_REG_BMPNA = vdp2_settings.BMPNA.all;
    }
    else
    {
       // Tile Enabled
-      vdp2settings.CHCTLA.part.n0chsz |= settings->charsize & 0x1;
-      if (settings->patternnamesize & 0x1)
+      vdp2_settings.CHCTLA.part.n0chsz |= settings->char_size & 0x1;
+      if (settings->pattern_name_size & 0x1)
       {
          // 1 Word
-         vdp2settings.PNCN0.part.n0pnb = 1;
-         vdp2settings.PNCN0.part.n0cnsm = settings->flipfunction;
-         vdp2settings.PNCN0.part.n0spr = settings->specialpriority;
-         vdp2settings.PNCN0.part.n0scc = settings->specialcolorcalc;
-         vdp2settings.PNCN0.part.n0splt = settings->extrapalettenum;
-         vdp2settings.PNCN0.part.n0scn = settings->extracharnum;
+         vdp2_settings.PNCN0.part.n0pnb = 1;
+         vdp2_settings.PNCN0.part.n0cnsm = settings->flip_function;
+         vdp2_settings.PNCN0.part.n0spr = settings->special_priority;
+         vdp2_settings.PNCN0.part.n0scc = settings->special_color_calc;
+         vdp2_settings.PNCN0.part.n0splt = settings->extra_palette_num;
+         vdp2_settings.PNCN0.part.n0scn = settings->extra_char_num;
       }
       else
          // 2 Words
-         vdp2settings.PNCN0.part.n0pnb = 0;
+         vdp2_settings.PNCN0.part.n0pnb = 0;
 
       // Pattern Name Control Register
-      VDP2_REG_PNCN0 = vdp2settings.PNCN0.all;
+      VDP2_REG_PNCN0 = vdp2_settings.PNCN0.all;
 
-      vdp2settings.PLSZ.part.rbplsz = settings->planesize & 0x3;
+      vdp2_settings.PLSZ.part.rbplsz = settings->plane_size & 0x3;
 
       // The following could probably be optimized
-      vdp2settings.MPABRB.part.rbmpa = settings->map[0];
-      vdp2settings.MPABRB.part.rbmpb = settings->map[1];
-      vdp2settings.MPCDRB.part.rbmpc = settings->map[2];
-      vdp2settings.MPCDRB.part.rbmpd = settings->map[3];
-      vdp2settings.MPEFRB.part.rbmpe = settings->map[4];
-      vdp2settings.MPEFRB.part.rbmpf = settings->map[5];
-      vdp2settings.MPGHRB.part.rbmpg = settings->map[6];
-      vdp2settings.MPGHRB.part.rbmph = settings->map[7];
-      vdp2settings.MPIJRB.part.rbmpi = settings->map[8];
-      vdp2settings.MPIJRB.part.rbmpj = settings->map[9];
-      vdp2settings.MPKLRB.part.rbmpk = settings->map[10];
-      vdp2settings.MPKLRB.part.rbmpl = settings->map[11];
-      vdp2settings.MPMNRB.part.rbmpm = settings->map[12];
-      vdp2settings.MPMNRB.part.rbmpn = settings->map[13];
-      vdp2settings.MPOPRB.part.rbmpo = settings->map[14];
-      vdp2settings.MPOPRB.part.rbmpp = settings->map[15];
-      VDP2_REG_MPABRB = vdp2settings.MPABRB.all;
-      VDP2_REG_MPCDRB = vdp2settings.MPCDRB.all;
-      VDP2_REG_MPEFRB = vdp2settings.MPEFRB.all;
-      VDP2_REG_MPGHRB = vdp2settings.MPGHRB.all;
-      VDP2_REG_MPIJRB = vdp2settings.MPIJRB.all;
-      VDP2_REG_MPKLRB = vdp2settings.MPKLRB.all;
-      VDP2_REG_MPMNRB = vdp2settings.MPMNRB.all;
-      VDP2_REG_MPOPRB = vdp2settings.MPOPRB.all;
+      vdp2_settings.MPABRB.part.rbmpa = settings->map[0];
+      vdp2_settings.MPABRB.part.rbmpb = settings->map[1];
+      vdp2_settings.MPCDRB.part.rbmpc = settings->map[2];
+      vdp2_settings.MPCDRB.part.rbmpd = settings->map[3];
+      vdp2_settings.MPEFRB.part.rbmpe = settings->map[4];
+      vdp2_settings.MPEFRB.part.rbmpf = settings->map[5];
+      vdp2_settings.MPGHRB.part.rbmpg = settings->map[6];
+      vdp2_settings.MPGHRB.part.rbmph = settings->map[7];
+      vdp2_settings.MPIJRB.part.rbmpi = settings->map[8];
+      vdp2_settings.MPIJRB.part.rbmpj = settings->map[9];
+      vdp2_settings.MPKLRB.part.rbmpk = settings->map[10];
+      vdp2_settings.MPKLRB.part.rbmpl = settings->map[11];
+      vdp2_settings.MPMNRB.part.rbmpm = settings->map[12];
+      vdp2_settings.MPMNRB.part.rbmpn = settings->map[13];
+      vdp2_settings.MPOPRB.part.rbmpo = settings->map[14];
+      vdp2_settings.MPOPRB.part.rbmpp = settings->map[15];
+      VDP2_REG_MPABRB = vdp2_settings.MPABRB.all;
+      VDP2_REG_MPCDRB = vdp2_settings.MPCDRB.all;
+      VDP2_REG_MPEFRB = vdp2_settings.MPEFRB.all;
+      VDP2_REG_MPGHRB = vdp2_settings.MPGHRB.all;
+      VDP2_REG_MPIJRB = vdp2_settings.MPIJRB.all;
+      VDP2_REG_MPKLRB = vdp2_settings.MPKLRB.all;
+      VDP2_REG_MPMNRB = vdp2_settings.MPMNRB.all;
+      VDP2_REG_MPOPRB = vdp2_settings.MPOPRB.all;
    }
 
-   VDP2_REG_PLSZ = vdp2settings.PLSZ.all;
+   VDP2_REG_PLSZ = vdp2_settings.PLSZ.all;
 
-   vdp2settings.BGON.part.nbg0transenab = settings->transparentbit;
+   vdp2_settings.BGON.part.nbg0_trans_enab = settings->transparent_bit;
 
    // Map offset Register
-   VDP2_REG_MPOFR = vdp2settings.MPOFR.all;
+   VDP2_REG_MPOFR = vdp2_settings.MPOFR.all;
 
    // Character Control Register
-   VDP2_REG_CHCTLA = vdp2settings.CHCTLA.all;
+   VDP2_REG_CHCTLA = vdp2_settings.CHCTLA.all;
 
    // Enable Screen
-   VDP2_REG_BGON = vdp2settings.BGON.all;
+   VDP2_REG_BGON = vdp2_settings.BGON.all;
 
    return VDP_ERR_OK;
 }
@@ -413,10 +413,10 @@ int vdp_rbg1_init(screen_settings_struct *settings)
 
 void vdp_rbg1_deinit(void)
 {
-   vdp2settings.BGON.part.rbg1enab = 0;
+   vdp2_settings.BGON.part.rbg1_enab = 0;
 
    // Disable Screen
-   VDP2_REG_BGON = vdp2settings.BGON.all;
+   VDP2_REG_BGON = vdp2_settings.BGON.all;
 }
 
 //////////////////////////////////////////////////////////////////////////////

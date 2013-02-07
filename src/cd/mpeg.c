@@ -1,4 +1,4 @@
-/*  Copyright 2006-2007 Theo Berkau
+/*  Copyright 2006-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -21,29 +21,29 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL IsMPEGCardPresent()
+BOOL is_mpeg_card_present()
 {
-   cdcmd_struct cdcmd;
-   cdcmd_struct cdcmdrs;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
 
-   cdcmd.CR1 = 0x0100;
-   cdcmd.CR2 = 0x0000;
-   cdcmd.CR3 = 0x0000;
-   cdcmd.CR4 = 0x0000;
+   cd_cmd.CR1 = 0x0100;
+   cd_cmd.CR2 = 0x0000;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
 
-   if (CDExecCommand(0, &cdcmd, &cdcmdrs) != LAPETUS_ERR_OK)
+   if (cd_exec_command(0, &cd_cmd, &cd_cmd_rs) != LAPETUS_ERR_OK)
       return FALSE;
 
    // Is MPEG card available?
-   if (((cdcmdrs.CR2 >> 8) & 0x02) == 0)
+   if (((cd_cmd_rs.CR2 >> 8) & 0x02) == 0)
    	   return FALSE;
    
    // Has MPEG card been authenticated?
-   if ((cdcmdrs.CR3 & 0xFF) == 0)
+   if ((cd_cmd_rs.CR3 & 0xFF) == 0)
    {
-       if (!BIOS_IsMpegCardPresent(0))
+       if (!bios_is_mpeg_card_present(0))
        {
-          if (!BIOS_IsMpegCardPresent(0))
+          if (!bios_is_mpeg_card_present(0))
           	  return FALSE;
        }
    }
@@ -52,24 +52,24 @@ BOOL IsMPEGCardPresent()
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL IsMPEGAuth()
+BOOL is_mpeg_auth()
 {
-   cdcmd_struct cdcmd;
-   cdcmd_struct cdcmdrs;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
 
-   cdcmd.CR1 = 0xE100;
-   cdcmd.CR2 = 0x0001;
-   cdcmd.CR3 = 0x0000;
-   cdcmd.CR4 = 0x0000;
+   cd_cmd.CR1 = 0xE100;
+   cd_cmd.CR2 = 0x0001;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
 
    // If command fails, assume it's not authenticated
-   if (CDExecCommand(0, &cdcmd, &cdcmdrs) != LAPETUS_ERR_OK)
+   if (cd_exec_command(0, &cd_cmd, &cd_cmd_rs) != LAPETUS_ERR_OK)
       return FALSE;
 
    // Disc type Authenticated:
    // 0x00: No MPEG Card/Not Authenticated
    // 0x02: Some kind of MPEG card
-   if (cdcmdrs.CR2 != 0x02)
+   if (cd_cmd_rs.CR2 != 0x02)
       return FALSE;
 
    return TRUE;
@@ -77,30 +77,30 @@ BOOL IsMPEGAuth()
 
 //////////////////////////////////////////////////////////////////////////////
 
-int MPEGAuth()
+int mpeg_auth()
 {
    int ret;
-   cdcmd_struct cdcmd;
-   cdcmd_struct cdcmdrs;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
    u16 auth;
 
    // Clear hirq flags
    CDB_REG_HIRQ = ~(HIRQ_MPED);
 
    // Authenticate disc
-   cdcmd.CR1 = 0xE000;
-   cdcmd.CR2 = 0x0001;
-   cdcmd.CR3 = 0x0000;
-   cdcmd.CR4 = 0x0000;
+   cd_cmd.CR1 = 0xE000;
+   cd_cmd.CR2 = 0x0001;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
 
-   if ((ret = CDExecCommand(HIRQ_EFLS, &cdcmd, &cdcmdrs)) != LAPETUS_ERR_OK)
+   if ((ret = cd_exec_command(HIRQ_EFLS, &cd_cmd, &cd_cmd_rs)) != LAPETUS_ERR_OK)
       return ret;
 
    // wait till operation is finished
    while (!(CDB_REG_HIRQ & HIRQ_MPED)) {}
 
    // Was Authentication successful?
-   if (!IsMPEGAuth(&auth))
+   if (!is_mpeg_auth(&auth))
       return -1;
 
    return LAPETUS_ERR_OK;
@@ -108,24 +108,24 @@ int MPEGAuth()
 
 //////////////////////////////////////////////////////////////////////////////
 
-int MPEGInit ()
+int mpeg_init ()
 {
    int ret;
-   cdcmd_struct cdcmd;
-   cdcmd_struct cdcmdrs;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
    screen_settings_struct settings;
 
    // Make sure MPEG card is authenticated
-   if (!IsMPEGAuth())
-      MPEGAuth();
+   if (!is_mpeg_auth())
+      mpeg_auth();
 
    // Now Initialize MPEG card
-   cdcmd.CR1 = 0x9300;
-   cdcmd.CR2 = 0x0001; // might have to change this
-   cdcmd.CR3 = 0x0000;
-   cdcmd.CR4 = 0x0000;
+   cd_cmd.CR1 = 0x9300;
+   cd_cmd.CR2 = 0x0001; // might have to change this
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
 
-   if ((ret = CDExecCommand(HIRQ_MPED, &cdcmd, &cdcmdrs)) != LAPETUS_ERR_OK)
+   if ((ret = cd_exec_command(HIRQ_MPED, &cd_cmd, &cd_cmd_rs)) != LAPETUS_ERR_OK)
       return ret;
 
    // Do a MPEG Set Mode here
@@ -135,24 +135,24 @@ int MPEGInit ()
    // Get MPEG Connection here
 
    // Enable the external audio through SCSP
-   SoundExternalAudioEnable(7, 7);
+   sound_external_audio_enable(7, 7);
 
    // Setup NBG1 as EXBG
-   settings.isbitmap = TRUE;
-   settings.bitmapsize = BG_BITMAP512x256;
-   settings.transparentbit = 0;
+   settings.is_bitmap = TRUE;
+   settings.bitmap_size = BG_BITMAP512x256;
+   settings.transparent_bit = 0;
    settings.color = BG_32786COLOR;
-   settings.specialpriority = 0;
-   settings.specialcolorcalc = 0;
-   settings.extrapalettenum = 0;
-   settings.mapoffset = 0;
+   settings.special_priority = 0;
+   settings.special_color_calc = 0;
+   settings.extra_palette_num = 0;
+   settings.map_offset = 0;
 
    return vdp_exbg_init(&settings);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int MpegPlay(file_struct *file)
+int mpeg_play(file_struct *file)
 {
    // Setup CD filters here
 
@@ -167,14 +167,14 @@ int MpegPlay(file_struct *file)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int MpegPause(file_struct *file)
+int mpeg_pause(file_struct *file)
 {
    return LAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int MpegStop(file_struct *file)
+int mpeg_stop(file_struct *file)
 {
    return LAPETUS_ERR_OK;
 }

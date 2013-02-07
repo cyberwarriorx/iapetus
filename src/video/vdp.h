@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -189,18 +189,18 @@ typedef struct
       struct 
       {
 	 u16 unused1:3;
-	 u16 rbg0transenab:1;
-	 u16 nbg3transenab:1;
-	 u16 nbg2transenab:1;
-	 u16 nbg1transenab:1;
-	 u16 nbg0transenab:1;
+	 u16 rbg0_trans_enab:1;
+	 u16 nbg3_trans_enab:1;
+	 u16 nbg2_trans_enab:1;
+	 u16 nbg1_trans_enab:1;
+	 u16 nbg0_trans_enab:1;
 	 u16 unused2:2;
-	 u16 rbg1enab:1;
-	 u16 rbg0enab:1;
-	 u16 nbg3enab:1;
-	 u16 nbg2enab:1;
-	 u16 nbg1enab:1;
-	 u16 nbg0enab:1;
+	 u16 rbg1_enab:1;
+	 u16 rbg0_enab:1;
+	 u16 nbg3_enab:1;
+	 u16 nbg2_enab:1;
+	 u16 nbg1_enab:1;
+	 u16 nbg0_enab:1;
       } part;
       u16 all;
    } BGON;
@@ -651,9 +651,9 @@ typedef struct
       struct 
       {
 	 u16 unused1:5;
-	 u16 nbg1priority:3;
+	 u16 nbg1_priority:3;
 	 u16 unused2:5;
-	 u16 nbg0priority:3;
+	 u16 nbg0_priority:3;
       } part;
       u16 all;
    } PRINA;
@@ -662,9 +662,9 @@ typedef struct
       struct 
       {
 	 u16 unused1:5;
-	 u16 nbg3priority:3;
+	 u16 nbg3_priority:3;
 	 u16 unused2:5;
-	 u16 nbg2priority:3;
+	 u16 nbg2_priority:3;
       } part;
       u16 all;
    } PRINB;
@@ -673,19 +673,19 @@ typedef struct
       struct 
       {
 	 u16 unused1:13;
-	 u16 rbg0priority:3;
+	 u16 rbg0_priority:3;
       } part;
       u16 all;
    } PRIR;
    u16 CLOFEN;
    u16 CLOFSL;
-   u32 patternnameaddr[4];
-   u32 charpatternaddr[4];
-   int patternnamecycles[4];
-   int charpatterncycles[4];
-   int screenwidth;
-   int screenheight;
-} vdp2settings_struct;
+   u32 pattern_name_addr[4];
+   u32 char_pattern_addr[4];
+   int pattern_name_cycles[4];
+   int char_pattern_cycles[4];
+   int screen_width;
+   int screen_height;
+} vdp2_settings_struct;
 
 #define ZP_NONE         0x0
 #define ZP_UPPERLEFT    0x5
@@ -734,25 +734,25 @@ enum RESNUM
 typedef struct
 {
    // bitmap specific
-   u8 bitmapsize;
+   u8 bitmap_size;
    // tile specific
-   u8 charsize;
-   u8 patternnamesize;
-   u8 planesize;
+   u8 char_size;
+   u8 pattern_name_size;
+   u8 plane_size;
    u8 map[16];
-   u8 flipfunction;
-   u8 extracharnum;
+   u8 flip_function;
+   u8 extra_char_num;
    // used by both bitmap and tile 
-   u8 transparentbit;
+   u8 transparent_bit;
    u8 color;
-   u8 isbitmap;
-   u8 specialpriority;
-   u8 specialcolorcalc;
-   u8 extrapalettenum;
-   u8 mapoffset;
+   u8 is_bitmap;
+   u8 special_priority;
+   u8 special_color_calc;
+   u8 extra_palette_num;
+   u8 map_offset;
    // rotation specific
-   u8 rotationmode;
-   u32 parameteraddr;
+   u8 rotation_mode;
+   u32 parameter_addr;
 } screen_settings_struct;
 
 enum SCREENNUM
@@ -867,8 +867,8 @@ typedef struct
 
 typedef struct
 {
-   u16 cmdctrl;
-   u16 cmdlink;
+   u16 cmd_ctrl;
+   u16 cmd_link;
    union
    {
       struct
@@ -882,24 +882,24 @@ typedef struct
          u16 mesh:1;
          u16 ecd:1;
          u16 spd:1;
-         u16 colormode:3;
-         u16 colorcalc:3;
+         u16 color_mode:3;
+         u16 color_calc:3;
       } part;
       u16 all;
-   } cmdpmod;
-   u16 cmdcolr;
-   u16 cmdsrca;
-   u16 cmdsize;
-   u16 cmdxa;
-   u16 cmdya;
-   u16 cmdxb;
-   u16 cmdyb;
-   u16 cmdxc;
-   u16 cmdyc;
-   u16 cmdxd;
-   u16 cmdyd;
-   u16 cmdgrda;
-   u16 cmdunused;
+   } cmd_pmod;
+   u16 cmd_colr;
+   u16 cmd_srca;
+   u16 cmd_size;
+   u16 cmd_xa;
+   u16 cmd_ya;
+   u16 cmd_xb;
+   u16 cmd_yb;
+   u16 cmd_xc;
+   u16 cmd_yc;
+   u16 cmd_xd;
+   u16 cmd_yd;
+   u16 cmd_grda;
+   u16 cmd_unused;
 } vdp1cmd_struct;
 
 typedef struct
@@ -920,9 +920,9 @@ typedef struct
    s16 y4;
 } sprite_struct;
 
-extern volatile u16 *vdp1ram;
-extern volatile u16 *vdp2ram;
-extern volatile u16 *vdp2cram;
+extern volatile u16 *vdp1_ram;
+extern volatile u16 *vdp2_ram;
+extern volatile u16 *vdp2_cram;
 
 void vdp_init(int res);
 void vdp_set_priority(int screen, u8 priority);

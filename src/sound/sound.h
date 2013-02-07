@@ -1,4 +1,4 @@
-/*  Copyright 2006-2007 Theo Berkau
+/*  Copyright 2006-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -31,10 +31,10 @@
 #define SCSP_REG_SCILV1 (*(volatile u8 *)0x25B00426)
 #define SCSP_REG_SCILV2 (*(volatile u8 *)0x25B00428)
 
-#define SoundKeyOffAll() (*(volatile u8 *)(0x25B00000) = 0x10)
+#define sound_key_off_all() (*(volatile u8 *)(0x25B00000) = 0x10)
 
-void SoundInit(void);
-void SoundLoadDriver(u8 *data, u32 size);
-void SoundExternalAudioEnable(u8 vol_l, u8 vol_r);
+void sound_init(void);
+void sound_load_driver(u8 *data, u32 size);
+void sound_external_audio_enable(u8 vol_l, u8 vol_r);
 
 #endif

@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -27,12 +27,12 @@
 #define SCUREG_PDA   (*(volatile u32 *)0x25FE0088)
 #define SCUREG_PDD   (*(volatile u32 *)0x25FE008C)
 
-int DSPLoad(u32 *program, u8 offset, u8 size);
-void DSPExec(u8 PC);
-int DSPIsExec();
-void DSPStop();
-void DSPPause();
-void DSPUnPause();
-void DSPStep();
+int dsp_load(u32 *program, u8 offset, u8 size);
+void dsp_exec(u8 PC);
+int dsp_is_exec();
+void dsp_stop();
+void dsp_pause();
+void dsp_unpause();
+void dsp_step();
 
 #endif

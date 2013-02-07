@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -38,7 +38,7 @@ enum INTMASK
    MASK_DRAWEND = 0x00002000
 };
 
-void InterruptSetLevelMask(u32 imask);
-u32 InterruptGetLevelMask(void);
+void interrupt_set_level_mask(u32 imask);
+u32 interrupt_get_level_mask(void);
 
 #endif

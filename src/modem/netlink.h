@@ -1,4 +1,4 @@
-/*  Copyright 2006 Theo Berkau
+/*  Copyright 2006,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -38,71 +38,71 @@
 #define MSR_RI                  0x40
 #define MSR_CD                  0x80
 
-void WriteUART(u8 num, u8 val);
-u8 ReadUART(u8 num);
-int NetlinkInit();
-void NetlinkTransmitCharacter(u8 val);
-void NetlinkTransmitString(const char *string);
-int NetlinkReceiveCharacter(u8 *data);
+void write_uart(u8 num, u8 val);
+u8 read_uart(u8 num);
+int netlink_init();
+void netlink_transmit_character(u8 val);
+void netlink_transmit_string(const char *string);
+int netlink_receive_character(u8 *data);
 
-#define ReadRBR() ReadUART(0x0)
-#define WriteTHR(n) WriteUART(0x0, n)
+#define read_rbr() read_uart(0x0)
+#define write_thr(n) write_uart(0x0, n)
 
-#define ReadIER() ReadUART(0x1)
-#define WriteIER(n) WriteUART(0x1, n)
+#define read_ier() read_uart(0x1)
+#define write_ier(n) write_uart(0x1, n)
 
-#define ReadIIR() ReadUART(0x2)
-#define WriteFCR(n) WriteUART(0x2, n)
+#define read_iir() read_uart(0x2)
+#define write_fcr(n) write_uart(0x2, n)
 
-#define ReadLCR() ReadUART(0x3)
-#define WriteLCR(n) WriteUART(0x3, n)
+#define read_lcr() read_uart(0x3)
+#define write_lcr(n) write_uart(0x3, n)
 
-#define ReadMCR() ReadUART(0x4)
-#define WriteMCR(n) WriteUART(0x4, n)
+#define read_mcr() read_uart(0x4)
+#define write_mcr(n) write_uart(0x4, n)
 
-#define ReadLSR() ReadUART(0x5)
+#define read_lsr() read_uart(0x5)
 
-#define ReadMSR() ReadUART(0x6)
+#define read_msr() read_uart(0x6)
 
-#define ReadSCR() ReadUART(0x7)
-#define WriteSCR(n) WriteUART(0x7, n)
+#define read_scr() read_uart(0x7)
+#define write_scr(n) write_uart(0x7, n)
 
 static inline u8 ReadDLL()
 {
     u8 oldlcr;
     u8 ret;
-    oldlcr = ReadLCR();
-    WriteLCR(oldlcr | 0x80);
-    ret = ReadUART(0x0);
-    WriteLCR(oldlcr);
+    oldlcr = read_lcr();
+    write_lcr(oldlcr | 0x80);
+    ret = read_uart(0x0);
+    write_lcr(oldlcr);
     return ret;
 }
-static inline void WriteDLL(u8 val)
+static inline void write_dll(u8 val)
 {
     u8 oldlcr;
-    oldlcr = ReadLCR();
-    WriteLCR(oldlcr | 0x80);
-    WriteUART(0x0, val);
-    WriteLCR(oldlcr);
+    oldlcr = read_lcr();
+    write_lcr(oldlcr | 0x80);
+    write_uart(0x0, val);
+    write_lcr(oldlcr);
 }
 
-static inline u8 ReadDLM()
+static inline u8 read_dlm()
 {
     u8 oldlcr;
     u8 ret;
-    oldlcr = ReadLCR();
-    WriteLCR(oldlcr | 0x80);
-    ret = ReadUART(0x1);
-    WriteLCR(oldlcr);
+    oldlcr = read_lcr();
+    write_lcr(oldlcr | 0x80);
+    ret = read_uart(0x1);
+    write_lcr(oldlcr);
     return ret;
 }
-static inline void WriteDLM(u8 val)
+static inline void write_dlm(u8 val)
 {
     u8 oldlcr;
-    oldlcr = ReadLCR();
-    WriteLCR(oldlcr | 0x80);
-    WriteUART(0x1, val);
-    WriteLCR(oldlcr);
+    oldlcr = read_lcr();
+    write_lcr(oldlcr | 0x80);
+    write_uart(0x1, val);
+    write_lcr(oldlcr);
 }
 
 #endif

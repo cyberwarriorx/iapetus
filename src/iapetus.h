@@ -31,6 +31,7 @@
 #include "modem/netlink.h"
 #include "peripherals/smpc.h"
 #include "scu/dsp.h"
+#include "scu/scudma.h"
 #include "sh2/sh2dma.h"
 #include "sh2/sh2int.h"
 #include "sh2/sci.h"
@@ -41,7 +42,7 @@
 #include "ui/text.h"
 #include "video/vdp.h"
 
-void InitIapetus(int res);
+void init_iapetus(int res);
 
 #define LAPETUS_ERR_OK                  0       // Everything is good
 #define LAPETUS_ERR_COMM                -1      // Communication error

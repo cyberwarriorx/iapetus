@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007, 2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -37,9 +37,9 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-int Sh2DMAInit(void)
+int sh2_dma_init(void)
 {
-   Sh2DMAStopAll();
+   sh2_dma_stop_all();
    CHCR0 = 0;
    CHCR1 = 0;
 
@@ -48,7 +48,7 @@ int Sh2DMAInit(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int Sh2DMAStart(int chan, void *src, void *dst, u32 size, u32 mode)
+int sh2_dma_start(int chan, void *src, void *dst, u32 size, u32 mode)
 {
    if (chan == 0)
    {
@@ -86,7 +86,7 @@ int Sh2DMAStart(int chan, void *src, void *dst, u32 size, u32 mode)
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL IsSh2DMARunning(int chan)
+BOOL is_sh2_dma_running(int chan)
 {
 //   if (DMAOR & 0x1)
    {
@@ -102,7 +102,7 @@ BOOL IsSh2DMARunning(int chan)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void Sh2DMAStopAll(void)
+void sh2_dma_stop_all(void)
 {
    DMAOR = DMAOR & 0xE;
 }

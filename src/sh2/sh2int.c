@@ -21,7 +21,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void InterruptSetLevelMask(u32 imask)
+void interrupt_set_level_mask(u32 imask)
 {
    u32 sr;
 
@@ -34,7 +34,7 @@ void InterruptSetLevelMask(u32 imask)
 
 //////////////////////////////////////////////////////////////////////////////
 
-u32 InterruptGetLevelMask(void)
+u32 interrupt_get_level_mask(void)
 {
    u32 sr;
 

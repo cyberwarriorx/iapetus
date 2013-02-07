@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -23,7 +23,7 @@ typedef struct
 {
    u32 lba;
    u32 size;
-   u32 sectpos;
+   u32 sect_pos;
    u32 pos;
 } file_struct;
 
@@ -34,10 +34,10 @@ enum SEEKTYPES
    CDFS_SEEK_END = 2
 };
 
-int CDFSInit(void *workdirtbl, int size);
-int CDFSOpen(const char *path, file_struct *file);
-int CDFSSeek(file_struct *file, int offset, int seek_type);
-int CDFSRead(u8 *buffer, int size, int num, file_struct *file);
-int CDFSClose(file_struct *file);
+int cdfs_init(void *work_dir_tbl, int size);
+int cdfs_open(const char *path, file_struct *file);
+int cdfs_seek(file_struct *file, int offset, int seek_type);
+int cdfs_read(u8 *buffer, int size, int num, file_struct *file);
+int cdfs_close(file_struct *file);
 
 #endif

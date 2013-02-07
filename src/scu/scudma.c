@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -56,9 +56,9 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-int ScuDMAInit(void)
+int scu_dma_init(void)
 {
-   ScuDMAStopAll();
+   scu_dma_stop_all();
    SCUREG_D0EN = 0;
    SCUREG_D1EN = 0;
    SCUREG_D2EN = 0;
@@ -68,7 +68,7 @@ int ScuDMAInit(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int ScuDMAStart(int chan, void *src, void *dst, u32 size, u32 add, u32 mode)
+int scu_dma_start(int chan, void *src, void *dst, u32 size, u32 add, u32 mode)
 {
    // Check first to make sure the channel has no pending DMA operation going
    switch (chan)
@@ -136,7 +136,7 @@ int ScuDMAStart(int chan, void *src, void *dst, u32 size, u32 add, u32 mode)
 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL IsScuDMARunning(int chan)
+BOOL is_scu_dma_running(int chan)
 {
    switch (chan)
    {
@@ -152,7 +152,7 @@ BOOL IsScuDMARunning(int chan)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void ScuDMAStopAll(void)
+void scu_dma_stop_all(void)
 {
    SCUREG_DSTP = 1;
 }

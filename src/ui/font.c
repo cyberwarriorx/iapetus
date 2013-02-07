@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -19,11 +19,11 @@
 
 #include "../iapetus.h"
 
-extern vdp2settings_struct vdp2settings;
+extern vdp2_settings_struct vdp2_settings;
 
 //////////////////////////////////////////////////////////////////////////////
 
-int DrawCharVdp1(font_struct *font, int x, int y, int color, int charnum)
+int draw_char_vdp1(font_struct *font, int x, int y, int color, int charnum)
 {
    sprite_struct sprite;
    u32 src = (u32)font->out + (charnum * font->charsize);
@@ -44,7 +44,7 @@ int DrawCharVdp1(font_struct *font, int x, int y, int color, int charnum)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int DrawCharBitmap1bppTo8bpp(font_struct *font, int x, int y, int color, int charnum)
+int draw_char_bitmap_1bpp_to_8bpp(font_struct *font, int x, int y, int color, int charnum)
 {
    int i, i2;
    u8 *src = font->data + (charnum * font->charsize);
@@ -70,7 +70,7 @@ int DrawCharBitmap1bppTo8bpp(font_struct *font, int x, int y, int color, int cha
 
 //////////////////////////////////////////////////////////////////////////////
 
-int VdpSetFont(int screen, font_struct *font, int transparent)
+int vdp_set_font(int screen, font_struct *font, int transparent)
 {
    int i;
 
@@ -83,27 +83,27 @@ int VdpSetFont(int screen, font_struct *font, int transparent)
       font->lineinc = font->width;
 
       for (i = 0; i < 128; i++)
-         DrawCharBitmap1bppTo8bpp(font, 0, i * font->height, 1, i);
-      font->drawchar = DrawCharVdp1;
+         draw_char_bitmap_1bpp_to_8bpp(font, 0, i * font->height, 1, i);
+      font->drawchar = draw_char_vdp1;
    }
    else
    {
       font->lineinc = 512; // fix me(should be detected)
-      font->drawchar = DrawCharBitmap1bppTo8bpp;
+      font->drawchar = draw_char_bitmap_1bpp_to_8bpp;
       font->out = (u8 *)0x25E00000;
       switch (screen)
       {
          case SCREEN_NBG0:
-            font->out += ((u32)vdp2settings.MPOFN.part.n0mp << 17);
+            font->out += ((u32)vdp2_settings.MPOFN.part.n0mp << 17);
             break;
          case SCREEN_NBG1:
-            font->out += ((u32)vdp2settings.MPOFN.part.n1mp << 17);
+            font->out += ((u32)vdp2_settings.MPOFN.part.n1mp << 17);
             break;
          case SCREEN_NBG2:
-            font->out += ((u32)vdp2settings.MPOFN.part.n2mp << 17);
+            font->out += ((u32)vdp2_settings.MPOFN.part.n2mp << 17);
             break;
          case SCREEN_NBG3:
-            font->out += ((u32)vdp2settings.MPOFN.part.n3mp << 17);
+            font->out += ((u32)vdp2_settings.MPOFN.part.n3mp << 17);
             break;
          default: break;
       }      
@@ -117,9 +117,9 @@ int VdpSetFont(int screen, font_struct *font, int transparent)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int VdpSetDefaultFont(int screen, font_struct *font)
+int vdp_set_default_font(int screen, font_struct *font)
 {
-   font->data = font8x16;
+   font->data = font_8x16;
    font->width = 8;
    font->height = 16;
    font->bpp = 1;
@@ -129,7 +129,7 @@ int VdpSetDefaultFont(int screen, font_struct *font)
    else
       font->out = (u8 *)0x25E00000;
 
-   return VdpSetFont(screen, font, 0);
+   return vdp_set_font(screen, font, 0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

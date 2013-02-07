@@ -6,6 +6,8 @@ CD Block
 ---------
 -Add CD file system support. That way people can easily opening files by
  passing a string to a simple function.
+-Finish adding filter subheader conditions
+-Setup newlib connections
 
 Backup Ram
 -----------
@@ -26,6 +28,7 @@ SCSP
 SMPC
 -----
 -Only standard pad, keyboard and mouse support have been added.
+-Need to rework intback so code is tighter
 
 SCU DSP
 --------

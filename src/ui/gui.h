@@ -1,4 +1,4 @@
-/*  Copyright 2006-2008 Theo Berkau
+/*  Copyright 2006-2008,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -34,18 +34,18 @@ typedef struct
 {
    s8 name[26];
    void (*func)();
-} menuitem_struct;
+} menu_item_struct;
 
 #define MTYPE_LEFTALIGN         0x00000000
 #define MTYPE_CENTER            0x00000001
 #define MTYPE_RIGHTALIGN        0x00000002
 
-int GuiDoMenu(menuitem_struct *menu, font_struct *font, int x, int y, const char *title, int flags, int num_lines);
+int gui_do_menu(menu_item_struct *menu, font_struct *font, int x, int y, const char *title, int flags, int num_lines);
 int MessageBox(const char *header, const char *body, int type);
-void GuiClearScr(font_struct *font);
+void gui_clear_scr(font_struct *font);
 
-void GuiWindowInit(void);
-void GuiWindowDraw(int x, int y, int width, int height, u16 fgcolor, u16 bgcolor);
+void gui_window_init(void);
+void gui_window_draw(int x, int y, int width, int height, u16 fgcolor, u16 bgcolor);
 
 extern font_struct testdispfont;
 

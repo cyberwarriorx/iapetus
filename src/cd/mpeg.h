@@ -1,4 +1,4 @@
-/*  Copyright 2006 Theo Berkau
+/*  Copyright 2006,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -23,14 +23,14 @@
 typedef struct
 {
    u8 status;
-   u8 playstatus;
-   u16 vcounter;
-   u8 pictureinfo;
-   u8 mpegaudiostatus;
-   u16 mpegvideostatus;
+   u8 play_status;
+   u16 v_counter;
+   u8 picture_info;
+   u8 mpeg_audio_status;
+   u16 mpeg_video_status;
 } mpegstat_struct;
 
-BOOL IsMPEGCardPresent();
-int IsMPEGAuth();
-int MPEGAuth();
+BOOL is_mpeg_card_present();
+int is_mpeg_auth();
+int mpeg_auth();
 #endif

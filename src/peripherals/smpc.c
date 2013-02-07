@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -20,33 +20,33 @@
 #include <string.h>
 #include "../iapetus.h"
 
-perdata_struct per[MAX_PERIPHERALS];
+per_data_struct per[MAX_PERIPHERALS];
 
 static u16 oldperpush[MAX_PERIPHERALS]; // fix me
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SmpcCommand (u8 cmd)
+void smpc_command (u8 cmd)
 {
-   SmpcWaitTillReady();
-   SmpcIssueCommand(cmd);
+   smpc_wait_till_ready();
+   smpc_issue_command(cmd);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void perhandler(void)
+void per_handler(void)
 {
    // Issue Intback command(we only want peripheral data)
-   SmpcWaitTillReady();
+   smpc_wait_till_ready();
    SMPC_REG_IREG(0) = 0x00; // no intback status
    SMPC_REG_IREG(1) = 0x0A; // 15-byte mode, peripheral data returned, time optimized
    SMPC_REG_IREG(2) = 0xF0; // ???
-   SmpcIssueCommand(SMPC_CMD_INTBACK);
+   smpc_issue_command(SMPC_CMD_INTBACK);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void smpchandler()
+void smpc_handler()
 {
    /* Port Status:
    0x04 - Sega-tap is connected
@@ -82,25 +82,25 @@ void smpchandler()
    etc.
    */
 
-   u16 perdata;
-   u8 portcon;
-   u8 perid;
-   u8 oregcounter=0;
-   u8 percounter=0;
+   u16 per_data;
+   u8 port_con;
+   u8 per_id;
+   u8 oreg_counter=0;
+   u8 per_counter=0;
    int i, i2;
 
    // See what is actually connected to Port 1/2
    for (i2 = 0; i2 < 2; i2++)
    {
-      portcon = SMPC_REG_OREG(oregcounter);
-      oregcounter++;
+      port_con = SMPC_REG_OREG(oreg_counter);
+      oreg_counter++;
 
-      if ((portcon & 0xF0) != 0x20)
+      if ((port_con & 0xF0) != 0x20)
       {
-         for (i = 0; i < (portcon & 0x0F); i++)
+         for (i = 0; i < (port_con & 0x0F); i++)
          {
-            per[i+percounter].id = perid = SMPC_REG_OREG(oregcounter);
-            oregcounter++;
+            per[i+per_counter].id = per_id = SMPC_REG_OREG(oreg_counter);
+            oreg_counter++;
 
 //            if (perid == 0x02)
 //            {
@@ -110,90 +110,90 @@ void smpchandler()
 //            }
 //            else
 //               oregcounter += (perid & 0xF);
-            switch (perid >> 4)
+            switch (per_id >> 4)
             {
                case 0x0: // Standard Pad type
                case 0x1: // Analog type(Racing wheel/Analog pad)
                case 0x3: // Keyboard type
                {
-                  oldperpush[i+percounter] = per[i+percounter].butpush;
-                  perdata = (SMPC_REG_OREG(oregcounter) << 8) | SMPC_REG_OREG(oregcounter+1);
-                  oregcounter += 2;
+                  oldperpush[i+per_counter] = per[i+per_counter].but_push;
+                  per_data = (SMPC_REG_OREG(oreg_counter) << 8) | SMPC_REG_OREG(oreg_counter+1);
+                  oreg_counter += 2;
 
-                  switch (perid & 0xF)
+                  switch (per_id & 0xF)
                   {
                      case 0x3: // Racing
-                        oregcounter += 1;
+                        oreg_counter += 1;
                         break;
                      case 0x4: // Keyboard
-                        ((keyboarddata_struct *)per)[i+percounter].kbdtype = perdata & 0x7;
-                        perdata |= 0x7;
-                        ((keyboarddata_struct *)per)[i+percounter].flags = SMPC_REG_OREG(oregcounter);
-                        ((keyboarddata_struct *)per)[i+percounter].key = SMPC_REG_OREG(oregcounter+1);
-                        if (((keyboarddata_struct *)per)[i+percounter].flags != 0x6)
+                        ((keyboarddata_struct *)per)[i+per_counter].kbd_type = per_data & 0x7;
+                        per_data |= 0x7;
+                        ((keyboarddata_struct *)per)[i+per_counter].flags = SMPC_REG_OREG(oreg_counter);
+                        ((keyboarddata_struct *)per)[i+per_counter].key = SMPC_REG_OREG(oreg_counter+1);
+                        if (((keyboarddata_struct *)per)[i+per_counter].flags != 0x6)
                         {
-                           if (((keyboarddata_struct *)per)[i+percounter].key == KEY_LEFTSHIFT ||
-                               ((keyboarddata_struct *)per)[i+percounter].key == KEY_RIGHTSHIFT)
-                                 ((keyboarddata_struct *)per)[i+percounter].extrastate[0] = (((keyboarddata_struct *)per)[i+percounter].flags >> 3) & 0x1;
+                           if (((keyboarddata_struct *)per)[i+per_counter].key == KEY_LEFTSHIFT ||
+                               ((keyboarddata_struct *)per)[i+per_counter].key == KEY_RIGHTSHIFT)
+                                 ((keyboarddata_struct *)per)[i+per_counter].extra_state[0] = (((keyboarddata_struct *)per)[i+per_counter].flags >> 3) & 0x1;
                         }
-                        oregcounter += 2;
+                        oreg_counter += 2;
                         break;
                      case 0x5: // Analog Pad
-                        oregcounter += 3;
+                        oreg_counter += 3;
                         break;
                      default: break;
                   }
 
-                  per[i+percounter].butpush = perdata ^ 0xFFFF;
-                  per[i+percounter].butpushonce = (oldperpush[i+percounter] ^ per[i+percounter].butpush) & per[i+percounter].butpush;
+                  per[i+per_counter].but_push = per_data ^ 0xFFFF;
+                  per[i+per_counter].but_push_once = (oldperpush[i+per_counter] ^ per[i+per_counter].but_push) & per[i+per_counter].but_push;
 
                   break;
                }
                case 0x2: // Pointer type(Mouse/Gun)
                case 0xE: // Other type(Mega Drive 3/6 button pads/Shuttle Mouse)
                {
-                  switch (perid & 0xF)
+                  switch (per_id & 0xF)
                   {
                      case 0x2: // Mega Drive 6-button Pad
                      case 0x1: // Mega Drive 3-button Pad
                         break;
                      case 0x3: // Saturn/Shuttle Mouse
                      {
-                        perdata = SMPC_REG_OREG(oregcounter);
-                        per[i+percounter].butpush = (perdata & 0xF) << 8; // fix me
-                        per[i+percounter].butpushonce = (oldperpush[i+percounter] ^ per[i+percounter].butpush) & per[i+percounter].butpush;
-                        ((mousedata_struct *)per)[i+percounter].flags = perdata >> 4;
+                        per_data = SMPC_REG_OREG(oreg_counter);
+                        per[i+per_counter].but_push = (per_data & 0xF) << 8; // fix me
+                        per[i+per_counter].but_push_once = (oldperpush[i+per_counter] ^ per[i+per_counter].but_push) & per[i+per_counter].but_push;
+                        ((mousedata_struct *)per)[i+per_counter].flags = per_data >> 4;
 
-                        ((mousedata_struct *)per)[i+percounter].x = SMPC_REG_OREG(oregcounter+1);
-                        ((mousedata_struct *)per)[i+percounter].y = SMPC_REG_OREG(oregcounter+2);
+                        ((mousedata_struct *)per)[i+per_counter].x = SMPC_REG_OREG(oreg_counter+1);
+                        ((mousedata_struct *)per)[i+per_counter].y = SMPC_REG_OREG(oreg_counter+2);
 
                         // X Overflow
-                        if (((mousedata_struct *)per)[i+percounter].flags & 0x4)
-                           ((mousedata_struct *)per)[i+percounter].x++;
+                        if (((mousedata_struct *)per)[i+per_counter].flags & 0x4)
+                           ((mousedata_struct *)per)[i+per_counter].x++;
 
                         // X Sign
-                        if (((mousedata_struct *)per)[i+percounter].flags & 0x1)
-                           ((mousedata_struct *)per)[i+percounter].x = 0 - ((mousedata_struct *)per)[i+percounter].x - 1;
+                        if (((mousedata_struct *)per)[i+per_counter].flags & 0x1)
+                           ((mousedata_struct *)per)[i+per_counter].x = 0 - ((mousedata_struct *)per)[i+per_counter].x - 1;
 
                         // Y Overflow
-                        if (((mousedata_struct *)per)[i+percounter].flags & 0x8)
-                           ((mousedata_struct *)per)[i+percounter].y++;
+                        if (((mousedata_struct *)per)[i+per_counter].flags & 0x8)
+                           ((mousedata_struct *)per)[i+per_counter].y++;
 
                         // Y Sign
-                        if (((mousedata_struct *)per)[i+percounter].flags & 0x2)
-                           ((mousedata_struct *)per)[i+percounter].y = 0 - ((mousedata_struct *)per)[i+percounter].y - 1;
+                        if (((mousedata_struct *)per)[i+per_counter].flags & 0x2)
+                           ((mousedata_struct *)per)[i+per_counter].y = 0 - ((mousedata_struct *)per)[i+per_counter].y - 1;
 
                         break;
                      }
                      default: break;
                   }
 
-                  oregcounter += (perid & 0xF);
+                  oreg_counter += (per_id & 0xF);
                   break;
                }
                default: break;
             }
-            percounter++;
+            per_counter++;
          }
       }
    }
@@ -204,27 +204,27 @@ void smpchandler()
 
 //////////////////////////////////////////////////////////////////////////////
 
-void PerInit()
+void per_init()
 {
    // Make sure vblank-out's and SMPC's interrupts are disabled
-   BIOS_ChangeSCUInterruptMask(0xFFFFFFF, MASK_VBLANKOUT | MASK_SYSTEMMANAGER);
+   bios_change_scu_interrupt_mask(0xFFFFFFF, MASK_VBLANKOUT | MASK_SYSTEMMANAGER);
 
    SMPC_REG_DDR1 = 0;
    SMPC_REG_EXLE = 0;
    SMPC_REG_IOSEL = 0; // Set both ports to SMPC control mode
 
    // Add our vblank-out interrupt
-   BIOS_SetSCUInterrupt(0x41, perhandler);
+   bios_set_scu_interrupt(0x41, per_handler);
 
    // Add our SMPC interrupt
-   BIOS_SetSCUInterrupt(0x47, smpchandler);
+   bios_set_scu_interrupt(0x47, smpc_handler);
 
    // Clear internal variables
    memset(oldperpush, 0, MAX_PERIPHERALS * sizeof(u16));
-   memset(per, 0, sizeof(perdata_struct) * MAX_PERIPHERALS);
+   memset(per, 0, sizeof(per_data_struct) * MAX_PERIPHERALS);
 
    // Unmask vblank-out interrupt
-   BIOS_ChangeSCUInterruptMask(~(MASK_VBLANKOUT | MASK_SYSTEMMANAGER), 0);
+   bios_change_scu_interrupt_mask(~(MASK_VBLANKOUT | MASK_SYSTEMMANAGER), 0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

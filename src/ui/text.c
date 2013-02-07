@@ -1,4 +1,4 @@
-/*  Copyright 2006-2007 Theo Berkau
+/*  Copyright 2006-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -24,11 +24,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-extern vdp2settings_struct vdp2settings;
+extern vdp2_settings_struct vdp2_settings;
 
 //////////////////////////////////////////////////////////////////////////////
 
-void VdpPrintText(font_struct *font, int x, int y, int color, const char *text)
+void vdp_print_text(font_struct *font, int x, int y, int color, const char *text)
 {
    int i;
    int length = strlen(text);
@@ -39,20 +39,20 @@ void VdpPrintText(font_struct *font, int x, int y, int color, const char *text)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void VdpPrintf(font_struct *font, int x, int y, int color, char *format, ...)
+void vdp_printf(font_struct *font, int x, int y, int color, char *format, ...)
 {
    char string[256]; // I hope that's enough
    va_list arg;
 
    va_start(arg, format);
    vsprintf(string, format, arg);
-   VdpPrintText(font, x, y, color, string);
+   vdp_print_text(font, x, y, color, string);
    va_end(arg);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void VdpClearScreen(font_struct *font)
+void vdp_clear_screen(font_struct *font)
 {
    int i;
 

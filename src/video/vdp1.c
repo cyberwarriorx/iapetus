@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -21,47 +21,47 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-int commandnum=0;
+int command_num=0;
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_system_clipping(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0009;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdxc = sprite->x;
-   tbl->cmdyc = sprite->y;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0009;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_xc = sprite->x;
+   tbl->cmd_yc = sprite->y;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_user_clipping(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0008;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdxc = sprite->x2;
-   tbl->cmdyc = sprite->y2;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0008;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_xc = sprite->x2;
+   tbl->cmd_yc = sprite->y2;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_local_coordinate(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x000A;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x000A;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   command_num++;
 }
 
 
@@ -69,142 +69,142 @@ void vdp_local_coordinate(sprite_struct *sprite)
 
 void vdp_draw_normal_sprite(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0000;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdpmod.all = (u16)sprite->attr;
-   tbl->cmdcolr = sprite->bank;
-   tbl->cmdsrca = sprite->addr / 8;
-   tbl->cmdsize = ((sprite->width / 8) << 8) | sprite->height;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdgrda = sprite->gouraud_addr / 8;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0000;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_pmod.all = (u16)sprite->attr;
+   tbl->cmd_colr = sprite->bank;
+   tbl->cmd_srca = sprite->addr / 8;
+   tbl->cmd_size = ((sprite->width / 8) << 8) | sprite->height;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_grda = sprite->gouraud_addr / 8;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_draw_scaled_sprite(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0001;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdpmod.all = (u16)sprite->attr;
-   tbl->cmdcolr = sprite->bank;
-   tbl->cmdsrca = sprite->addr / 8;
-   tbl->cmdsize = ((sprite->width / 8) << 8) | sprite->height;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdxb = sprite->x2;
-   tbl->cmdyb = sprite->y2;
-   tbl->cmdxc = sprite->x3;
-   tbl->cmdyc = sprite->y3;
-   tbl->cmdxd = sprite->x4;
-   tbl->cmdyd = sprite->y4;
-   tbl->cmdgrda = sprite->gouraud_addr / 8;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0001;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_pmod.all = (u16)sprite->attr;
+   tbl->cmd_colr = sprite->bank;
+   tbl->cmd_srca = sprite->addr / 8;
+   tbl->cmd_size = ((sprite->width / 8) << 8) | sprite->height;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_xb = sprite->x2;
+   tbl->cmd_yb = sprite->y2;
+   tbl->cmd_xc = sprite->x3;
+   tbl->cmd_yc = sprite->y3;
+   tbl->cmd_xd = sprite->x4;
+   tbl->cmd_yd = sprite->y4;
+   tbl->cmd_grda = sprite->gouraud_addr / 8;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_draw_distorted_sprite(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0002;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdpmod.all = (u16)sprite->attr;
-   tbl->cmdcolr = sprite->bank;
-   tbl->cmdsrca = sprite->addr / 8;
-   tbl->cmdsize = ((sprite->width / 8) << 8) | sprite->height;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdxb = sprite->x2;
-   tbl->cmdyb = sprite->y2;
-   tbl->cmdxc = sprite->x3;
-   tbl->cmdyc = sprite->y3;
-   tbl->cmdxd = sprite->x4;
-   tbl->cmdyd = sprite->y4;
-   tbl->cmdgrda = sprite->gouraud_addr / 8;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0002;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_pmod.all = (u16)sprite->attr;
+   tbl->cmd_colr = sprite->bank;
+   tbl->cmd_srca = sprite->addr / 8;
+   tbl->cmd_size = ((sprite->width / 8) << 8) | sprite->height;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_xb = sprite->x2;
+   tbl->cmd_yb = sprite->y2;
+   tbl->cmd_xc = sprite->x3;
+   tbl->cmd_yc = sprite->y3;
+   tbl->cmd_xd = sprite->x4;
+   tbl->cmd_yd = sprite->y4;
+   tbl->cmd_grda = sprite->gouraud_addr / 8;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_draw_polygon(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0004;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdpmod.all = (u16)sprite->attr | 0xC0 ;
-   tbl->cmdcolr = sprite->bank;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdxb = sprite->x2;
-   tbl->cmdyb = sprite->y2;
-   tbl->cmdxc = sprite->x3;
-   tbl->cmdyc = sprite->y3;
-   tbl->cmdxd = sprite->x4;
-   tbl->cmdyd = sprite->y4;
-   tbl->cmdgrda = sprite->gouraud_addr / 8;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0004;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_pmod.all = (u16)sprite->attr | 0xC0 ;
+   tbl->cmd_colr = sprite->bank;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_xb = sprite->x2;
+   tbl->cmd_yb = sprite->y2;
+   tbl->cmd_xc = sprite->x3;
+   tbl->cmd_yc = sprite->y3;
+   tbl->cmd_xd = sprite->x4;
+   tbl->cmd_yd = sprite->y4;
+   tbl->cmd_grda = sprite->gouraud_addr / 8;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_draw_poly_line(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0005;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdpmod.all = (u16)sprite->attr | 0xC0;
-   tbl->cmdcolr = sprite->bank;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdxb = sprite->x2;
-   tbl->cmdyb = sprite->y2;
-   tbl->cmdxc = sprite->x3;
-   tbl->cmdyc = sprite->y3;
-   tbl->cmdxd = sprite->x4;
-   tbl->cmdyd = sprite->y4;
-   tbl->cmdgrda = sprite->gouraud_addr / 8;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0005;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_pmod.all = (u16)sprite->attr | 0xC0;
+   tbl->cmd_colr = sprite->bank;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_xb = sprite->x2;
+   tbl->cmd_yb = sprite->y2;
+   tbl->cmd_xc = sprite->x3;
+   tbl->cmd_yc = sprite->y3;
+   tbl->cmd_xd = sprite->x4;
+   tbl->cmd_yd = sprite->y4;
+   tbl->cmd_grda = sprite->gouraud_addr / 8;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_draw_line(sprite_struct *sprite)
 {
-   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(commandnum * 0x20));
+   volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
 
-   tbl->cmdctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0006;
-   tbl->cmdlink = sprite->link_addr / 8;
-   tbl->cmdpmod.all = (u16)sprite->attr | 0xC0;
-   tbl->cmdcolr = sprite->bank;
-   tbl->cmdxa = sprite->x;
-   tbl->cmdya = sprite->y;
-   tbl->cmdxb = sprite->x2;
-   tbl->cmdyb = sprite->y2;
-   tbl->cmdgrda = sprite->gouraud_addr / 8;
-   commandnum++;
+   tbl->cmd_ctrl = ((sprite->attr >> 12) & 0x7FF0) | 0x0006;
+   tbl->cmd_link = sprite->link_addr / 8;
+   tbl->cmd_pmod.all = (u16)sprite->attr | 0xC0;
+   tbl->cmd_colr = sprite->bank;
+   tbl->cmd_xa = sprite->x;
+   tbl->cmd_ya = sprite->y;
+   tbl->cmd_xb = sprite->x2;
+   tbl->cmd_yb = sprite->y2;
+   tbl->cmd_grda = sprite->gouraud_addr / 8;
+   command_num++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_start_draw_kist()
 {
-   commandnum = 0;
+   command_num = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_end_draw_list()
 {
-   *((volatile u16 *)(VDP1_RAM+(commandnum * 0x20))) = 0x8000;
+   *((volatile u16 *)(VDP1_RAM+(command_num * 0x20))) = 0x8000;
 }
 
 //////////////////////////////////////////////////////////////////////////////

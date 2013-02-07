@@ -18,17 +18,17 @@
 
 .section .text
 
-_RemoteDebugStart:                      .long ExchangeByte
-_RemoteDebugSize:                       .long endofcode-ExchangeByte
-_RemoteExGeneralIllegalInstruction:     .long RemoteExGeneralIllegalInstruction-ExchangeByte
-_RemoteExSlotIllegalInstruction:        .long RemoteExSlotIllegalInstruction-ExchangeByte
-_RemoteExCPUAddressError:               .long RemoteExCPUAddressError-ExchangeByte
-_RemoteExDMAAddressError:               .long RemoteExDMAAddressError-ExchangeByte
-_RemoteUBCHandler:                      .long RemoteUBCHandler-ExchangeByte
+_RemoteDebugStart:                      .long exchange_byte
+_RemoteDebugSize:                       .long endofcode-exchange_byte
+_remoteex_general_illegal_instruction:  .long remoteex_general_illegal_instruction-exchange_byte
+_remoteex_slot_illegal_instruction:     .long remoteex_slot_illegal_instruction-exchange_byte
+_remoteex_cpu_address_error:            .long remoteex_cpu_address_error-exchange_byte
+_remoteex_dma_address_error:            .long remoteex_dma_address_error-exchange_byte
+_RemoteUBCHandler:                      .long RemoteUBCHandler-exchange_byte
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-ExchangeByte:
+exchange_byte:
     mov.l  R1, @-R15
     mov.l  STATPORT, r1
     ! Keep reading the status port until there's data ready
@@ -59,18 +59,18 @@ SendLong:
     mov    R4, R1
     ! Send highest byte
     shlr16 R4
-    bsr    ExchangeByte
+    bsr    exchange_byte
     shlr8  R4
     ! Send second-highest byte
     mov    R1, R4
-    bsr    ExchangeByte
+    bsr    exchange_byte
     shlr16 R4
     ! Send second-lowest byte
     mov    R1, R4
-    bsr    ExchangeByte
+    bsr    exchange_byte
     shlr8 R4
     ! Send lowest byte
-    bsr    ExchangeByte
+    bsr    exchange_byte
     mov    R1, R4
     ! Alright, we're done
     mov.l  @r15+, r1
@@ -81,7 +81,7 @@ SendLong:
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-saveregisters:
+save_registers:
     stc.l   SR, @-r15
     stc.l   GBR, @-r15
     stc.l   VBR, @-r15
@@ -109,16 +109,16 @@ saveregisters:
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SendExceptionData:
+send_exception_data:
     sts     PR, R8
     mov     R4, R0
 
     ! Send the data back to computer(use 0x01 return command)
-    bsr     ExchangeByte
+    bsr     exchange_byte
     mov     #1, R4
 
     ! exception type
-    bsr     ExchangeByte
+    bsr     exchange_byte
     mov     R0, R4
 
     ! Send all Registers to computer
@@ -137,17 +137,17 @@ genregloop:
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-RemoteExGeneralIllegalInstruction:
+remoteex_general_illegal_instruction:
     ! Save all registers to stack
     sts.l   PR, @-r15
-    bsr     saveregisters
+    bsr     save_registers
     nop
 
     ! Now that we've insured that we have the previous program's state at crash
     ! Let's start doing our own thing
 
     ! Send the initial exception data
-    bsr     SendExceptionData
+    bsr     send_exception_data
     mov     #0, R4
 
     ! Wait in a loop until the computer tells us what to do
@@ -157,17 +157,17 @@ giloop:
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-RemoteExSlotIllegalInstruction:
+remoteex_slot_illegal_instruction:
     ! Save all registers to stack
     sts.l   PR, @-r15
-    bsr     saveregisters
+    bsr     save_registers
     nop
 
     ! Now that we've insured that we have the previous program's state at crash
     ! Let's start doing our own thing
 
     ! Send the initial exception data
-    bsr     SendExceptionData
+    bsr     send_exception_data
     mov     #1, R4
 
     ! Wait in a loop until the computer tells us what to do
@@ -179,17 +179,17 @@ siloop:
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-RemoteExCPUAddressError:
+remoteex_cpu_address_error:
     ! Save all registers to stack
     sts.l   PR, @-r15
-    bsr     saveregisters
+    bsr     save_registers
     nop
 
     ! Now that we've insured that we have the previous program's state at crash
     ! Let's start doing our own thing
 
     ! Send the initial exception data
-    bsr     SendExceptionData
+    bsr     send_exception_data
     mov     #1, R4
 
     ! Wait in a loop until the computer tells us what to do
@@ -201,17 +201,17 @@ caloop:
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-RemoteExDMAAddressError:
+remoteex_dma_address_error:
     ! Save all registers to stack
     sts.l   PR, @-r15
-    bsr     saveregisters
+    bsr     save_registers
     nop
 
     ! Now that we've insured that we have the previous program's state at crash
     ! Let's start doing our own thing
 
     ! Send the initial exception data
-    bsr     SendExceptionData
+    bsr     send_exception_data
     mov     #1, R4
 
     ! Wait in a loop until the computer tells us what to do
@@ -226,7 +226,7 @@ daloop:
 RemoteUBCHandler:
     ! Save all registers to stack
     sts.l   PR, @-r15
-    bsr     saveregisters
+    bsr     save_registers
     nop
 
     ! Now that we've insured that we have the previous program's state at crash

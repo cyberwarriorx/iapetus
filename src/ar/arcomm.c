@@ -1,4 +1,4 @@
-/*  Copyright 2009 Theo Berkau
+/*  Copyright 2009, 2013 Theo Berkau
     
     Flash code based on code by Ex-Cyber
 
@@ -36,19 +36,19 @@ typedef struct
    u32 pid;
    int pagesize; // in words
    int romsize; // in words
-} flashlist_struct;
+} flash_list_struct;
 
-static flashlist_struct flashlist[] = {
+static flash_list_struct flash_list[] = {
    { "Silicon Storage Technology SST29EE010", 0xBFBF0707, 128, 131072 },
    { "Atmel AT29C010", 0x1F1FD5D5, 128, 131072 },
 };
 
-static int numsupportedflash=sizeof(flashlist)/sizeof(flashlist_struct);
+static int numsupportedflash=sizeof(flash_list)/sizeof(flash_list_struct);
 
 static int arpagesize=0;
 static int arromsize=0;
 
-void ARCLInitHandler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr)
+void arcl_init_handler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr)
 {
    int i;
 
@@ -75,7 +75,7 @@ void ARCLInitHandler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr)
    *((u32 *)(codeaddr+0x11C)) = codeaddr;   
 }
 
-void ARCommand(u16 cmd)
+void ar_command(u16 cmd)
 {
   // Unlock Flash
   AR_5555 = 0xAAAA;
@@ -84,30 +84,30 @@ void ARCommand(u16 cmd)
   AR_5555 = cmd;
 }
 
-void ARDelay10ms()
+void ar_delay_10ms()
 {
    // This should be good enough. Ideally though, you'd want something a little more accurate using WDT, FRT or something
    vdp_vsync();
    vdp_vsync();
 }
 
-void ARGetProductID(u16 *vendorid, u16 *deviceid)
+void ar_get_product_id(u16 *vendorid, u16 *deviceid)
 {
-  ARCommand(CMD_PID_ENTRY);
-  ARDelay10ms();
+  ar_command(CMD_PID_ENTRY);
+  ar_delay_10ms();
   *vendorid = AR_VENDOR;
   *deviceid = AR_DEVICE;
-  ARCommand(CMD_PID_EXIT);
-  ARDelay10ms();
+  ar_command(CMD_PID_EXIT);
+  ar_delay_10ms();
 }
 
-int ARInitFlashIO()
+int ar_init_flash_io()
 {
    u16 vendorid, deviceid;
    u32 pid;
    int i;
 
-   ARGetProductID(&vendorid, &deviceid);
+   ar_get_product_id(&vendorid, &deviceid);
    pid = (vendorid << 16) | deviceid;
 
    if (pid == 0xFFFFFFFF)
@@ -120,10 +120,10 @@ int ARInitFlashIO()
    // Make sure vendor id and device id are supported here
    for (i = 0; i < numsupportedflash; i++)
    {
-      if (flashlist[i].pid == pid)
+      if (flash_list[i].pid == pid)
       {
-         arpagesize=flashlist[i].pagesize;
-         arromsize=flashlist[i].romsize;
+         arpagesize=flash_list[i].pagesize;
+         arromsize=flash_list[i].romsize;
          return LAPETUS_ERR_OK;
       }
    }
@@ -134,41 +134,41 @@ int ARInitFlashIO()
 }
 
 // Untested
-void AREraseFlash(volatile u16 *page, int numpages)
+void ar_erase_flash(volatile u16 *page, int numpages)
 {
   int i,j;
 
   for (i = 0; i < numpages; i++)
   {
-     ARCommand(CMD_PAGE_WRITE);
+     ar_command(CMD_PAGE_WRITE);
      for(j = 0; j < arpagesize; j++)
      {
         page[0] = 0xFFFF;
         page++;
      }
-     ARDelay10ms();
+     ar_delay_10ms();
   }
 }
 
-void ARWriteFlash(volatile u16 *page, u16 *data, int numpages)
+void ar_write_flash(volatile u16 *page, u16 *data, int numpages)
 {
   int i,j;
 
   for (i = 0; i < numpages; i++)
   {
-     ARCommand(CMD_PAGE_WRITE);
+     ar_command(CMD_PAGE_WRITE);
      for(j = 0; j < arpagesize; j++)
      {
         page[0] = data[0];
         page++;
         data++;
      }
-     ARDelay10ms();
+     ar_delay_10ms();
   }
 }
 
 // Untested
-int ARVerifyWriteFlash(volatile u16 *page, u16 *data, int numpages)
+int ar_verify_write_flash(volatile u16 *page, u16 *data, int numpages)
 {
    int i;
 

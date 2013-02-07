@@ -1,4 +1,4 @@
-!   Copyright 2007 Theo Berkau
+!   Copyright 2007,2013 Theo Berkau
 !
 !   This file is part of Iapetus.
 !
@@ -18,10 +18,10 @@
 
 .section .text
 
-! UbcSetCodeBreakpoint !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ubc_set_code_breakpoint !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.global _UbcSetCodeBreakpoint ! R4 = slot, R5 = address, returns LAPETUS_ERR_OK if no problems
-_UbcSetCodeBreakpoint:
+.global _ubc_set_code_breakpoint ! R4 = slot, R5 = address, returns LAPETUS_ERR_OK if no problems
+_ubc_set_code_breakpoint:
     mov.l   r1, @-r15
     cmp/eq  r4, #0    ! 0 = Breakpoint A, 1 = Breakpoint B
     bf bpb
@@ -86,17 +86,17 @@ BAMRB:                .long 0xFFFFFF64
 BBRB:                 .long 0xFFFFFF68
 BRCR:                 .long 0xFFFFFF78
 
-! UbcSetMemoryBreakpoint !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ubc_set_memory_breakpoint !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.global _UbcSetMemoryBreakpoint ! R4 = slot, R5 = address, R6 = type, returns LAPETUS_ERR_OK if no problems
-_UbcSetMemoryBreakpoint:
+.global _ubc_set_memory_breakpoint ! R4 = slot, R5 = address, R6 = type, returns LAPETUS_ERR_OK if no problems
+_ubc_set_memory_breakpoint:
    rts
    nop
 
-! BreakpointHandler !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ubc_int_handler !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.global _UBCIntHandler
-_UBCIntHandler:
+.global _ubc_int_handler
+_ubc_int_handler:
     ! Save all registers to stack
     stc.l   SR, @-r15
     stc.l   GBR, @-r15

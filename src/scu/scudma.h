@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Lapetus.
 
@@ -17,12 +17,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef DMA_H
-#define DMA_H
+#ifndef DMASCU_H
+#define DMASCU_H
 
-int ScuDMAInit(void);
-int ScuDMAStart(int chan, void *src, void *dst, u32 size, u32 add, u32 mode);
-BOOL IsScuDMARunning(int chan);
-void ScuDMAStopAll(void);
+int scu_dma_init(void);
+int scu_dma_start(int chan, void *src, void *dst, u32 size, u32 add, u32 mode);
+BOOL is_scu_dma_running(int chan);
+void scu_dma_stop_all(void);
 
 #endif

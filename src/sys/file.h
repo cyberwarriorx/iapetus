@@ -1,4 +1,4 @@
-/*  Copyright 2008 Theo Berkau
+/*  Copyright 2008,2013 Theo Berkau
 
     This file is part of Iapetus.
 

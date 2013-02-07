@@ -1,4 +1,4 @@
-/*  Copyright 2006 Theo Berkau
+/*  Copyright 2006,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -20,7 +20,7 @@
 #ifndef COMMLINK_H
 #define COMMLINK_H
 
-void CommlinkStartService(void);
-void CommlinkStopService(void);
+void commlink_start_service(void);
+void commlink_stop_service(void);
 
 #endif

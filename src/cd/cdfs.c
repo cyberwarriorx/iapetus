@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -24,161 +24,161 @@
 
 typedef struct
 {
-  u16 groupid;
-  u16 userid;
+  u16 group_id;
+  u16 user_id;
   u16 attributes;
   u16 signature;
-  u8 filenumber;
+  u8 file_number;
   u8 reserved[5];
-} xarec_struct;
+} xa_rec_struct;
 
 typedef struct
 {
-  u8 recordsize;
-  u8 xarecordsize;
+  u8 record_size;
+  u8 xa_record_size;
   u32 lba;
   u32 size;
-  u8 dateyear;
-  u8 datemonth;
-  u8 dateday;
-  u8 datehour;
-  u8 dateminute;
-  u8 datesecond;
-  u8 gmtoffset;
+  u8 date_year;
+  u8 date_month;
+  u8 date_day;
+  u8 date_hour;
+  u8 date_minute;
+  u8 date_second;
+  u8 gmt_offset;
   u8 flags;
-  u8 fileunitsize;
-  u8 interleavegapsize;
-  u16 volumesequencenumber;
-  u8 namelength;
+  u8 file_unit_size;
+  u8 interleave_gap_size;
+  u16 volume_sequence_number;
+  u8 name_length;
   char name[32];
-  xarec_struct xarecord;
-} dirrec_struct;
+  xa_rec_struct xa_record;
+} dir_rec_struct;
 
-u8 *dirtbl;
-u8 *sectbuf;
-int sectbuffered;
-int dirtblsize;
-int rootlba;
-int rootsize;
+u8 *dir_tbl;
+u8 *sect_buf;
+int sect_buffered;
+int dir_tbl_size;
+int root_lba;
+int root_size;
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CopyDirRecord(u8 *buffer, dirrec_struct *dirrec)
+void copy_dir_record(u8 *buffer, dir_rec_struct *dir_rec)
 {
   u8 *temp_pointer;
 
   temp_pointer = buffer;
 
-  memcpy(&dirrec->recordsize, buffer, sizeof(dirrec->recordsize));
-  buffer += sizeof(dirrec->recordsize);
+  memcpy(&dir_rec->record_size, buffer, sizeof(dir_rec->record_size));
+  buffer += sizeof(dir_rec->record_size);
 
-  memcpy(&dirrec->xarecordsize, buffer, sizeof(dirrec->xarecordsize));
-  buffer += sizeof(dirrec->xarecordsize);
+  memcpy(&dir_rec->xa_record_size, buffer, sizeof(dir_rec->xa_record_size));
+  buffer += sizeof(dir_rec->xa_record_size);
 
-  buffer += sizeof(dirrec->lba);
-  memcpy(&dirrec->lba, buffer, sizeof(dirrec->lba));
-  buffer += sizeof(dirrec->lba);
+  buffer += sizeof(dir_rec->lba);
+  memcpy(&dir_rec->lba, buffer, sizeof(dir_rec->lba));
+  buffer += sizeof(dir_rec->lba);
 
-  buffer += sizeof(dirrec->size);
-  memcpy(&dirrec->size, buffer, sizeof(dirrec->size));
-  buffer += sizeof(dirrec->size);
+  buffer += sizeof(dir_rec->size);
+  memcpy(&dir_rec->size, buffer, sizeof(dir_rec->size));
+  buffer += sizeof(dir_rec->size);
 
-  dirrec->dateyear = buffer[0];
-  dirrec->datemonth = buffer[1];
-  dirrec->dateday = buffer[2];
-  dirrec->datehour = buffer[3];
-  dirrec->dateminute = buffer[4];
-  dirrec->datesecond = buffer[5];
-  dirrec->gmtoffset = buffer[6];
+  dir_rec->date_year = buffer[0];
+  dir_rec->date_month = buffer[1];
+  dir_rec->date_day = buffer[2];
+  dir_rec->date_hour = buffer[3];
+  dir_rec->date_minute = buffer[4];
+  dir_rec->date_second = buffer[5];
+  dir_rec->gmt_offset = buffer[6];
   buffer += 7;
 
-  dirrec->flags = buffer[0];
-  buffer += sizeof(dirrec->flags);
+  dir_rec->flags = buffer[0];
+  buffer += sizeof(dir_rec->flags);
 
-  dirrec->fileunitsize = buffer[0];
-  buffer += sizeof(dirrec->fileunitsize);
+  dir_rec->file_unit_size = buffer[0];
+  buffer += sizeof(dir_rec->file_unit_size);
 
-  dirrec->interleavegapsize = buffer[0];
-  buffer += sizeof(dirrec->interleavegapsize);
+  dir_rec->interleave_gap_size = buffer[0];
+  buffer += sizeof(dir_rec->interleave_gap_size);
 
-  buffer += sizeof(dirrec->volumesequencenumber);
-  memcpy(&dirrec->volumesequencenumber, buffer, sizeof(dirrec->volumesequencenumber));
-  buffer += sizeof(dirrec->volumesequencenumber);
+  buffer += sizeof(dir_rec->volume_sequence_number);
+  memcpy(&dir_rec->volume_sequence_number, buffer, sizeof(dir_rec->volume_sequence_number));
+  buffer += sizeof(dir_rec->volume_sequence_number);
 
-  dirrec->namelength = buffer[0];
-  buffer += sizeof(dirrec->namelength);
+  dir_rec->name_length = buffer[0];
+  buffer += sizeof(dir_rec->name_length);
 
-  memset(dirrec->name, 0, sizeof(dirrec->name));
-  memcpy(dirrec->name, buffer, dirrec->namelength);
-  buffer += dirrec->namelength;
+  memset(dir_rec->name, 0, sizeof(dir_rec->name));
+  memcpy(dir_rec->name, buffer, dir_rec->name_length);
+  buffer += dir_rec->name_length;
 
   // handle padding
-  buffer += (1 - dirrec->namelength % 2);
+  buffer += (1 - dir_rec->name_length % 2);
 
-  memset(&dirrec->xarecord, 0, sizeof(dirrec->xarecord));
+  memset(&dir_rec->xa_record, 0, sizeof(dir_rec->xa_record));
 
   // Sadily, this is the best way I can think of for detecting XA records
-  if ((dirrec->recordsize - (buffer - temp_pointer)) == 14)
+  if ((dir_rec->record_size - (buffer - temp_pointer)) == 14)
   {
-     memcpy(&dirrec->xarecord.groupid, buffer, sizeof(dirrec->xarecord.groupid));
-     buffer += sizeof(dirrec->xarecord.groupid);
+     memcpy(&dir_rec->xa_record.group_id, buffer, sizeof(dir_rec->xa_record.group_id));
+     buffer += sizeof(dir_rec->xa_record.group_id);
 
-     memcpy(&dirrec->xarecord.userid, buffer, sizeof(dirrec->xarecord.userid));
-     buffer += sizeof(dirrec->xarecord.userid);
+     memcpy(&dir_rec->xa_record.user_id, buffer, sizeof(dir_rec->xa_record.user_id));
+     buffer += sizeof(dir_rec->xa_record.user_id);
 
-     memcpy(&dirrec->xarecord.attributes, buffer, sizeof(dirrec->xarecord.attributes));
-     buffer += sizeof(dirrec->xarecord.attributes);
+     memcpy(&dir_rec->xa_record.attributes, buffer, sizeof(dir_rec->xa_record.attributes));
+     buffer += sizeof(dir_rec->xa_record.attributes);
 
-     memcpy(&dirrec->xarecord.signature, buffer, sizeof(dirrec->xarecord.signature));
-     buffer += sizeof(dirrec->xarecord.signature);
+     memcpy(&dir_rec->xa_record.signature, buffer, sizeof(dir_rec->xa_record.signature));
+     buffer += sizeof(dir_rec->xa_record.signature);
 
-     memcpy(&dirrec->xarecord.filenumber, buffer, sizeof(dirrec->xarecord.filenumber));
-     buffer += sizeof(dirrec->xarecord.filenumber);
+     memcpy(&dir_rec->xa_record.file_number, buffer, sizeof(dir_rec->xa_record.file_number));
+     buffer += sizeof(dir_rec->xa_record.file_number);
 
-     memcpy(dirrec->xarecord.reserved, buffer, sizeof(dirrec->xarecord.reserved));
-     buffer += sizeof(dirrec->xarecord.reserved);
+     memcpy(dir_rec->xa_record.reserved, buffer, sizeof(dir_rec->xa_record.reserved));
+     buffer += sizeof(dir_rec->xa_record.reserved);
   }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int CDFSInit(void *workdirtbl, int size)
+int cdfs_init(void *work_dir_tbl, int size)
 {
    int ret;
-   dirrec_struct dirrec;
+   dir_rec_struct dir_rec;
 
-   dirtbl = workdirtbl;
-   dirtblsize = size;
+   dir_tbl = work_dir_tbl;
+   dir_tbl_size = size;
    if (size < 4096)
       return LAPETUS_ERR_INVALIDARG;
 
-   sectbuf = workdirtbl+2048;
-   sectbuffered = 0;
+   sect_buf = work_dir_tbl+2048;
+   sect_buffered = 0;
 
    // Read in lba 16
-   if ((ret = CDReadSector(dirtbl, 166, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+   if ((ret = cd_read_sector(dir_tbl, 166, SECT_2048, 2048)) != LAPETUS_ERR_OK)
       return ret;
 
-   CopyDirRecord(dirtbl+0x9C, &dirrec);
+   copy_dir_record(dir_tbl+0x9C, &dir_rec);
 
    // Ok, now we have the root directory(that's good enough for now)
-   rootlba = dirrec.lba;
-   rootsize = (dirrec.size / 2048);
+   root_lba = dir_rec.lba;
+   root_size = (dir_rec.size / 2048);
 
    return LAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int CDFSOpen(const char *path, file_struct *file)
+int cdfs_open(const char *path, file_struct *file)
 {
    char *p;
-   char dirname[13];
-   dirrec_struct dirrec;
+   char dir_name[13];
+   dir_rec_struct dir_rec;
    u32 lba;
    u32 size;
-   int sectorsleft;
-   u8 *workbuffer;
+   int sectors_left;
+   u8 *work_buffer;
    int done=0;
    int ret;
 
@@ -186,12 +186,12 @@ int CDFSOpen(const char *path, file_struct *file)
    // read the directory table, and find the next subdirectory. Once we're
    // in the correct level, parse through the table and find the file.
 
-   if ((ret = CDReadSector(dirtbl, 150+rootlba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+   if ((ret = cd_read_sector(dir_tbl, 150+root_lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
       return ret;
 
-   lba = rootlba + 1;
-   sectorsleft = rootsize - 1;
-   workbuffer = dirtbl;
+   lba = root_lba + 1;
+   sectors_left = root_size - 1;
+   work_buffer = dir_tbl;
 
    if (path == NULL)
    {
@@ -199,17 +199,17 @@ int CDFSOpen(const char *path, file_struct *file)
       // Get first file(I may remove this feature yet)
       for (i = 0; i < 3; i++)
       {
-         if (workbuffer[0] == 0)
+         if (work_buffer[0] == 0)
             return LAPETUS_ERR_FILENOTFOUND;
 
-         CopyDirRecord(workbuffer, &dirrec);
-         workbuffer += dirrec.recordsize;
+         copy_dir_record(work_buffer, &dir_rec);
+         work_buffer += dir_rec.record_size;
       }
 
       // We're done.
-      file->lba = dirrec.lba;
-      file->size = dirrec.size;
-      file->sectpos = 0;
+      file->lba = dir_rec.lba;
+      file->size = dir_rec.size;
+      file->sect_pos = 0;
       file->pos = 0;
 
       return LAPETUS_ERR_OK;
@@ -226,38 +226,38 @@ int CDFSOpen(const char *path, file_struct *file)
       else
          size = p - path;
 
-      strncpy(dirname, path, size);
-      dirname[size] = '\0';
+      strncpy(dir_name, path, size);
+      dir_name[size] = '\0';
       path += size;
 
       // Now that we've got the current subdirectory's name, let's find its
       // table.
       for (;;)
       {
-         CopyDirRecord(workbuffer, &dirrec);
-         workbuffer += dirrec.recordsize;
+         copy_dir_record(work_buffer, &dir_rec);
+         work_buffer += dir_rec.record_size;
 
-         if (strcmp(dirrec.name, dirname) == 0 ||
-             strncmp(dirrec.name, dirname, strlen(dirname)) == 0)
+         if (strcmp(dir_rec.name, dir_name) == 0 ||
+             strncmp(dir_rec.name, dir_name, strlen(dir_name)) == 0)
          {
-            lba = dirrec.lba;
-            sectorsleft = dirrec.size / 2048;
+            lba = dir_rec.lba;
+            sectors_left = dir_rec.size / 2048;
             break;
          }
            
          // If record size of the next entry is zero, it means we're at the end
          // of the directory record data in the current sector
-         if (workbuffer[0] == 0)
+         if (work_buffer[0] == 0)
          {
             // Let's see if we can read in another sector yet
-            if (sectorsleft > 0)
+            if (sectors_left > 0)
             {
                // Read in new sector
-               if ((ret = CDReadSector(dirtbl, 150+lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+               if ((ret = cd_read_sector(dir_tbl, 150+lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
                   return ret;
                lba++;
-               sectorsleft--;
-               workbuffer = dirtbl;
+               sectors_left--;
+               work_buffer = dir_tbl;
             }
             else
                // We can't, let's bail
@@ -269,17 +269,17 @@ int CDFSOpen(const char *path, file_struct *file)
          break;
 
       // Ok, we've found the next directory table, time to read it
-      if ((ret = CDReadSector(dirtbl, 150+lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+      if ((ret = cd_read_sector(dir_tbl, 150+lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
          return ret;
       lba++;
-      sectorsleft--;
-      workbuffer = dirtbl;
+      sectors_left--;
+      work_buffer = dir_tbl;
    }
 
    // Ok, time to fill out the file structure
    file->lba = lba;
-   file->size = dirrec.size;
-   file->sectpos = 0;
+   file->size = dir_rec.size;
+   file->sect_pos = 0;
    file->pos = 0;
 
    return LAPETUS_ERR_OK;
@@ -287,20 +287,20 @@ int CDFSOpen(const char *path, file_struct *file)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int CDFSSeek(file_struct *file, int offset, int seek_type)
+int cdfs_seek(file_struct *file, int offset, int seek_type)
 {
    switch(seek_type)
    {
       case CDFS_SEEK_SET:
-         file->sectpos = offset / 2048;
+         file->sect_pos = offset / 2048;
          file->pos = offset % 2048;
          break;
       case CDFS_SEEK_CUR:
-         file->sectpos = file->sectpos + ((file->pos + offset) / 2048);
+         file->sect_pos = file->sect_pos + ((file->pos + offset) / 2048);
          file->pos = (file->pos + offset) % 2048;
          break;
       case CDFS_SEEK_END:
-         file->sectpos = (file->size - 1 - offset) / 2048;
+         file->sect_pos = (file->size - 1 - offset) / 2048;
          file->pos = (file->size - 1 - offset) % 2048;
          break;
       default:
@@ -313,7 +313,7 @@ int CDFSSeek(file_struct *file, int offset, int seek_type)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int CDFSRead(u8 *buffer, int size, int num, file_struct *file)
+int cdfs_read(u8 *buffer, int size, int num, file_struct *file)
 {
    int ret;
 
@@ -321,8 +321,8 @@ int CDFSRead(u8 *buffer, int size, int num, file_struct *file)
    if (file->pos == 0)
    {
       // Straight sectors reads. Nice and fast
-      if ((ret = CDReadSector(buffer, 150+file->lba+file->sectpos, SECT_2048, size * num)) == LAPETUS_ERR_OK)
-         file->sectpos += (size * num);
+      if ((ret = cd_read_sector(buffer, 150+file->lba+file->sect_pos, SECT_2048, size * num)) == LAPETUS_ERR_OK)
+         file->sect_pos += (size * num);
       return ret;
    }
    else
@@ -333,7 +333,7 @@ int CDFSRead(u8 *buffer, int size, int num, file_struct *file)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int CDFSClose(file_struct *file)
+int cdfs_close(file_struct *file)
 {
    return LAPETUS_ERR_OK;
 }

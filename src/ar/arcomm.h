@@ -1,4 +1,4 @@
-/*  Copyright 2009 Theo Berkau
+/*  Copyright 2009,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -20,12 +20,12 @@
 #ifndef ARCOMM_H
 #define ARCOMM_H
 	
-void ARCLInitHandler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr);
+void arcl_init_handler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr);
 
-void ARGetProductID(u16 *vendorid, u16 *deviceid);
-int ARInitFlashIO(void);
-void AREraseFlash(volatile u16 *page, int numpages);
-void ARWriteFlash(volatile u16 *page, u16 *data, int numpages);
-int ARVerifyWriteFlash(volatile u16 *page, u16 *data, int numpages);
+void ar_get_product_id(u16 *vendorid, u16 *deviceid);
+int ar_init_flash_io(void);
+void ar_erase_flash(volatile u16 *page, int numpages);
+void ar_write_flash(volatile u16 *page, u16 *data, int numpages);
+int ar_verify_write_flash(volatile u16 *page, u16 *data, int numpages);
 
 #endif

@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -17,12 +17,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef DMA_H
-#define DMA_H
+#ifndef SH2DMA_H
+#define SH2DMA_H
 
-int Sh2DMAInit(void);
-int Sh2DMAStart(int chan, void *src, void *dst, u32 size, u32 mode);
-BOOL IsSh2DMARunning(int chan);
-void Sh2DMAStopAll(void);
+int sh2_dma_init(void);
+int sh2_dma_start(int chan, void *src, void *dst, u32 size, u32 mode);
+BOOL is_sh2_dma_running(int chan);
+void sh2_dma_stop_all(void);
 
 #endif

@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -21,37 +21,37 @@
 
 //////////////////////////////////////////////////////////////////////
 
-void InitIapetus(int res)
+void init_iapetus(int res)
 {
    int i;
 
-   InterruptSetLevelMask(0xF);
+   interrupt_set_level_mask(0xF);
 
    for (i = 0; i < 0x80; i++)
-      BIOS_SetSH2Interrupt(i, 0);
+      bios_set_sh2_interrupt(i, 0);
 
    for (i = 0x40; i < 0x60; i++)
-      BIOS_SetSCUInterrupt(i, 0);
+      bios_set_scu_interrupt(i, 0);
 
    // Make sure all interrupts have been called
-   BIOS_ChangeSCUInterruptMask(0, 0);
-   BIOS_ChangeSCUInterruptMask(0xFFFFFFFF, 0xFFFFFFFF);
+   bios_change_scu_interrupt_mask(0, 0);
+   bios_change_scu_interrupt_mask(0xFFFFFFFF, 0xFFFFFFFF);
 
    vdp_init(res);
-   PerInit();
+   per_init();
 
-   CommlinkStopService();
+   commlink_stop_service();
 
 #ifdef DEBUG
-   DebugInit();
+   debug_init();
 #endif
 
    // If DSP is running, stop it
-   if (DSPIsExec())
-       DSPStop();
+   if (dsp_is_exec())
+       dsp_stop();
 
-   if (InterruptGetLevelMask() > 0x7)
-      InterruptSetLevelMask(0x7);
+   if (interrupt_get_level_mask() > 0x7)
+      interrupt_set_level_mask(0x7);
 }
 
 //////////////////////////////////////////////////////////////////////

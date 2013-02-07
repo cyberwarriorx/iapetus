@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -33,11 +33,11 @@ struct font_s
 
 typedef struct font_s font_struct;
 
-extern u8 font8x8[];
-extern u32 font8x8size;
-extern u8 font8x16[];
-extern u32 font8x16size;
+extern u8 font_8x8[];
+extern u32 font_8x8_size;
+extern u8 font_8x16[];
+extern u32 font_8x16_size;
 
-int VdpSetFont(int screen, font_struct *font, int transparent);
-int VdpSetDefaultFont(int screen, font_struct *font);
+int vdp_set_font(int screen, font_struct *font, int transparent);
+int vdp_set_default_font(int screen, font_struct *font);
 #endif

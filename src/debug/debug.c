@@ -18,18 +18,18 @@
 #if 0
 extern u32 RemoteDebugStart;
 extern u32 RemoteDebugSize;
-extern u32 RemoteExGeneralIllegalInstruction;
-extern u32 RemoteExSlotIllegalInstruction;
-extern u32 RemoteExCPUAddressError;
-extern u32 RemoteExDMAAddressError;
+extern u32 remoteex_general_illegal_instruction;
+extern u32 remoteex_slot_illegal_instruction;
+extern u32 remoteex_cpu_address_error;
+extern u32 remoteex_dma_address_error;
 extern u32 RemoteUBCHandler;
 //void RemoteUBCHandler(void) __attribute__ ((interrupt_handler)); 
 #endif
 
-void ExGeneralIllegalInstruction(void);
-void ExSlotIllegalInstruction(void);
-void ExCPUAddressError(void);
-void ExDMAAddressError(void);
+void ex_general_illegal_instruction(void);
+void ex_slot_illegal_instruction(void);
+void ex_cpu_address_error(void);
+void ex_dma_address_error(void);
 void UBCHandler(void) __attribute__ ((interrupt_handler));
 
 #if 0
@@ -70,11 +70,11 @@ int RemoteDebuggerStart(void *addr)
       outbuf[i] = buf[i];
 
    // Setup exception functions
-   BIOS_SetSH2Interrupt(0x4, addr+RemoteExGeneralIllegalInstruction);
-   BIOS_SetSH2Interrupt(0x6, addr+RemoteExSlotIllegalInstruction);
-   BIOS_SetSH2Interrupt(0x9, addr+RemoteExCPUAddressError);
-   BIOS_SetSH2Interrupt(0xA, addr+RemoteExDMAAddressError);
-   BIOS_SetSH2Interrupt(0xC, addr+RemoteUBCHandler);
+   bios_set_sh2_interrupt(0x4, addr+remoteex_general_illegal_instruction);
+   bios_set_sh2_interrupt(0x6, addr+remoteex_slot_illegal_instruction);
+   bios_set_sh2_interrupt(0x9, addr+remoteex_cpu_address_error);
+   bios_set_sh2_interrupt(0xA, addr+remoteex_dma_address_error);
+   bios_set_sh2_interrupt(0xC, addr+RemoteUBCHandler);
 
    // Hijack interrupt handling function here
 //   if (so and so word == ?)
@@ -87,11 +87,11 @@ int RemoteDebuggerStart(void *addr)
 
 int RemoteDebuggerStop(void)
 {
-   BIOS_SetSH2Interrupt(0x4, 0);
-   BIOS_SetSH2Interrupt(0x6, 0);
-   BIOS_SetSH2Interrupt(0x9, 0);
-   BIOS_SetSH2Interrupt(0xA, 0);
-   BIOS_SetSH2Interrupt(0xC, 0);
+   bios_set_sh2_interrupt(0x4, 0);
+   bios_set_sh2_interrupt(0x6, 0);
+   bios_set_sh2_interrupt(0x9, 0);
+   bios_set_sh2_interrupt(0xA, 0);
+   bios_set_sh2_interrupt(0xC, 0);
 
    // Give interrupt handling function control back here
 
@@ -108,37 +108,37 @@ void UBCHandler(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int DebuggerStart(void)
+int debugger_start(void)
 {
    // This function basically sets up exception handlers, disables remote
    // debugging, and sets things up to allows for breakpoints
    int ret;
 
-   if ((ret = DebuggerStop()) != LAPETUS_ERR_OK)
+   if ((ret = debugger_stop()) != LAPETUS_ERR_OK)
       return ret;
 
-   BIOS_SetSH2Interrupt(0x4, ExGeneralIllegalInstruction);
-   BIOS_SetSH2Interrupt(0x6, ExSlotIllegalInstruction);
-   BIOS_SetSH2Interrupt(0x9, ExCPUAddressError);
-   BIOS_SetSH2Interrupt(0xA, ExDMAAddressError);
+   bios_set_sh2_interrupt(0x4, ex_general_illegal_instruction);
+   bios_set_sh2_interrupt(0x6, ex_slot_illegal_instruction);
+   bios_set_sh2_interrupt(0x9, ex_cpu_address_error);
+   bios_set_sh2_interrupt(0xA, ex_dma_address_error);
 
    // Clear the UBC registers
    BBRA = 0;
    BBRB = 0;
    BDRB = 0;
    BRCR = 0;
-   BIOS_SetSH2Interrupt(0xC, UBCHandler);
+   bios_set_sh2_interrupt(0xC, UBCHandler);
 
    // Adjust level mask
-   if (InterruptGetLevelMask() > 0xE)
-      InterruptSetLevelMask(0xE);
+   if (interrupt_get_level_mask() > 0xE)
+      interrupt_set_level_mask(0xE);
 
    return LAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void DebuggerSetCodeBreakpoint(u32 addr)
+void debugger_set_code_breakpoint(u32 addr)
 {
    BARA = addr;
    BAMRA = 0;
@@ -152,14 +152,14 @@ void DebuggerSetCodeBreakpoint(u32 addr)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void DebuggerClearCodeBreakpoint()
+void debugger_clear_code_breakpoint()
 {
    BBRA = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void DebuggerSetMemoryBreakpoint(u32 addr, u32 val, u32 valmask, int rw, int size)
+void debugger_set_memory_breakpoint(u32 addr, u32 val, u32 valmask, int rw, int size)
 {
    BARB = addr;
    BAMRB = 0;
@@ -175,20 +175,20 @@ void DebuggerSetMemoryBreakpoint(u32 addr, u32 val, u32 valmask, int rw, int siz
 
 //////////////////////////////////////////////////////////////////////////////
 
-void DebuggerClearMemoryBreakpoint(u32 addr)
+void debugger_clear_memory_breakpoint(u32 addr)
 {
    BBRB = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int DebuggerStop(void)
+int debugger_stop(void)
 {
-   BIOS_SetSH2Interrupt(0x4, 0);
-   BIOS_SetSH2Interrupt(0x6, 0);
-   BIOS_SetSH2Interrupt(0x9, 0);
-   BIOS_SetSH2Interrupt(0xA, 0);
-   BIOS_SetSH2Interrupt(0xC, 0);
+   bios_set_sh2_interrupt(0x4, 0);
+   bios_set_sh2_interrupt(0x6, 0);
+   bios_set_sh2_interrupt(0x9, 0);
+   bios_set_sh2_interrupt(0xA, 0);
+   bios_set_sh2_interrupt(0xC, 0);
 
    return LAPETUS_ERR_OK;
 }

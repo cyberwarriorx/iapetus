@@ -1,4 +1,4 @@
-/*  Copyright 2006 Theo Berkau
+/*  Copyright 2006,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -19,7 +19,7 @@
 
 #include "../iapetus.h"
 
-volatile int commlinkservice;
+volatile int commlink_service;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +29,7 @@ volatile int commlinkservice;
 
 //////////////////////////////////////////////////////////////////////////////
 
-u8 CLExchangeByte(u8 val)
+u8 cl_exchange_byte(u8 val)
 {
    u8 ret;
    while (!(PAR_STATPORT & 0x1)) {}
@@ -40,7 +40,7 @@ u8 CLExchangeByte(u8 val)
 
 //////////////////////////////////////////////////////////////////////////////
 
-u8 CLReceiveByte(void)
+u8 cl_receive_byte(void)
 {
    u8 ret;
    while (!(PAR_STATPORT & 0x1)) {}
@@ -51,29 +51,29 @@ u8 CLReceiveByte(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CLSendLong(u32 val)
+void cl_send_long(u32 val)
 {
-   CLExchangeByte(val >> 24);
-   CLExchangeByte(val >> 16);
-   CLExchangeByte(val >> 8);
-   CLExchangeByte(val & 0xFF);
+   cl_exchange_byte(val >> 24);
+   cl_exchange_byte(val >> 16);
+   cl_exchange_byte(val >> 8);
+   cl_exchange_byte(val & 0xFF);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-u32 CLReceiveLong(void)
+u32 cl_receive_long(void)
 {
    u32 ret;
-   ret = CLExchangeByte(0x00) << 24;
-   ret |= CLExchangeByte(0x00) << 16;
-   ret |= CLExchangeByte(0x00) << 8;
-   ret |= CLExchangeByte(0x00);
+   ret = cl_exchange_byte(0x00) << 24;
+   ret |= cl_exchange_byte(0x00) << 16;
+   ret |= cl_exchange_byte(0x00) << 8;
+   ret |= cl_exchange_byte(0x00);
    return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int CLCheck1(void)
+int cl_check1(void)
 {
    u8 buf[2];
    s32 addr;
@@ -90,32 +90,32 @@ int CLCheck1(void)
    {
       for (;;)
       {
-         buf[0] = CLExchangeByte('R');
-         buf[1] = CLExchangeByte('W');
+         buf[0] = cl_exchange_byte('R');
+         buf[1] = cl_exchange_byte('W');
 
          if (buf[0] == 'W' && buf[1] == 'B')
             break;
       }
 
       // First byte seems to be unused
-      CLReceiveByte();
+      cl_receive_byte();
 
-      addr = CLReceiveByte() << 24;
-      addr |= CLReceiveByte() << 16;
-      addr |= CLReceiveByte() << 8;
-      addr |= CLReceiveByte();
+      addr = cl_receive_byte() << 24;
+      addr |= cl_receive_byte() << 16;
+      addr |= cl_receive_byte() << 8;
+      addr |= cl_receive_byte();
 
-      size = CLReceiveByte() << 24;
-      size |= CLReceiveByte() << 16;
-      size |= CLReceiveByte() << 8;
-      size |= CLReceiveByte();
+      size = cl_receive_byte() << 24;
+      size |= cl_receive_byte() << 16;
+      size |= cl_receive_byte() << 8;
+      size |= cl_receive_byte();
 
       calcchksum = 0;
 
       // Receive data
       while (size > 0)
       {
-         data = CLReceiveByte();
+         data = cl_receive_byte();
          *((volatile u8 *)addr) = data;
          addr++;
          calcchksum += data;
@@ -123,8 +123,8 @@ int CLCheck1(void)
          size--;
       }
 
-      chksum = CLReceiveByte() << 8;
-      chksum |= CLReceiveByte();
+      chksum = cl_receive_byte() << 8;
+      chksum |= cl_receive_byte();
 
       if (chksum == calcchksum)
       {
@@ -139,7 +139,7 @@ int CLCheck1(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CLCheck2(u8 val)
+void cl_check2(u8 val)
 {
    u32 addr;
    u32 size;
@@ -152,41 +152,41 @@ void CLCheck2(u8 val)
    // Sync with commlink
    for (;;)
    {
-      if (CLExchangeByte('D') != 'I')
+      if (cl_exchange_byte('D') != 'I')
          continue;
 
-      if (CLExchangeByte('O') == 'N')
+      if (cl_exchange_byte('O') == 'N')
          break;
    }
 
-   switch(CLExchangeByte(0x00))
+   switch(cl_exchange_byte(0x00))
    {
       case 0x01:
       {
          u8 chksum;
 
          // Download Memory
-         CLSendLong(val);
+         cl_send_long(val);
 
          for (;;)
          {
             data = 0;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             addr = data << 24;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             addr |= data << 16;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             addr |= data << 8;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             addr |= data;
 
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             size = data << 24;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             size |= data << 16;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             size |= data << 8;
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             size |= data;
 
             // Transfer data
@@ -199,17 +199,17 @@ void CLCheck2(u8 val)
             {
                data = *((volatile u8 *)addr);
                chksum += data;
-               CLExchangeByte(data);
+               cl_exchange_byte(data);
                addr++;
                size--;
             }
 
             // Send the checksum
-            CLExchangeByte(chksum);
+            cl_exchange_byte(chksum);
          }
 
-         CLExchangeByte('0');
-         CLExchangeByte('K');
+         cl_exchange_byte('0');
+         cl_exchange_byte('K');
 
          break;
       }
@@ -218,38 +218,38 @@ void CLCheck2(u8 val)
          break;
       case 0x03:
          // Receive 5 long's, and do stuff(FIXME)
-         CLReceiveLong();
-         CLReceiveLong();
-         CLReceiveLong();
-         CLReceiveLong();
-         CLReceiveLong();
+         cl_receive_long();
+         cl_receive_long();
+         cl_receive_long();
+         cl_receive_long();
+         cl_receive_long();
          break;
       case 0x04:
          // Send 5 long's(FIXME), used by AR software's download/upload saves features
-         CLSendLong(0);
-         CLSendLong(0);
-         CLSendLong(0);
-         CLSendLong(0);
-         CLSendLong(0);
+         cl_send_long(0);
+         cl_send_long(0);
+         cl_send_long(0);
+         cl_send_long(0);
+         cl_send_long(0);
          break;
       case 0x05:
          // Exchange byte, write received byte to 0x060FFE20(FIXME), used by AR software's download/upload saves features
-         CLExchangeByte(0x00);
+         cl_exchange_byte(0x00);
          break;
       case 0x06:
          // Receive 2 long's, write the first one to 0x060FE000, the second one to 0x060FE004(fix me), used by AR software's download/upload saves features(FIXME)
-         CLReceiveLong();
-         CLReceiveLong();
+         cl_receive_long();
+         cl_receive_long();
          break;
       case 0x07:
          // Send whatever is in R9. Looks like some kind of conditional variable. In the main menu it's 0x1, in other instances, it's 0x2, used by AR software's download/upload saves features
-         CLSendLong(val);
+         cl_send_long(val);
          break;
       case 0x08:
       {         
          // Write byte to memory
-         addr = CLReceiveLong();
-         *((volatile u8 *)addr) = CLExchangeByte(0x00);
+         addr = cl_receive_long();
+         *((volatile u8 *)addr) = cl_exchange_byte(0x00);
          break;
       }
       case 0x09:
@@ -257,14 +257,14 @@ void CLCheck2(u8 val)
          u32 execaddr;
 
          // Upload(and execute) to Memory
-         execaddr = addr = CLReceiveLong();
-         size = CLReceiveLong();
-         exec = CLExchangeByte(0x00);
+         execaddr = addr = cl_receive_long();
+         size = cl_receive_long();
+         exec = cl_exchange_byte(0x00);
 
          // Transfer data
          while (size > 0)
          {
-            data = CLExchangeByte(data);
+            data = cl_exchange_byte(data);
             *((volatile u8 *)addr) = data;
             addr++;
             size--;
@@ -281,16 +281,16 @@ void CLCheck2(u8 val)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CommlinkStartService(void)
+void commlink_start_service(void)
 {
-   commlinkservice = TRUE;
+   commlink_service = TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CommlinkStopService()
+void commlink_stop_service()
 {
-   commlinkservice = FALSE;
+   commlink_service = FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////

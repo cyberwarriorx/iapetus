@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -20,17 +20,17 @@
 #ifndef BIOS_H
 #define BIOS_H
 
-#define BIOS_RunCDPlayer() ((**(void(**)(void))0x0600026C)())
-#define BIOS_IsMpegCardPresent(filtno) ((**(volatile int(**)(int))0x06000274)(filtno))
-#define BIOS_GetMpegRom(index, size, addr) ((**(int(**)(u32, u32, u32))0x6000298)(index, size, addr))
-#define BIOS_SetSCUInterrupt(vector, func) ((**(void(**)(u32, void *))0x06000300)((vector), (func)))
-#define BIOS_GetSCUInterrupt(vector) ((void*)(**(void(*(**)(u32))(u32))0x6000304)(vector))
-#define BIOS_SetSH2Interrupt(vector, func) ((**(void(**)(u32, void *))0x06000310)((vector), (func)))
-#define BIOS_GetSH2Interrupt(vector) ((void*)(**(void(*(**)(u32))(u32))0x6000314)(vector))
-#define BIOS_SetClockSpeed(mode) ((**(void(**)(u32))0x06000320)((mode)))
-#define BIOS_GetClockSpeed (*(volatile u32*)0x6000324)
-#define BIOS_SetSCUInterruptMask(bits) ((**(void(**)(u32))0x06000340)((bits)))
-#define BIOS_ChangeSCUInterruptMask(mask, bits) ((**(volatile void(**)(u32, u32))0x06000344)((mask), (bits)))
-#define BIOS_GetSCUInterruptMask() (*(volatile u32 *)0x06000348)
+#define bios_run_cd_player() ((**(void(**)(void))0x0600026C)())
+#define bios_is_mpeg_card_present(filtno) ((**(int(**)(int))0x06000274)(filtno))
+#define bios_get_mpeg_rom(index, size, addr) ((**(int(**)(u32, u32, u32))0x6000298)(index, size, addr))
+#define bios_set_scu_interrupt(vector, func) ((**(void(**)(u32, void *))0x06000300)((vector), (func)))
+#define bios_get_scu_interrupt(vector) ((void*)(**(void(*(**)(u32))(u32))0x6000304)(vector))
+#define bios_set_sh2_interrupt(vector, func) ((**(void(**)(u32, void *))0x06000310)((vector), (func)))
+#define bios_get_sh2_interrupt(vector) ((void*)(**(void(*(**)(u32))(u32))0x6000314)(vector))
+#define bios_set_clock_speed(mode) ((**(void(**)(u32))0x06000320)((mode)))
+#define bios_get_clock_speed (*(volatile u32*)0x6000324)
+#define bios_set_scu_interrupt_mask(bits) ((**(void(**)(u32))0x06000340)((bits)))
+#define bios_change_scu_interrupt_mask(mask, bits) ((**(void(**)(u32, u32))0x06000344)((mask), (bits)))
+#define bios_get_scu_interrupt_mask() (*(volatile u32 *)0x06000348)
 
 #endif

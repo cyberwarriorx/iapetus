@@ -21,12 +21,12 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SoundInit(void)
+void sound_init(void)
 {
    int i;
 
    // Turn off Sound CPU
-   SmpcIssueCommand(0x07);
+   smpc_issue_command(0x07);
 
    // Make sure SCSP is set to 512k mode
    *(volatile u8 *)(0x25B00400) = 0x02;
@@ -62,7 +62,7 @@ void SoundInit(void)
       *(volatile u16 *)(0x25B00000 + i) = 0;
 
    // Key off all slots
-   SoundKeyOffAll();
+   sound_key_off_all();
 
    // Set TL to max for all slots
    for (i = 0; i < 32; i++)
@@ -74,12 +74,12 @@ void SoundInit(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SoundLoadDriver(u8 *data, u32 size)
+void sound_load_driver(u8 *data, u32 size)
 {
    int i;
 
    // Turn off Sound CPU
-   SmpcIssueCommand(0x07);
+   smpc_issue_command(0x07);
 
    // Make sure SCSP is set to 512k mode
    *(volatile u8 *)(0x25B00400) = 0x02;
@@ -93,12 +93,12 @@ void SoundLoadDriver(u8 *data, u32 size)
       *(volatile u8 *)(0x25A00000 + i) = data[i];
 
    // Turn on Sound CPU again
-   SmpcIssueCommand(0x06);
+   smpc_issue_command(0x06);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void SoundExternalAudioEnable(u8 vol_l, u8 vol_r)
+void sound_external_audio_enable(u8 vol_l, u8 vol_r)
 {
    volatile u16 *slot_ptr;
 

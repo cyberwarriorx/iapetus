@@ -1,4 +1,4 @@
-/*  Copyright 2009 Theo Berkau
+/*  Copyright 2009,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -20,13 +20,13 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-int RemoteDebuggerStart(void *addr);
-int RemoteDebuggerStop(void);
-int DebuggerStart(void);
-void DebuggerSetCodeBreakpoint(u32 addr);
-void DebuggerClearCodeBreakpoint();
-void DebuggerSetMemoryBreakpoint(u32 addr, u32 val, u32 valmask, int rw, int size);
-void DebuggerClearMemoryBreakpoint(u32 addr);
-int DebuggerStop(void);
+int remote_debugger_start(void *addr);
+int remote_debugger_stop(void);
+int debugger_start(void);
+void debugger_set_code_breakpoint(u32 addr);
+void debugger_clear_code_breakpoint();
+void debugger_set_memory_breakpoint(u32 addr, u32 val, u32 valmask, int rw, int size);
+void debugger_clear_memory_breakpoint(u32 addr);
+int debugger_stop(void);
 
 #endif

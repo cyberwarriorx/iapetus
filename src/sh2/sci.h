@@ -1,4 +1,4 @@
-/*  Copyright 2006 Theo Berkau
+/*  Copyright 2006,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -23,16 +23,16 @@
 #define SERIALMODE_ASYNC        0x00000000
 #define SERIALMODE_CLOCKEDSYNC  0x00800000
 
-int SciInit(u32 settings);
-u8 SciTransferByteNowait(u8 val, BOOL *success);
-void SciSendByte(u8 val);
-u8 SciReceiveByte();
-void SciSendWord(u16 val);
-void SciSendLong(u32 val);
-u16 SciReceiveWord();
-u32 SciReceiveLong();
-int SciRemoteExecute(void *buffer, u32 addr, u32 size);
-int SciSyncOut();
-int SciSyncIn();
-void SciHandler();
+int sci_init(u32 settings);
+u8 sci_transfer_byte_no_wait(u8 val, BOOL *success);
+void sci_send_byte(u8 val);
+u8 sci_receive_byte();
+void sci_send_word(u16 val);
+void sci_send_long(u32 val);
+u16 sci_receive_word();
+u32 sci_receive_long();
+int sci_remote_execute(void *buffer, u32 addr, u32 size);
+int sci_sync_out();
+int sci_sync_in();
+void sci_handler();
 #endif

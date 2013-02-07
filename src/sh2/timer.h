@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -25,7 +25,7 @@
 #define TIMER_WDT       2
 #define TIMER_HBLANK    3
 
-int TimerSetup(int type, u32 *freq);
-u32 TimerCounter();
+int timer_setup(int type, u32 *freq);
+u32 timer_counter();
 
 #endif

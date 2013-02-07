@@ -1,4 +1,4 @@
-/*  Copyright 2006-2007 Theo Berkau
+/*  Copyright 2006-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -67,18 +67,18 @@ typedef struct
    u16 CR2;
    u16 CR3;
    u16 CR4;
-} cdcmd_struct;
+} cd_cmd_struct;
 
 typedef struct
 {
    u8 status;
    u8 flag;
-   u8 repeatcnt;
-   u8 ctrladdr;
+   u8 repeat_cnt;
+   u8 ctrl_addr;
    u8 track;
    u8 index;
    u32 FAD;
-} cdstat_struct;
+} cd_stat_struct;
 
 enum SECTORSIZE
 {
@@ -88,16 +88,16 @@ enum SECTORSIZE
    SECT_2352 = 0x3
 };
 
-int CDExecCommand(u16 hirqmask, cdcmd_struct *cdcmd, cdcmd_struct *cdcmdrs);
-int CDDebugExecCommand(font_struct *font, u16 hirqmask, cdcmd_struct *cdcmd, cdcmd_struct *cdcmdrs);
-int CDInit();
-int IsCDAuth(u16 *disctypeauth);
-int CDAuth();
-int CDStopDrive();
-int CDStartDrive();
-int IsCDPresent();
-int CDReadSector(void *buffer, u32 FAD, int sectorsize, u32 numbytes);
-int PlayCDAudio(u8 audiotrack, u8 repeat, u8 vol_l, u8 vol_r);
-int StopCDAudio(void);
-int CDGetSessionNum(u8 *num);
+int cd_exec_command(u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int cd_debug_exec_command(font_struct *font, u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int cd_init();
+int is_cd_auth(u16 *disctypeauth);
+int cd_auth();
+int cd_stop_drive();
+int cd_start_drive();
+int is_cd_present();
+int cd_read_sector(void *buffer, u32 FAD, int sectorsize, u32 numbytes);
+int play_cd_audio(u8 audiotrack, u8 repeat, u8 vol_l, u8 vol_r);
+int stop_cd_audio(void);
+int cd_get_session_num(u8 *num);
 #endif

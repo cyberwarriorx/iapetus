@@ -1,4 +1,4 @@
-/*  Copyright 2007 Theo Berkau
+/*  Copyright 2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -37,53 +37,53 @@
 volatile u32 timercounter;
 u32 timerfreq;
 
-void TimerRTCIncrement(void) __attribute__ ((interrupt_handler));
-void TimerFRTIncrement(void) __attribute__ ((interrupt_handler));
-void TimerWDTIncrement(void) __attribute__ ((interrupt_handler));
+void timer_rtc_increment(void) __attribute__ ((interrupt_handler));
+void timer_frt_increment(void) __attribute__ ((interrupt_handler));
+void timer_wdt_increment(void) __attribute__ ((interrupt_handler));
 
 //////////////////////////////////////////////////////////////////////////////
 
-void TimerRTCIncrement(void)
+void timer_rtc_increment(void)
 {
    timercounter++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void TimerFRTIncrement(void)
+void timer_frt_increment(void)
 {
    timercounter++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void TimerWDTIncrement(void)
+void timer_wdt_increment(void)
 {
    timercounter++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void TimerHBlankIncrement(void)
+void timer_hblank_increment(void)
 {
    timercounter++;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-int TimerSetup(int type, u32 *freq)
+int timer_setup(int type, u32 *freq)
 {
    u32 clock=0;
-   int old_levelmask = InterruptGetLevelMask();
+   int old_level_mask = interrupt_get_level_mask();
 
    if (freq == NULL)
       return LAPETUS_ERR_INVALIDPOINTER;
 
    freq[0] = 0;
 
-   InterruptSetLevelMask(0xF);
+   interrupt_set_level_mask(0xF);
 
-   if (BIOS_GetClockSpeed == 0)
+   if (bios_get_clock_speed == 0)
       clock = 26846587;
    else
       clock = 28636360;
@@ -94,7 +94,7 @@ int TimerSetup(int type, u32 *freq)
          // Disable RTC
          SH2_REG_RTCSR_W(0);
          // Setup Interrupt
-         BIOS_SetSH2Interrupt(0x7F, TimerRTCIncrement);
+         bios_set_sh2_interrupt(0x7F, timer_rtc_increment);
          // Setup vector
          SH2_REG_VCRWDT = 0x7F7F;
          // Setup level
@@ -111,7 +111,7 @@ int TimerSetup(int type, u32 *freq)
          // Setup so that FRC is cleared on compare match A
 //         SH2_REG_FTCSR = 1; 
          // Setup Interrupt
-//         BIOS_SetSH2Interrupt(0x7F, TimerFRTIncrement);
+//         bios_set_sh2_interrupt(0x7F, TimerFRTIncrement);
          // Setup vector
 //         SH2_REG_VCRWDT = 0x7F7F;
          // Setup level
@@ -128,7 +128,7 @@ int TimerSetup(int type, u32 *freq)
          // Disable WDT interval timer
          SH2_REG_WTCSR_W(SH2_REG_WTCSR_R & 0x18);
          // Setup Interrupt
-         BIOS_SetSH2Interrupt(0x7F, TimerWDTIncrement);
+         bios_set_sh2_interrupt(0x7F, timer_wdt_increment);
          // Setup vector
          SH2_REG_VCRWDT = 0x7F7F;
          // Setup level
@@ -140,12 +140,12 @@ int TimerSetup(int type, u32 *freq)
          break;
       case TIMER_HBLANK:
          // Setup Interrupt
-         BIOS_SetSCUInterrupt(0x42, TimerHBlankIncrement);
-         BIOS_ChangeSCUInterruptMask(~MASK_HBLANKIN, 0);
+         bios_set_scu_interrupt(0x42, timer_hblank_increment);
+         bios_change_scu_interrupt_mask(~MASK_HBLANKIN, 0);
          freq[0] = 224; // fix me
 
-         if (old_levelmask > 0xC)
-            old_levelmask = 0xC;
+         if (old_level_mask > 0xC)
+            old_level_mask = 0xC;
 
          break;
       default:
@@ -153,26 +153,26 @@ int TimerSetup(int type, u32 *freq)
    }
 
    timercounter = 0;
-   if (old_levelmask == 0xF)
-      old_levelmask = 0xE;
+   if (old_level_mask == 0xF)
+      old_level_mask = 0xE;
 
-   InterruptSetLevelMask(old_levelmask);
+   interrupt_set_level_mask(old_level_mask);
 
    return LAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-u32 TimerCounter()
+u32 timer_counter()
 {
    return timercounter;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void TimerStop()
+void timer_stop()
 {
-   BIOS_SetSH2Interrupt(0x7F, 0);  
+   bios_set_sh2_interrupt(0x7F, 0);  
 }
 
 //////////////////////////////////////////////////////////////////////////////

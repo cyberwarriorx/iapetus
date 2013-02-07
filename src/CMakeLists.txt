@@ -1,10 +1,11 @@
 project(iapetus)
 
+enable_language(ASM)
 set(iapetus_SOURCES
 	ar/arcomm.c ar/commlink.c
 	cd/cd.c cd/cdfs.c cd/mpeg.c
 	debug/debug.c debug/remoteex.s debug/localex.s
-	scu/dsp.c scu/dmascu.c
+	scu/dsp.c scu/scudma.c
 	peripherals/smpc.c
 	sh2/sh2dma.c sh2/sh2int.c sh2/timer.c
 	sys/stdin.c sys/stdout.c sys/stderr.c sys/cd.c

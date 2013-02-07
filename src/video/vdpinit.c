@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -21,19 +21,19 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void CLCheck2(u8 val);
-extern volatile int commlinkservice;
+void cl_check2(u8 val);
+extern volatile int commlink_service;
 
 //////////////////////////////////////////////////////////////////////////////
 
-volatile u16 *vdp1ram = (volatile u16 *)VDP1_RAM;
-volatile u16 *vdp2ram = (volatile u16 *)VDP2_RAM;
-volatile u16 *vdp2cram = (volatile u16 *)VDP2_CRAM;
+volatile u16 *vdp1_ram = (volatile u16 *)VDP1_RAM;
+volatile u16 *vdp2_ram = (volatile u16 *)VDP2_RAM;
+volatile u16 *vdp2_cram = (volatile u16 *)VDP2_CRAM;
 
 //////////////////////////////////////////////////////////////////////////////
 // Internal variables
 
-vdp2settings_struct vdp2settings;
+vdp2_settings_struct vdp2_settings;
 
 //static u16 cmdlistnum = 1;
 
@@ -45,26 +45,26 @@ void vdp_init(int res)
    u16 EWRR;
 
    if (res & 0x1)
-      BIOS_SetClockSpeed(1); // 352
+      bios_set_clock_speed(1); // 352
    else
-      BIOS_SetClockSpeed(0); // 320
+      bios_set_clock_speed(0); // 320
 
-   for (i = 0; i < sizeof(vdp2settings); i++)
-      *(((u8 *)&vdp2settings)+i) = 0;
+   for (i = 0; i < sizeof(vdp2_settings); i++)
+      *(((u8 *)&vdp2_settings)+i) = 0;
 
    switch(res & 0x3)
    {
       case 0:
-         vdp2settings.screenwidth = 320;
+         vdp2_settings.screen_width = 320;
          break;
       case 1:
-         vdp2settings.screenwidth = 352;
+         vdp2_settings.screen_width = 352;
          break;
       case 2:
-         vdp2settings.screenwidth = 640;
+         vdp2_settings.screen_width = 640;
          break;
       case 3:
-         vdp2settings.screenwidth = 704;
+         vdp2_settings.screen_width = 704;
          break;
       default: break;
    }
@@ -72,19 +72,19 @@ void vdp_init(int res)
    switch((res >> 4) & 0x3)
    {
       case 0:
-         vdp2settings.screenheight = 224;
+         vdp2_settings.screen_height = 224;
          break;
       case 1:
-         vdp2settings.screenheight = 240;
+         vdp2_settings.screen_height = 240;
          break;
       case 2:
-         vdp2settings.screenheight = 256;
+         vdp2_settings.screen_height = 256;
          break;
       default: break;
    }
 
    if (res & 0xC0)
-      vdp2settings.screenheight <<= 1;   
+      vdp2_settings.screen_height <<= 1;   
 
    // Clear registers
    for (i = 0; i < 0x200; i+=2)
@@ -115,13 +115,13 @@ void vdp_init(int res)
    VDP1_REG_EWDR = 0x0000;
    VDP1_REG_EWLR = (0 << 9) | 0;
 
-   if (vdp2settings.screenwidth <= 512)
-      EWRR = (vdp2settings.screenwidth << 9);
+   if (vdp2_settings.screen_width <= 512)
+      EWRR = (vdp2_settings.screen_width << 9);
    else
-      EWRR = (512 << 9);
+      EWRR = (1 << 9);
 
-   if (vdp2settings.screenheight <= 256)
-      EWRR |= vdp2settings.screenheight;
+   if (vdp2_settings.screen_height <= 256)
+      EWRR |= vdp2_settings.screen_height;
    else
       EWRR |= 256;
 
@@ -170,33 +170,33 @@ void vdp_set_priority(int screen, u8 priority)
       case SCREEN_NBG0: // NBG0/RBG1
       case SCREEN_RBG1:
       {
-         vdp2settings.PRINA.part.nbg0priority = priority;
-         VDP2_REG_PRINA = vdp2settings.PRINA.all;
+         vdp2_settings.PRINA.part.nbg0_priority = priority;
+         VDP2_REG_PRINA = vdp2_settings.PRINA.all;
          break;
       }
       case SCREEN_NBG1: // NBG1/EXBG
       case SCREEN_EXBG:
       {         
-         vdp2settings.PRINA.part.nbg1priority = priority;
-         VDP2_REG_PRINA = vdp2settings.PRINA.all;
+         vdp2_settings.PRINA.part.nbg1_priority = priority;
+         VDP2_REG_PRINA = vdp2_settings.PRINA.all;
          break;
       }
       case SCREEN_NBG2: // NBG2
       {         
-         vdp2settings.PRINB.part.nbg2priority = priority;
-         VDP2_REG_PRINB = vdp2settings.PRINB.all;
+         vdp2_settings.PRINB.part.nbg2_priority = priority;
+         VDP2_REG_PRINB = vdp2_settings.PRINB.all;
          break;
       }
       case SCREEN_NBG3: // NBG3
       {         
-         vdp2settings.PRINB.part.nbg3priority = priority;
-         VDP2_REG_PRINB = vdp2settings.PRINB.all;
+         vdp2_settings.PRINB.part.nbg3_priority = priority;
+         VDP2_REG_PRINB = vdp2_settings.PRINB.all;
          break;
       }
       case SCREEN_RBG0: // RBG0
       {         
-         vdp2settings.PRIR.all = priority;
-         VDP2_REG_PRIR = vdp2settings.PRIR.all;
+         vdp2_settings.PRIR.all = priority;
+         VDP2_REG_PRIR = vdp2_settings.PRIR.all;
          break;
       }
       default: break;
@@ -209,8 +209,8 @@ void vdp_vsync(void)
 {
    // Wait for Vblank-in
    while(!(VDP2_REG_TVSTAT & 8)) {
-      if (commlinkservice)
-         CLCheck2(0x01); // Heh, I may change this
+      if (commlink_service)
+         cl_check2(0x01); // Heh, I may change this
    }
 
    // Wait for Vblank-out
@@ -259,24 +259,24 @@ void vdp_enable_color_offset(u16 screen, int select)
    screen = 1 << screen;
 
    if (select == 0)
-      vdp2settings.CLOFSL &= ~screen;
+      vdp2_settings.CLOFSL &= ~screen;
    else
-      vdp2settings.CLOFSL |= screen;
+      vdp2_settings.CLOFSL |= screen;
 
    // Adjust enable
-   vdp2settings.CLOFEN |= screen;
+   vdp2_settings.CLOFEN |= screen;
 
    // Write the new values to registers
-   VDP2_REG_CLOFSL = vdp2settings.CLOFSL;
-   VDP2_REG_CLOFEN = vdp2settings.CLOFEN;
+   VDP2_REG_CLOFSL = vdp2_settings.CLOFSL;
+   VDP2_REG_CLOFEN = vdp2_settings.CLOFEN;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void vdp_disable_color_offset(u16 screen)
 {
-   vdp2settings.CLOFEN &= ~screen;
-   VDP2_REG_CLOFEN = vdp2settings.CLOFEN;
+   vdp2_settings.CLOFEN &= ~screen;
+   VDP2_REG_CLOFEN = vdp2_settings.CLOFEN;
 }
 
 //////////////////////////////////////////////////////////////////////////////

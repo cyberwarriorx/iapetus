@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007 Theo Berkau
+/*  Copyright 2005-2007,2013 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -57,7 +57,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-static inline void SmpcWaitTillReady ()
+static inline void smpc_wait_till_ready ()
 {
    // Wait until SF register is cleared
    while(SMPC_REG_SF & 0x1) { }
@@ -65,7 +65,7 @@ static inline void SmpcWaitTillReady ()
 
 //////////////////////////////////////////////////////////////////////////////
 
-static inline void SmpcIssueCommand(u8 cmd)
+static inline void smpc_issue_command(u8 cmd)
 {
    // Set SF register so that no other command can be issued.
    SMPC_REG_SF = 1;
@@ -92,27 +92,27 @@ static inline void SmpcIssueCommand(u8 cmd)
 
 typedef struct
 {
-   u16 butpush; // currently pressed down buttons, etc.
-   u16 butpushonce; // If button is freshly pressed
+   u16 but_push; // currently pressed down buttons, etc.
+   u16 but_push_once; // If button is freshly pressed
    u32 other[2];
    u8 id; // peripheral id
-} perdata_struct;
+} per_data_struct;
 
 typedef struct
 {
-   u16 butpush; // currently pressed down buttons, etc.
-   u16 butpushonce; // If button is freshly pressed
-   u8 kbdtype;
+   u16 but_push; // currently pressed down buttons, etc.
+   u16 but_push_once; // If button is freshly pressed
+   u8 kbd_type;
    u8 flags;
    u8 key;
-   u8 extrastate[5];
+   u8 extra_state[5];
    u8 id; // peripheral id
 } keyboarddata_struct;
 
 typedef struct
 {
-   u16 butpush; // currently pressed down buttons, etc.
-   u16 butpushonce; // If button is freshly pressed
+   u16 but_push; // currently pressed down buttons, etc.
+   u16 but_push_once; // If button is freshly pressed
    s16 x;
    s16 y;
    u32 flags;
@@ -121,8 +121,8 @@ typedef struct
 
 typedef struct
 {
-   u16 butpush; // currently pressed down buttons, etc.
-   u16 butpushonce; // If button is freshly pressed
+   u16 but_push; // currently pressed down buttons, etc.
+   u16 but_push_once; // If button is freshly pressed
    u8 x;
    u8 y;
    u8 z;
@@ -130,7 +130,7 @@ typedef struct
    u8 id; // peripheral id
 } analogdata_struct;
 
-extern perdata_struct per[MAX_PERIPHERALS];
+extern per_data_struct per[MAX_PERIPHERALS];
 
 #define PAD_RIGHT       0x8000
 #define PAD_LEFT        0x4000
@@ -146,7 +146,7 @@ extern perdata_struct per[MAX_PERIPHERALS];
 #define PAD_Z           0x0010
 #define PAD_L           0x0008
 
-void PerInit();
+void per_init();
 
 #define KEY_ESC         0x76
 #define KEY_F1          0x05
@@ -250,9 +250,9 @@ void PerInit();
 #define KEY_KPINSERT    0x70
 #define KEY_KPDELETE    0x71
 
-static inline u8 KbdScancodeToAscii(keyboarddata_struct *kbd)
+static inline u8 kbd_scancode_to_ascii(keyboarddata_struct *kbd)
 {
-   u8 keytable[0x90] = {
+   u8 key_table[0x90] = {
       0x00, // ??
       0x00, // F9
       0x00, // ??
@@ -398,7 +398,7 @@ static inline u8 KbdScancodeToAscii(keyboarddata_struct *kbd)
       0x00, // ??
       0x00  // ??
    };
-   u8 keytable2[0x90] = {
+   u8 key_table2[0x90] = {
       0x00, // ??
       0x00, // F9
       0x00, // ??
@@ -548,18 +548,18 @@ static inline u8 KbdScancodeToAscii(keyboarddata_struct *kbd)
    if (!(kbd->flags >> 4))
    {
       // Straight conversion
-      if (!kbd->extrastate[0])
-         return keytable[kbd->key];
-      else if (keytable[kbd->key]) // SHIFT
-         return keytable2[kbd->key];
+      if (!kbd->extra_state[0])
+         return key_table[kbd->key];
+      else if (key_table[kbd->key]) // SHIFT
+         return key_table2[kbd->key];
    }
 
    // Depending on the other flags, adjust the returned ASCII code
    if (kbd->flags & 0x40) // CAPS LOCK
    {
       // Let's see if it's a letter
-      if (keytable[kbd->key] >= 'a' && keytable[kbd->key] <= 'z')
-         return (keytable[kbd->key] - 0x20);
+      if (key_table[kbd->key] >= 'a' && key_table[kbd->key] <= 'z')
+         return (key_table[kbd->key] - 0x20);
    }
 
    return 0; // fix me

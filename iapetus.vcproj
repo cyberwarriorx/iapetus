@@ -172,11 +172,11 @@
 				Name="SCU"
 				>
 				<File
-					RelativePath=".\src\scu\dmascu.c"
+					RelativePath=".\src\scu\dsp.c"
 					>
 				</File>
 				<File
-					RelativePath=".\src\scu\dsp.c"
+					RelativePath=".\src\scu\scudma.c"
 					>
 				</File>
 			</Filter>
@@ -377,6 +377,10 @@
 					RelativePath=".\src\scu\dsp.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\scu\scudma.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Debug"
@@ -420,6 +424,10 @@
 			</File>
 			<File
 				RelativePath=".\SegaSaturn-compiler-SH7604.cmake"
+				>
+			</File>
+			<File
+				RelativePath=".\TODO"
 				>
 			</File>
 			<Filter
