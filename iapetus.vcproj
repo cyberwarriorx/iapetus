@@ -23,9 +23,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="cd build &amp;&amp; make -f makefile"
-				ReBuildCommandLine="cd build &amp;&amp; make -f makefile clean &amp;&amp; make -f makefile"
-				CleanCommandLine="cd build &amp;&amp; make -f makefile clean"
+				BuildCommandLine="cd build &amp;&amp; make VERBOSE=1"
+				ReBuildCommandLine="cd build &amp;&amp; make clean &amp;&amp; make"
+				CleanCommandLine="cd build &amp;&amp; make clean"
 				Output="libiapetus.a"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
@@ -412,6 +412,14 @@
 			</File>
 			<File
 				RelativePath=".\makefile"
+				>
+			</File>
+			<File
+				RelativePath=".\README.TXT"
+				>
+			</File>
+			<File
+				RelativePath=".\SegaSaturn-compiler-SH7604.cmake"
 				>
 			</File>
 			<Filter
