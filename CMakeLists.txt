@@ -1,7 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-INCLUDE(CMakeForceCompiler)
-include(CMakeDetermineASMCompiler)
+include(CMakeForceCompiler)
 
 SET(CMAKE_SYSTEM_NAME SegaSaturn)
 
