@@ -90,6 +90,7 @@ enum SECTORSIZE
 
 int cd_exec_command(u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
 int cd_debug_exec_command(font_struct *font, u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int cd_connect_cd_to_filter(int filternum);
 int cd_init();
 int is_cd_auth(u16 *disctypeauth);
 int cd_auth();

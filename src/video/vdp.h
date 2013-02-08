@@ -968,7 +968,7 @@ void vdp_draw_distorted_sprite(sprite_struct *sprite);
 void vdp_draw_polygon(sprite_struct *sprite);
 void vdp_draw_poly_line(sprite_struct *sprite);
 void vdp_draw_line(sprite_struct *sprite);
-void vdp_start_draw_kist();
+void vdp_start_draw_list();
 void vdp_end_draw_list();
 
 #endif

@@ -195,7 +195,7 @@ void vdp_draw_line(sprite_struct *sprite)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void vdp_start_draw_kist()
+void vdp_start_draw_list()
 {
    command_num = 0;
 }

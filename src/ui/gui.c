@@ -132,7 +132,7 @@ int gui_do_menu(menu_item_struct *menu, font_struct *font, int x, int y, const c
       {
          gui_clear_scr(font);
 
-         vdp_start_draw_kist();
+         vdp_start_draw_list();
          vdp_end_draw_list();
 
          if (menu[cursel].func)
@@ -143,7 +143,7 @@ int gui_do_menu(menu_item_struct *menu, font_struct *font, int x, int y, const c
       {
          gui_clear_scr(font);
 
-         vdp_start_draw_kist();
+         vdp_start_draw_list();
          vdp_end_draw_list();
          return -1;
       }
@@ -168,7 +168,7 @@ void gui_window_draw(int x, int y, int width, int height, u16 fgcolor, u16 bgcol
    localcoord.x = 0;
    localcoord.y = 0;
 
-   vdp_start_draw_kist();
+   vdp_start_draw_list();
    vdp_local_coordinate(&localcoord);
 
    sprite.attr = SPRITE_PRECLIPENABLE | SPRITE_HIGHSPEEDSHRINKDISABLE |

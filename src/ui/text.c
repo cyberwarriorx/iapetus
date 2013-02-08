@@ -58,7 +58,7 @@ void vdp_clear_screen(font_struct *font)
 
    if (font->screen == SCREEN_VDP1)
    {
-      vdp_start_draw_kist();
+      vdp_start_draw_list();
       vdp_end_draw_list();
    }
    else
