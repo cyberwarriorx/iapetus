@@ -62,7 +62,6 @@ int cd_wait_hirq(int flag)
 
 //////////////////////////////////////////////////////////////////////////////
 
-
 int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs)
 {
    int old_level_mask;
@@ -105,6 +104,15 @@ int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_
 
    // It's all good
    return LAPETUS_ERR_OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void cd_get_info_data(int size, u16 *data)
+{
+   int i;
+   for (i = 0; i < size; i++)
+      data[i] = *((volatile u16 *)0x25898000);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -210,6 +218,34 @@ int cd_seek_fad(int seekfad)
    cd_cmd.CR4 = 0;
 
    return cd_exec_command(0, &cd_cmd, &cd_cmd_rs);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags)
+{
+   int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   cd_cmd.CR1 = 0x4400 | (type & 0xFF);
+   cd_cmd.CR2 = 0;
+   cd_cmd.CR3 = 0;
+   cd_cmd.CR4 = 0;
+
+   ret = cd_exec_command(HIRQ_DRDY, &cd_cmd, &cd_cmd_rs);
+
+   if (ret == LAPETUS_ERR_OK)
+   {
+      // Wait for data to be ready
+      if (!cd_wait_hirq(HIRQ_DRDY))
+         return LAPETUS_ERR_BUSY;
+
+      cd_get_info_data(cd_cmd_rs.CR2, data);
+      *flags = cd_cmd_rs.CR4;
+   }
+
+   return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////

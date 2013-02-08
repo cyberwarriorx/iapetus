@@ -92,6 +92,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\sys\mem.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\sys\open.c"
 					>
 				</File>
@@ -420,10 +424,6 @@
 			</File>
 			<File
 				RelativePath=".\README.TXT"
-				>
-			</File>
-			<File
-				RelativePath=".\SegaSaturn-compiler-SH7604.cmake"
 				>
 			</File>
 			<File

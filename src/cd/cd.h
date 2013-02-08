@@ -80,12 +80,18 @@ typedef struct
    u32 FAD;
 } cd_stat_struct;
 
-enum SECTORSIZE
+enum SECTOR_SIZE
 {
    SECT_2048 = 0x0,
    SECT_2336 = 0x1,
    SECT_2340 = 0x2,
    SECT_2352 = 0x3
+};
+
+enum SUBCODE_TYPE
+{
+   SC_Q = 0x0,
+   SC_RW = 0x1
 };
 
 int cd_exec_command(u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
