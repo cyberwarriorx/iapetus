@@ -228,7 +228,7 @@ int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags)
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x4400 | (type & 0xFF);
+   cd_cmd.CR1 = 0x2000 | (type & 0xFF);
    cd_cmd.CR2 = 0;
    cd_cmd.CR3 = 0;
    cd_cmd.CR4 = 0;

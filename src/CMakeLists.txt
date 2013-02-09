@@ -19,6 +19,7 @@ set(iapetus_SOURCES
 
 set(CMAKE_C_FLAGS "-O2 -Wall -m2 -DREENTRANT_SYSCALLS_PROVIDED")
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(${PROJECT_NAME} STATIC ${iapetus_SOURCES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION "lib")

@@ -4,10 +4,28 @@ include(CMakeForceCompiler)
 
 SET(CMAKE_SYSTEM_NAME SegaSaturn)
 
+if (WIN32)
+	set(SH_ELF_PATHS 
+		"[HKEY_LOCAL_MACHINE\\SOFTWARE\\KPIT\\GNUSH v12.02-ELF;Path]/sh-elf/bin"
+		"[HKEY_LOCAL_MACHINE\\SOFTWARE\\KPIT Cummins\\GNUSH v10.02-ELF;Path]/sh-elf/bin")
+else (WIN32)	        
+	set(SH_ELF_PATHS "")
+endif (WIN32)
+
+find_program(SH_ELF_GCC
+	NAMES sh-elf-gcc
+	PATHS
+		${SH_ELF_PATHS})
+
+find_program(SH_ELF_GPP
+	NAMES sh-elf-g++
+	PATHS
+		${SH_ELF_PATHS})
+		
 # Specify the cross compiler.
-CMAKE_FORCE_C_COMPILER("C:/Program Files (x86)/KPIT Cummins/GNUSHv10.02-ELF/sh-elf/bin/sh-elf-gcc.exe" GNU)
-CMAKE_FORCE_CXX_COMPILER("C:/Program Files (x86)/KPIT Cummins/GNUSHv10.02-ELF/sh-elf/bin/sh-elf-g++.exe" GNU)
-SET(CMAKE_FIND_ROOT_PATH "C:/Program Files (x86)/KPIT Cummins/GNUSHv10.02-ELF/sh-elf/bin/" "C:/Program Files (x86)/KPIT Cummins/GNUSHv10.02-ELF/Other Utilities/")
+CMAKE_FORCE_C_COMPILER(${SH_ELF_GCC} GNU)
+CMAKE_FORCE_CXX_COMPILER(${SH_ELF_GPP} GNU)
+SET(CMAKE_FIND_ROOT_PATH /usr/local/share/sh-elf/bin)
 
 PROJECT(iapetus)
 
