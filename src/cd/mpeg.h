@@ -147,8 +147,20 @@ BOOL is_mpeg_card_present();
 int is_mpeg_auth();
 int mpeg_auth();
 int mpeg_get_status(mpeg_status_struct *mpeg_status);
+int mpeg_init ();
 int mpeg_set_con(enum STM_SEL stm_sel, mpeg_con_struct *mpeg_con_audio, mpeg_con_struct *mpeg_con_video);
 int mpeg_get_con(enum STM_SEL stm_sel, mpeg_con_struct *mpeg_con_audio, mpeg_con_struct *mpeg_con_video);
 int mpeg_set_mode(enum SMVM video_mode, enum SMDT dec_timing_mode, enum SMOM out_mode, enum SMSM scanline_mode);
+int mpeg_set_stream(enum STM_SEL stm_sel, mpeg_stream_struct *mpeg_stream_audio, mpeg_stream_struct *mpeg_stream_video);
+int mpeg_set_decoding(u8 mute, u16 pause_time, u16 freeze_time);
+int mpeg_display(BOOL disp_show, u8 fb_num);
+int mpeg_set_window(enum SWCT type, s16 x, s16 y);
+int mpeg_set_border_color(u16 color);
+int mpeg_set_fade(u8 y_gain, u8 c_gain);
+int mpeg_set_video_effects(u8 intp, u8 lumikey, u8 mosaic_width, u8 mosaic_height, u8 blur_width, u8 blur_height);
+int mpeg_play(file_struct *file);
+int mpeg_pause(file_struct *file);
+int mpeg_unpause(file_struct *file);
+int mpeg_stop(file_struct *file);
 
 #endif
