@@ -41,6 +41,8 @@ void timer_rtc_increment(void) __attribute__ ((interrupt_handler));
 void timer_frt_increment(void) __attribute__ ((interrupt_handler));
 void timer_wdt_increment(void) __attribute__ ((interrupt_handler));
 
+extern vdp2_settings_struct vdp2_settings;
+
 //////////////////////////////////////////////////////////////////////////////
 
 void timer_rtc_increment(void)
@@ -77,7 +79,7 @@ int timer_setup(int type, u32 *freq)
    int old_level_mask = interrupt_get_level_mask();
 
    if (freq == NULL)
-      return LAPETUS_ERR_INVALIDPOINTER;
+      return IAPETUS_ERR_INVALIDPOINTER;
 
    freq[0] = 0;
 
@@ -142,14 +144,14 @@ int timer_setup(int type, u32 *freq)
          // Setup Interrupt
          bios_set_scu_interrupt(0x42, timer_hblank_increment);
          bios_change_scu_interrupt_mask(~MASK_HBLANKIN, 0);
-         freq[0] = 224; // fix me
+         freq[0] = vdp2_settings.screen_height;
 
          if (old_level_mask > 0xC)
             old_level_mask = 0xC;
 
          break;
       default:
-         return LAPETUS_ERR_INVALIDARG;
+         return IAPETUS_ERR_INVALIDARG;
    }
 
    timercounter = 0;
@@ -158,7 +160,7 @@ int timer_setup(int type, u32 *freq)
 
    interrupt_set_level_mask(old_level_mask);
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

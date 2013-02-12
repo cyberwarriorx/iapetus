@@ -76,7 +76,7 @@ int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_
 
    // Make sure CMOK flag is set, or we can't continue
    if (!(hirq_temp & HIRQ_CMOK))
-      return LAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_BUSY;
 
    // Clear CMOK and any other user-defined flags
    CDB_REG_HIRQ = ~(hirq_mask | HIRQ_CMOK);
@@ -86,7 +86,7 @@ int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_
 
    // Let's wait till the command operation is finished
    if (!cd_wait_hirq(HIRQ_CMOK))
-      return LAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_TIMEOUT;
 
    // Read return data
    cd_read_return_status(cd_cmd_rs);
@@ -95,15 +95,15 @@ int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_
 
    // Was command good?
    if (cd_status == STATUS_REJECT)
-      return LAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_BUSY;
    else if (cd_status & STATUS_WAIT)
-      return LAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_BUSY;
 
    // return interrupts back to normal
    interrupt_set_level_mask(old_level_mask);
 
    // It's all good
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cm
 
    // Make sure CMOK flag is set, or we can't continue
    if (!(hirq_temp & HIRQ_CMOK))
-      return LAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_BUSY;
 
    // Clear CMOK and any other user-defined flags
    CDB_REG_HIRQ = ~(hirq_mask | HIRQ_CMOK);
@@ -186,7 +186,7 @@ int cd_end_transfer()
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_play_fad(int playmode, int startfad, int numsectors)
+int cd_play_fad(int play_mode, int start_fad, int num_sectors)
 {
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
@@ -195,10 +195,10 @@ int cd_play_fad(int playmode, int startfad, int numsectors)
    // Clear flags
    CDB_REG_HIRQ = ~(HIRQ_PEND|HIRQ_CSCT) | HIRQ_CMOK;
 
-   cd_cmd.CR1 = 0x1080 | (startfad >> 16);
-   cd_cmd.CR2 = startfad;
-   cd_cmd.CR3 = (playmode << 8) | 0x80 | (numsectors >> 16);
-   cd_cmd.CR4 = numsectors;
+   cd_cmd.CR1 = 0x1080 | (start_fad >> 16);
+   cd_cmd.CR2 = start_fad;
+   cd_cmd.CR3 = (play_mode << 8) | 0x80 | (num_sectors >> 16);
+   cd_cmd.CR4 = num_sectors;
 
    ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs);
 
@@ -235,11 +235,11 @@ int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags)
 
    ret = cd_exec_command(HIRQ_DRDY, &cd_cmd, &cd_cmd_rs);
 
-   if (ret == LAPETUS_ERR_OK)
+   if (ret == IAPETUS_ERR_OK)
    {
       // Wait for data to be ready
       if (!cd_wait_hirq(HIRQ_DRDY))
-         return LAPETUS_ERR_BUSY;
+         return IAPETUS_ERR_TIMEOUT;
 
       cd_get_info_data(cd_cmd_rs.CR2, data);
       *flags = cd_cmd_rs.CR4;
@@ -250,14 +250,14 @@ int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_connect_cd_to_filter(int filternum)
+int cd_connect_cd_to_filter(u8 filter_num)
 {
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
    cd_cmd.CR1 = 0x3000;
    cd_cmd.CR2 = 0x0000;
-   cd_cmd.CR3 = filternum << 8;
+   cd_cmd.CR3 = filter_num << 8;
    cd_cmd.CR4 = 0x0000;
 
    return cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
@@ -265,56 +265,14 @@ int cd_connect_cd_to_filter(int filternum)
 
 //////////////////////////////////////////////////////////////////////////////
 
-static int cd_set_filter_mode(int filternum, int mode)
+static int cd_set_filter_mode(u8 filter_num, u8 mode)
 {
    int ret;
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x4400 | (mode & 0xFF);
+   cd_cmd.CR1 = 0x4400 | mode;
    cd_cmd.CR2 = 0;
-   cd_cmd.CR3 = (filternum << 8);
-   cd_cmd.CR4 = 0;
-
-   ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
-
-   // Wait for function to finish
-   while (!(CDB_REG_HIRQ & HIRQ_ESEL)) {}
-
-   return ret;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-int cd_set_filter_subheader_conditions(int filter_num) // fix me
-{
-   int ret;
-   cd_cmd_struct cd_cmd;
-   cd_cmd_struct cd_cmd_rs;
-
-   cd_cmd.CR1 = 0x4200 | 0x00; // fix me
-   cd_cmd.CR2 = 0x0000; // fix me
-   cd_cmd.CR3 = (filter_num << 8) | 0x00; // fix me
-   cd_cmd.CR4 = 0x0000; // fix me
-
-   ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
-
-   // Wait for function to finish
-   while (!(CDB_REG_HIRQ & HIRQ_ESEL)) {}
-
-   return ret;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-int cd_set_filter_connection(int filter_num, int connect_flag, int true_con, int false_con)
-{
-   int ret;
-   cd_cmd_struct cd_cmd;
-   cd_cmd_struct cd_cmd_rs;
-
-   cd_cmd.CR1 = 0x4600 | (connect_flag & 0xFF);
-   cd_cmd.CR2 = (true_con << 8) | (false_con & 0xFF);
    cd_cmd.CR3 = (filter_num << 8);
    cd_cmd.CR4 = 0;
 
@@ -328,36 +286,109 @@ int cd_set_filter_connection(int filter_num, int connect_flag, int true_con, int
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_set_filter(int filternum, int mode, int truecon, int falsecon)
+int cd_set_filter_subheader_conditions(u8 filter_num, cd_sh_cond_struct *sh_cond)
 {
    int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
 
-   if ((ret = cd_set_filter_mode(filternum, mode)) != 0)
-      return ret;
+   cd_cmd.CR1 = 0x4200 | sh_cond->channel;
+   cd_cmd.CR2 = (sh_cond->sm_mask << 8) | sh_cond->ci_mask;
+   cd_cmd.CR3 = (filter_num << 8) | sh_cond->file_id;
+   cd_cmd.CR4 = (sh_cond->sm_val << 8) | sh_cond->ci_val;
 
-   // fix me
-//   if ((ret = CDSetFilterSubheaderConditions(filternum)) != 0)
-//      return ret;
+   ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
 
-   // Connect filter 0's true condition to selector 0, false condition to selector NULL
-   if ((ret = cd_set_filter_connection(filternum, 0x03, truecon, falsecon)) != 0)
-      return ret;
+   // Wait for function to finish
+   while (!(CDB_REG_HIRQ & HIRQ_ESEL)) {}
 
-   return LAPETUS_ERR_OK;
+   return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-static int cd_reset_selector(int resetflags, int selnum)
+int cd_set_filter_range(u8 filter_num, cd_range_struct *cd_range)
+{
+   int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   cd_cmd.CR1 = 0x4000 | ((cd_range->fad >> 8) & 0xFF);
+   cd_cmd.CR2 = cd_range->fad;
+   cd_cmd.CR3 = (filter_num << 8) | ((cd_range->range >> 8) & 0xFF);
+   cd_cmd.CR4 = cd_range->range;
+
+   ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
+
+   // Wait for function to finish
+   while (!(CDB_REG_HIRQ & HIRQ_ESEL)) {}
+
+   return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+int cd_set_filter_connection(u8 filter_num, cd_con_struct *cd_con)
+{
+   int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   cd_cmd.CR1 = 0x4600 | cd_con->connect_flags;
+   cd_cmd.CR2 = (cd_con->true_con << 8) | cd_con->false_con;
+   cd_cmd.CR3 = (filter_num << 8);
+   cd_cmd.CR4 = 0;
+
+   ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
+
+   // Wait for function to finish
+   while (!(CDB_REG_HIRQ & HIRQ_ESEL)) {}
+
+   return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+int cd_set_filter(u8 filter_num, u8 mode, cd_sh_cond_struct *sh_cond, cd_range_struct *cd_range, cd_con_struct *cd_con)
+{
+   int ret;
+
+   if ((ret = cd_set_filter_mode(filter_num, mode)) != IAPETUS_ERR_OK)
+      return ret;
+
+   if (sh_cond)
+   {
+      if ((ret = cd_set_filter_subheader_conditions(filter_num, sh_cond)) != IAPETUS_ERR_OK)
+         return ret;
+   }
+
+   if (cd_range)
+   {
+      if ((ret = cd_set_filter_range(filter_num, cd_range)) != IAPETUS_ERR_OK)
+         return ret;
+   }
+
+   if (cd_con)
+   {
+      if ((ret = cd_set_filter_connection(filter_num, cd_con)) != IAPETUS_ERR_OK)
+         return ret;
+   }
+
+   return IAPETUS_ERR_OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+static int cd_reset_selector(u8 reset_flags, u8 sel_num)
 {
    int ret;
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
    // Reset Selector Command
-   cd_cmd.CR1 = 0x4800 | ((u8)resetflags);
+   cd_cmd.CR1 = 0x4800 | reset_flags;
    cd_cmd.CR2 = 0x0000;
-   cd_cmd.CR3 = (selnum << 8);
+   cd_cmd.CR3 = (sel_num << 8);
    cd_cmd.CR4 = 0x0000;
 
    if ((ret = cd_exec_command(HIRQ_EFLS, &cd_cmd, &cd_cmd_rs)) != 0)
@@ -366,7 +397,7 @@ static int cd_reset_selector(int resetflags, int selnum)
    // wait for function to finish
    while (!(CDB_REG_HIRQ & HIRQ_ESEL)) {}
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -385,7 +416,7 @@ int cd_reset_selector_all()
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_is_data_ready(int selnum)
+int cd_is_data_ready(int sel_num)
 {
    int ret;
    cd_cmd_struct cd_cmd;
@@ -393,11 +424,11 @@ int cd_is_data_ready(int selnum)
 
    cd_cmd.CR1 = 0x5100;
    cd_cmd.CR2 = 0;
-   cd_cmd.CR3 = (selnum << 8);
+   cd_cmd.CR3 = (sel_num << 8);
    cd_cmd.CR4 = 0;
 
    if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != 0)
-      return LAPETUS_ERR_OK;
+      return IAPETUS_ERR_OK;
 
    // Return the number of sectors ready
    return cd_cmd_rs.CR4;
@@ -422,15 +453,15 @@ int cd_set_sector_size(int size)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_get_then_delete_sector_data(int selnum, int sectorpos, int numsectors)
+int cd_get_then_delete_sector_data(u8 sel_num, u16 sector_pos, u16 num_sectors)
 {
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
    cd_cmd.CR1 = 0x6300;
-   cd_cmd.CR2 = sectorpos;
-   cd_cmd.CR3 = selnum << 8;
-   cd_cmd.CR4 = numsectors;
+   cd_cmd.CR2 = sector_pos;
+   cd_cmd.CR3 = sel_num << 8;
+   cd_cmd.CR4 = num_sectors;
 
    return cd_exec_command(HIRQ_EHST, &cd_cmd, &cd_cmd_rs);
 }
@@ -465,7 +496,7 @@ int cd_transfer_data(u32 num_sectors, u32 *buffer)
 
    // Wait till data is ready
    if (!cd_wait_hirq(HIRQ_DRDY | HIRQ_EHST))
-   	   return LAPETUS_ERR_BUSY;
+   	   return IAPETUS_ERR_TIMEOUT;
 
    // Do transfer
    for (i = 0; i < ((num_sectors * sector_size_tbl[cd_sector_size]) / 4); i++)
@@ -474,7 +505,7 @@ int cd_transfer_data(u32 num_sectors, u32 *buffer)
    if ((ret = cd_end_transfer()) != 0)
       return ret;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -495,7 +526,7 @@ int cd_transfer_data_bytes(u32 num_bytes, u32 *buffer)
 
    // Wait till data is ready
    if (!cd_wait_hirq(HIRQ_DRDY | HIRQ_EHST))
-   	   return LAPETUS_ERR_BUSY;
+   	   return IAPETUS_ERR_TIMEOUT;
 
    // Do transfer
    for (i = 0; i < (num_bytes >> 2); i++)
@@ -519,7 +550,7 @@ int cd_transfer_data_bytes(u32 num_bytes, u32 *buffer)
    if ((ret = cd_end_transfer()) != 0)
       return ret;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -545,7 +576,7 @@ int cd_init()
    if ((ret = cd_reset_selector_all()) != 0)
       return ret;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -572,7 +603,7 @@ int cd_get_stat(cd_stat_struct *cd_status)
    cd_status->index = cd_cmd_rs.CR3 >> 8;
    cd_status->FAD = ((cd_cmd_rs.CR3 & 0xFF) << 16) | cd_cmd_rs.CR4;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -588,7 +619,7 @@ int is_cd_auth(u16 *disc_type_auth)
    cd_cmd.CR4 = 0x0000;
 
    // If command fails, assume it's not authenticated
-   if (cd_exec_command(0, &cd_cmd, &cd_cmd_rs) != LAPETUS_ERR_OK)
+   if (cd_exec_command(0, &cd_cmd, &cd_cmd_rs) != IAPETUS_ERR_OK)
       return FALSE;
 
    if (disc_type_auth)
@@ -641,14 +672,14 @@ int cd_auth()
       if (cd_get_stat(&cd_status) != 0) continue;
 
       if (cd_status.status == STATUS_PAUSE) break;
-      else if (cd_status.status == STATUS_FATAL) return LAPETUS_ERR_UNKNOWN;
+      else if (cd_status.status == STATUS_FATAL) return IAPETUS_ERR_UNKNOWN;
    }
 
    // Was Authentication successful?
    if (!is_cd_auth(&auth))
-      return LAPETUS_ERR_AUTH;
+      return IAPETUS_ERR_AUTH;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -681,10 +712,10 @@ int cd_stop_drive()
       if (cd_get_stat(&cd_status) != 0) continue;
 
       if (cd_status.status == STATUS_STANDBY) break;
-      else if (cd_status.status == STATUS_FATAL) return LAPETUS_ERR_UNKNOWN;
+      else if (cd_status.status == STATUS_FATAL) return IAPETUS_ERR_UNKNOWN;
    }
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -706,7 +737,7 @@ int cd_start_drive()
 
    // wait till operation is finished(fix me)
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -783,7 +814,7 @@ int cd_read_sector(void *buffer, u32 FAD, int sector_size, u32 num_bytes)
 
       // Setup a transfer from cd buffer to wram, then delete data
       // from cd buffer
-      if ((ret = cd_transfer_data_bytes(bytes_to_read, buffer)) != LAPETUS_ERR_OK)
+      if ((ret = cd_transfer_data_bytes(bytes_to_read, buffer)) != IAPETUS_ERR_OK)
          return ret;
 
       num_bytes -= bytes_to_read;
@@ -793,7 +824,7 @@ int cd_read_sector(void *buffer, u32 FAD, int sector_size, u32 num_bytes)
          done = 1;
    }
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -864,7 +895,7 @@ int cd_get_session_num(u8 *num)
       return ret;
 
    num[0] = cd_cmd_rs.CR3 >> 8;
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

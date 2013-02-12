@@ -19,6 +19,7 @@
 
 #ifndef CDFS_H
 #define CDFS_H
+
 typedef struct
 {
    u32 lba;

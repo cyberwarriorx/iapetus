@@ -112,7 +112,7 @@ int vdp_set_font(int screen, font_struct *font, int transparent)
    font->screen = screen;
    font->transparent = transparent;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

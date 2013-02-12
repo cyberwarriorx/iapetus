@@ -92,10 +92,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\sys\mem.c"
-					>
-				</File>
-				<File
 					RelativePath=".\src\sys\open.c"
 					>
 				</File>
@@ -123,6 +119,38 @@
 					RelativePath=".\src\sys\write.c"
 					>
 				</File>
+				<Filter
+					Name="mem"
+					>
+					<File
+						RelativePath=".\src\sys\mem\free.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\sys\mem\free_r.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\sys\mem\malloc.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\sys\mem\malloc_r.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\sys\mem\memb.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\sys\mem\realloc_r.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\sys\mem\slob.c"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Action Replay"
@@ -293,6 +321,14 @@
 					RelativePath=".\src\sys\file.h"
 					>
 				</File>
+				<Filter
+					Name="mem"
+					>
+					<File
+						RelativePath=".\src\sys\mem\memb.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="CD"

@@ -115,10 +115,10 @@ int vdp_set_palette(int type, void *palette, int size)
             *((volatile u32 *)(VDP2_CRAM+i)) = *((u32 *)(palette+i));            
          break;
       default:
-         return LAPETUS_ERR_INVALIDARG;
+         return IAPETUS_ERR_INVALIDARG;
    }
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

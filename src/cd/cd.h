@@ -61,6 +61,11 @@
 #define CDB_REG_CR4         *((volatile u16 *)0x25890024)
 #define CDB_REG_DATATRNS    *((volatile u32 *)0x25818000)
 
+#define CD_CON_TRUE             (1 << 0)
+#define CD_CON_FALSE            (1 << 1)
+
+#define CD_NO_CHANGE 0xFF
+
 typedef struct
 {
    u16 CR1;
@@ -80,6 +85,45 @@ typedef struct
    u32 FAD;
 } cd_stat_struct;
 
+#define FM_FN                    (1 << 0)
+#define FM_CN                    (1 << 1)
+#define FM_SM                    (1 << 2)
+#define FM_CI                    (1 << 3)
+#define FM_REV                   (1 << 4)
+#define FM_FAD                   (1 << 6)
+
+#define SM_EOR                   (1 << 0)
+#define SM_VIDEO                 (1 << 1)
+#define SM_AUDIO                 (1 << 2)
+#define SM_DATA                  (1 << 3)
+#define SM_TRIGGER               (1 << 4)
+#define SM_FORM                  (1 << 5)
+#define SM_RT                    (1 << 6)
+#define SM_EOF                   (1 << 7)
+
+typedef struct
+{
+   u8 channel;
+   u8 sm_mask;
+   u8 ci_mask;
+   u8 file_id;
+   u8 sm_val;
+   u8 ci_val;
+} cd_sh_cond_struct;
+
+typedef struct
+{
+   u32 fad;
+   u32 range;
+} cd_range_struct;
+
+typedef struct
+{
+   u8 connect_flags;
+   u8 true_con;
+   u8 false_con;
+} cd_con_struct;
+
 enum SECTOR_SIZE
 {
    SECT_2048 = 0x0,
@@ -94,17 +138,20 @@ enum SUBCODE_TYPE
    SC_RW = 0x1
 };
 
-int cd_exec_command(u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
-int cd_debug_exec_command(font_struct *font, u16 hirqmask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
-int cd_connect_cd_to_filter(int filternum);
+int cd_wait_hirq(int flag);
+int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int cd_play_fad(int play_mode, int start_fad, int num_sectors);
+int cd_connect_cd_to_filter(u8 filter_num);
+int cd_set_filter(u8 filter_num, u8 mode, cd_sh_cond_struct *sh_cond, cd_range_struct *cd_range, cd_con_struct *cd_con);
 int cd_init();
-int is_cd_auth(u16 *disctypeauth);
+int is_cd_auth(u16 *disc_type_auth);
 int cd_auth();
 int cd_stop_drive();
 int cd_start_drive();
 int is_cd_present();
-int cd_read_sector(void *buffer, u32 FAD, int sectorsize, u32 numbytes);
-int play_cd_audio(u8 audiotrack, u8 repeat, u8 vol_l, u8 vol_r);
+int cd_read_sector(void *buffer, u32 FAD, int sector_size, u32 num_bytes);
+int play_cd_audio(u8 audio_track, u8 repeat, u8 vol_l, u8 vol_r);
 int stop_cd_audio(void);
 int cd_get_session_num(u8 *num);
 #endif

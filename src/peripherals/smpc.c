@@ -22,7 +22,7 @@
 
 per_data_struct per[MAX_PERIPHERALS];
 
-static u16 oldperpush[MAX_PERIPHERALS]; // fix me
+static u16 old_per_push[MAX_PERIPHERALS]; // fix me
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +116,7 @@ void smpc_handler()
                case 0x1: // Analog type(Racing wheel/Analog pad)
                case 0x3: // Keyboard type
                {
-                  oldperpush[i+per_counter] = per[i+per_counter].but_push;
+                  old_per_push[i+per_counter] = per[i+per_counter].but_push;
                   per_data = (SMPC_REG_OREG(oreg_counter) << 8) | SMPC_REG_OREG(oreg_counter+1);
                   oreg_counter += 2;
 
@@ -145,7 +145,7 @@ void smpc_handler()
                   }
 
                   per[i+per_counter].but_push = per_data ^ 0xFFFF;
-                  per[i+per_counter].but_push_once = (oldperpush[i+per_counter] ^ per[i+per_counter].but_push) & per[i+per_counter].but_push;
+                  per[i+per_counter].but_push_once = (old_per_push[i+per_counter] ^ per[i+per_counter].but_push) & per[i+per_counter].but_push;
 
                   break;
                }
@@ -161,7 +161,7 @@ void smpc_handler()
                      {
                         per_data = SMPC_REG_OREG(oreg_counter);
                         per[i+per_counter].but_push = (per_data & 0xF) << 8; // fix me
-                        per[i+per_counter].but_push_once = (oldperpush[i+per_counter] ^ per[i+per_counter].but_push) & per[i+per_counter].but_push;
+                        per[i+per_counter].but_push_once = (old_per_push[i+per_counter] ^ per[i+per_counter].but_push) & per[i+per_counter].but_push;
                         ((mousedata_struct *)per)[i+per_counter].flags = per_data >> 4;
 
                         ((mousedata_struct *)per)[i+per_counter].x = SMPC_REG_OREG(oreg_counter+1);
@@ -220,7 +220,7 @@ void per_init()
    bios_set_scu_interrupt(0x47, smpc_handler);
 
    // Clear internal variables
-   memset(oldperpush, 0, MAX_PERIPHERALS * sizeof(u16));
+   memset(old_per_push, 0, MAX_PERIPHERALS * sizeof(u16));
    memset(per, 0, sizeof(per_data_struct) * MAX_PERIPHERALS);
 
    // Unmask vblank-out interrupt

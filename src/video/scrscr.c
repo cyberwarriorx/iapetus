@@ -189,7 +189,7 @@ int vdp_nbg0_init(screen_settings_struct *settings)
 //   CalcPatternNameCyclesAndAddr(SCREEN_NBG0, settings->isbitmap);
 
    // Adjust VRAM access
-//   if (SetupRamCycles() != LAPETUS_ERR_OK)
+//   if (SetupRamCycles() != IAPETUS_ERR_OK)
 //      return VDP_ERR_CONFLICT;
 
    vdp2_settings.BGON.part.nbg0_trans_enab = settings->transparent_bit;
@@ -293,7 +293,7 @@ int vdp_nbg1_init(screen_settings_struct *settings)
    }
 
    // Adjust VRAM access
-   if (SetupRamCycles() != LAPETUS_ERR_OK)
+   if (SetupRamCycles() != IAPETUS_ERR_OK)
       return VDP_ERR_CONFLICT;
 
    vdp2_settings.BGON.part.nbg1_trans_enab = settings->transparent_bit;
@@ -369,7 +369,7 @@ int vdp_nbg2_init(screen_settings_struct *settings)
    VDP2_REG_MPCDN2 = vdp2_settings.MPCDN2.all;
 
    // Adjust VRAM access
-   if (SetupRamCycles() != LAPETUS_ERR_OK)
+   if (SetupRamCycles() != IAPETUS_ERR_OK)
       return VDP_ERR_CONFLICT;
 
    vdp2_settings.BGON.part.nbg2_trans_enab = settings->transparent_bit;
@@ -445,7 +445,7 @@ int vdp_nbg3_init(screen_settings_struct *settings)
    VDP2_REG_MPCDN3 = vdp2_settings.MPCDN3.all;
 
    // Adjust VRAM access
-   if (SetupRamCycles() != LAPETUS_ERR_OK)
+   if (SetupRamCycles() != IAPETUS_ERR_OK)
       return VDP_ERR_CONFLICT;
 
    vdp2_settings.BGON.part.nbg3_trans_enab = settings->transparent_bit;

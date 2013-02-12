@@ -20,7 +20,7 @@
 
 ! ubc_set_code_breakpoint !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.global _ubc_set_code_breakpoint ! R4 = slot, R5 = address, returns LAPETUS_ERR_OK if no problems
+.global _ubc_set_code_breakpoint ! R4 = slot, R5 = address, returns IAPETUS_ERR_OK if no problems
 _ubc_set_code_breakpoint:
     mov.l   r1, @-r15
     cmp/eq  r4, #0    ! 0 = Breakpoint A, 1 = Breakpoint B
@@ -88,7 +88,7 @@ BRCR:                 .long 0xFFFFFF78
 
 ! ubc_set_memory_breakpoint !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-.global _ubc_set_memory_breakpoint ! R4 = slot, R5 = address, R6 = type, returns LAPETUS_ERR_OK if no problems
+.global _ubc_set_memory_breakpoint ! R4 = slot, R5 = address, R6 = type, returns IAPETUS_ERR_OK if no problems
 _ubc_set_memory_breakpoint:
    rts
    nop

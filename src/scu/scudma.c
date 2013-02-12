@@ -63,7 +63,7 @@ int scu_dma_init(void)
    SCUREG_D1EN = 0;
    SCUREG_D2EN = 0;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -128,10 +128,10 @@ int scu_dma_start(int chan, void *src, void *dst, u32 size, u32 add, u32 mode)
             SCUREG_D2EN = 0x100;
          break;
       default:
-         return LAPETUS_ERR_INVALIDARG;
+         return IAPETUS_ERR_INVALIDARG;
    }
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ BOOL is_scu_dma_running(int chan)
    {
       case 0:
 //         if (SCUREG_DSTA & ?)
-//            return LAPETUS_ERR_BUSY;
+//            return IAPETUS_ERR_BUSY;
       case 1:
       case 2:
       default:

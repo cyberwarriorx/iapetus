@@ -6,7 +6,6 @@ CD Block
 ---------
 -Add CD file system support. That way people can easily opening files by
  passing a string to a simple function.
--Finish adding filter subheader conditions
 -Setup newlib connections
 
 Backup Ram
@@ -27,8 +26,8 @@ SCSP
 
 SMPC
 -----
--Only standard pad, keyboard and mouse support have been added.
 -Need to rework intback so code is tighter
+-Only standard pad, keyboard and mouse support have been added.
 
 SCU DSP
 --------
@@ -44,6 +43,7 @@ VDP1
 
 VDP2
 -----
+-Need to better detect vram cycles
 -Pretty much everything except for Rotation Screens, Back Screen and color offset
  needs implementing
 

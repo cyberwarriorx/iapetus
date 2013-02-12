@@ -9,8 +9,13 @@ set(iapetus_SOURCES
 	peripherals/smpc.c
 	sh2/sh2dma.c sh2/sh2int.c sh2/timer.c
 	sound/sound.c
+	sys/mem/free.c sys/mem/free_r.c
+	sys/mem/malloc.c sys/mem/malloc_r.c
+	sys/mem/memb.c
+	sys/mem/realloc_r.c
+	sys/mem/slob.c sys/mem/slob.h
 	sys/stdin.c sys/stdout.c sys/stderr.c sys/cd.c
-	sys/bup.c sys/open.c sys/close.c sys/mem.c
+	sys/bup.c sys/open.c sys/close.c
 	sys/write.c sys/read.c sys/fstat.c sys/lseek.c 
 	sys/sys.c
 	ui/font.c ui/font8x8.c ui/font8x16.c ui/gui.c ui/text.c

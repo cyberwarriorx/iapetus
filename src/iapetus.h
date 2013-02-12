@@ -44,16 +44,21 @@
 
 void init_iapetus(int res);
 
-#define LAPETUS_ERR_OK                  0       // Everything is good
-#define LAPETUS_ERR_COMM                -1      // Communication error
-#define LAPETUS_ERR_HWNOTFOUND          -2      // Hardware not found
-#define LAPETUS_ERR_SIZE                -3      // Invalid size specified
-#define LAPETUS_ERR_INVALIDPOINTER      -4      // Invalid pointer passed
-#define LAPETUS_ERR_INVALIDARG          -5      // Invalid argument passed
-#define LAPETUS_ERR_BUSY                -6      // Hardware is busy
-#define LAPETUS_ERR_UNKNOWN             -7      // Unknown error
-#define LAPETUS_ERR_AUTH                -8      // Disc authentication error
-#define LAPETUS_ERR_FILENOTFOUND        -9      // File not found error
-#define LAPETUS_ERR_UNSUPPORTED         -10     // Unsupported feature
+enum IAPETUS_ERR
+{
+   IAPETUS_ERR_OK=0,                // Everything is good
+   IAPETUS_ERR_COMM=-1,             // Communication error
+   IAPETUS_ERR_HWNOTFOUND=-2,       // Hardware not found
+   IAPETUS_ERR_SIZE=-3,             // Invalid size specified
+   IAPETUS_ERR_INVALIDPOINTER=-4,   // Invalid pointer passed
+   IAPETUS_ERR_INVALIDARG=-5,       // Invalid argument passed
+   IAPETUS_ERR_BUSY=-6,             // Hardware is busy
+   IAPETUS_ERR_UNKNOWN=-7,          // Unknown error
+   IAPETUS_ERR_AUTH=-8,             // Disc authentication error
+   IAPETUS_ERR_FILENOTFOUND=-9,     // File not found error
+   IAPETUS_ERR_UNSUPPORTED=-10,     // Unsupported feature
+   IAPETUS_ERR_TIMEOUT=-11,         // Operation timed out
+   IAPETUS_ERR_MPEGCMD=-12,         // MPEG command hirq bit not set
+};
 
 #endif

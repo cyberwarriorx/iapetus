@@ -150,13 +150,13 @@ int cdfs_init(void *work_dir_tbl, int size)
    dir_tbl = work_dir_tbl;
    dir_tbl_size = size;
    if (size < 4096)
-      return LAPETUS_ERR_INVALIDARG;
+      return IAPETUS_ERR_INVALIDARG;
 
    sect_buf = work_dir_tbl+2048;
    sect_buffered = 0;
 
    // Read in lba 16
-   if ((ret = cd_read_sector(dir_tbl, 166, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+   if ((ret = cd_read_sector(dir_tbl, 166, SECT_2048, 2048)) != IAPETUS_ERR_OK)
       return ret;
 
    copy_dir_record(dir_tbl+0x9C, &dir_rec);
@@ -165,7 +165,7 @@ int cdfs_init(void *work_dir_tbl, int size)
    root_lba = dir_rec.lba;
    root_size = (dir_rec.size / 2048);
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ int cdfs_open(const char *path, file_struct *file)
    // read the directory table, and find the next subdirectory. Once we're
    // in the correct level, parse through the table and find the file.
 
-   if ((ret = cd_read_sector(dir_tbl, 150+root_lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+   if ((ret = cd_read_sector(dir_tbl, 150+root_lba, SECT_2048, 2048)) != IAPETUS_ERR_OK)
       return ret;
 
    lba = root_lba + 1;
@@ -200,7 +200,7 @@ int cdfs_open(const char *path, file_struct *file)
       for (i = 0; i < 3; i++)
       {
          if (work_buffer[0] == 0)
-            return LAPETUS_ERR_FILENOTFOUND;
+            return IAPETUS_ERR_FILENOTFOUND;
 
          copy_dir_record(work_buffer, &dir_rec);
          work_buffer += dir_rec.record_size;
@@ -212,7 +212,7 @@ int cdfs_open(const char *path, file_struct *file)
       file->sect_pos = 0;
       file->pos = 0;
 
-      return LAPETUS_ERR_OK;
+      return IAPETUS_ERR_OK;
    }
 
    while(!done)
@@ -253,7 +253,7 @@ int cdfs_open(const char *path, file_struct *file)
             if (sectors_left > 0)
             {
                // Read in new sector
-               if ((ret = cd_read_sector(dir_tbl, 150+lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+               if ((ret = cd_read_sector(dir_tbl, 150+lba, SECT_2048, 2048)) != IAPETUS_ERR_OK)
                   return ret;
                lba++;
                sectors_left--;
@@ -261,7 +261,7 @@ int cdfs_open(const char *path, file_struct *file)
             }
             else
                // We can't, let's bail
-               return LAPETUS_ERR_FILENOTFOUND;
+               return IAPETUS_ERR_FILENOTFOUND;
          }        
       }
 
@@ -269,7 +269,7 @@ int cdfs_open(const char *path, file_struct *file)
          break;
 
       // Ok, we've found the next directory table, time to read it
-      if ((ret = cd_read_sector(dir_tbl, 150+lba, SECT_2048, 2048)) != LAPETUS_ERR_OK)
+      if ((ret = cd_read_sector(dir_tbl, 150+lba, SECT_2048, 2048)) != IAPETUS_ERR_OK)
          return ret;
       lba++;
       sectors_left--;
@@ -282,7 +282,7 @@ int cdfs_open(const char *path, file_struct *file)
    file->sect_pos = 0;
    file->pos = 0;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -304,11 +304,11 @@ int cdfs_seek(file_struct *file, int offset, int seek_type)
          file->pos = (file->size - 1 - offset) % 2048;
          break;
       default:
-         return LAPETUS_ERR_INVALIDARG;
+         return IAPETUS_ERR_INVALIDARG;
    }
 
    // Change the CD read position here if need be
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -321,21 +321,21 @@ int cdfs_read(u8 *buffer, int size, int num, file_struct *file)
    if (file->pos == 0)
    {
       // Straight sectors reads. Nice and fast
-      if ((ret = cd_read_sector(buffer, 150+file->lba+file->sect_pos, SECT_2048, size * num)) == LAPETUS_ERR_OK)
+      if ((ret = cd_read_sector(buffer, 150+file->lba+file->sect_pos, SECT_2048, size * num)) == IAPETUS_ERR_OK)
          file->sect_pos += (size * num);
       return ret;
    }
    else
-      return LAPETUS_ERR_UNSUPPORTED;
+      return IAPETUS_ERR_UNSUPPORTED;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 int cdfs_close(file_struct *file)
 {
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -114,7 +114,7 @@ int ar_init_flash_io()
    {
       arpagesize = 0;
       arromsize = 0;
-      return LAPETUS_ERR_HWNOTFOUND;
+      return IAPETUS_ERR_HWNOTFOUND;
    }
 
    // Make sure vendor id and device id are supported here
@@ -124,13 +124,13 @@ int ar_init_flash_io()
       {
          arpagesize=flash_list[i].pagesize;
          arromsize=flash_list[i].romsize;
-         return LAPETUS_ERR_OK;
+         return IAPETUS_ERR_OK;
       }
    }
 
    arpagesize = 0;
    arromsize = 0;
-   return LAPETUS_ERR_UNSUPPORTED;
+   return IAPETUS_ERR_UNSUPPORTED;
 }
 
 // Untested

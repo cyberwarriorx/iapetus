@@ -80,7 +80,7 @@ int RemoteDebuggerStart(void *addr)
 //   if (so and so word == ?)
 //      replace word with bra instruction
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ int RemoteDebuggerStop(void)
 
    // Give interrupt handling function control back here
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ int debugger_start(void)
    // debugging, and sets things up to allows for breakpoints
    int ret;
 
-   if ((ret = debugger_stop()) != LAPETUS_ERR_OK)
+   if ((ret = debugger_stop()) != IAPETUS_ERR_OK)
       return ret;
 
    bios_set_sh2_interrupt(0x4, ex_general_illegal_instruction);
@@ -133,7 +133,7 @@ int debugger_start(void)
    if (interrupt_get_level_mask() > 0xE)
       interrupt_set_level_mask(0xE);
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ int debugger_stop(void)
    bios_set_sh2_interrupt(0xA, 0);
    bios_set_sh2_interrupt(0xC, 0);
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -43,7 +43,7 @@ int sh2_dma_init(void)
    CHCR0 = 0;
    CHCR1 = 0;
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ int sh2_dma_start(int chan, void *src, void *dst, u32 size, u32 mode)
       // Set the Mode and Enable DMA
       CHCR0 = (CHCR0 & 0x0) | mode | 0x1;
 
-      return LAPETUS_ERR_OK;
+      return IAPETUS_ERR_OK;
    }
    else if (chan == 1)
    {
@@ -78,10 +78,10 @@ int sh2_dma_start(int chan, void *src, void *dst, u32 size, u32 mode)
       // Set the Mode and Enable DMA
       CHCR1 = (CHCR1 & 0x0) | mode | 0x1;
 
-      return LAPETUS_ERR_OK;
+      return IAPETUS_ERR_OK;
    }
 
-   return LAPETUS_ERR_INVALIDARG;
+   return IAPETUS_ERR_INVALIDARG;
 }
 
 //////////////////////////////////////////////////////////////////////////////

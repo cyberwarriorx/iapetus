@@ -30,7 +30,7 @@ int dsp_load(u32 *program, u8 offset, u8 size)
    testval = SCUREG_PPAF;
 
    if (size > (256 - offset))
-      return LAPETUS_ERR_SIZE;
+      return IAPETUS_ERR_SIZE;
 
    // Make sure program is stopped, etc.
    SCUREG_PPAF = 0; 
@@ -44,7 +44,7 @@ int dsp_load(u32 *program, u8 offset, u8 size)
       SCUREG_PPD = program[i];
    }
 
-   return LAPETUS_ERR_OK;
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
