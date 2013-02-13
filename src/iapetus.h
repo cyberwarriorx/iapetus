@@ -54,11 +54,12 @@ enum IAPETUS_ERR
    IAPETUS_ERR_INVALIDARG=-5,       // Invalid argument passed
    IAPETUS_ERR_BUSY=-6,             // Hardware is busy
    IAPETUS_ERR_UNKNOWN=-7,          // Unknown error
-   IAPETUS_ERR_AUTH=-8,             // Disc authentication error
+   IAPETUS_ERR_AUTH=-8,             // Disc/MPEG card authentication error
    IAPETUS_ERR_FILENOTFOUND=-9,     // File not found error
    IAPETUS_ERR_UNSUPPORTED=-10,     // Unsupported feature
    IAPETUS_ERR_TIMEOUT=-11,         // Operation timed out
    IAPETUS_ERR_MPEGCMD=-12,         // MPEG command hirq bit not set
+   IAPETUS_ERR_CMOK=-13,            // CD command ok hirq bit not set
 };
 
 #endif

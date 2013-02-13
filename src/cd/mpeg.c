@@ -154,7 +154,13 @@ int mpeg_init ()
 
    // Make sure MPEG card is authenticated
    if (!is_mpeg_auth())
+   {
       mpeg_auth();
+
+      // Verify it authenticated correctly
+      if (!is_mpeg_auth())
+         return IAPETUS_ERR_AUTH;
+   }
 
    // Now Initialize MPEG card
    cd_cmd.CR1 = 0x9300;

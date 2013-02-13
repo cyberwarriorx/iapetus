@@ -76,7 +76,7 @@ int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_
 
    // Make sure CMOK flag is set, or we can't continue
    if (!(hirq_temp & HIRQ_CMOK))
-      return IAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_CMOK;
 
    // Clear CMOK and any other user-defined flags
    CDB_REG_HIRQ = ~(hirq_mask | HIRQ_CMOK);
@@ -95,7 +95,7 @@ int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_
 
    // Was command good?
    if (cd_status == STATUS_REJECT)
-      return IAPETUS_ERR_BUSY;
+      return IAPETUS_ERR_INVALIDARG;
    else if (cd_status & STATUS_WAIT)
       return IAPETUS_ERR_BUSY;
 
