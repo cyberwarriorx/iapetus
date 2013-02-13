@@ -109,7 +109,7 @@ int mpeg_auth()
 
    // Was Authentication successful?
    if (!is_mpeg_auth(&auth))
-      return -1;
+      return IAPETUS_ERR_AUTH;
 
    return IAPETUS_ERR_OK;
 }
@@ -155,11 +155,8 @@ int mpeg_init ()
    // Make sure MPEG card is authenticated
    if (!is_mpeg_auth())
    {
-      mpeg_auth();
-
-      // Verify it authenticated correctly
-      if (!is_mpeg_auth())
-         return IAPETUS_ERR_AUTH;
+      if ((ret = mpeg_auth()) != IAPETUS_ERR_OK)
+         return ret;
    }
 
    // Now Initialize MPEG card
@@ -226,7 +223,7 @@ int mpeg_get_con(enum STM_SEL stm_sel, mpeg_con_struct *mpeg_con_audio, mpeg_con
    cd_cmd.CR3 = (stm_sel << 8);
    cd_cmd.CR4 = 0x0000;
 
-   if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
+   if ((ret = mpeg_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
       return ret;
 
    mpeg_con_audio->con_mode = cd_cmd.CR1;

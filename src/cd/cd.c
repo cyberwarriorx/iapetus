@@ -140,9 +140,22 @@ int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cm
 
    // Go into an endless loop showing the HIRQ
    vdp_print_text(font, 2 * 8, 20 * 8, 15, "HIRQ = ");
+   vdp_print_text(font, 2 * 8, 21 * 8, 15, "CR1 = ");
+   vdp_print_text(font, 2 * 8, 22 * 8, 15, "CR2 = ");
+   vdp_print_text(font, 2 * 8, 23 * 8, 15, "CR3 = ");
+   vdp_print_text(font, 2 * 8, 24 * 8, 15, "CR4 = ");
 
    for (;;)
-      vdp_printf(font, 2 * 8, 20 * 8, 15, "%d", CDB_REG_HIRQ);
+   {
+      u16 hirq=CDB_REG_HIRQ;
+      u16 cr1=CDB_REG_CR1, cr2=CDB_REG_CR2, cr3=CDB_REG_CR3, cr4=CDB_REG_CR4;
+      vdp_vsync();
+      vdp_printf(font, 9 * 8, 20 * 8, 15, "%04X", hirq);
+      vdp_printf(font, 9 * 8, 21 * 8, 15, "%04X", cr1);
+      vdp_printf(font, 9 * 8, 22 * 8, 15, "%04X", cr2);
+      vdp_printf(font, 9 * 8, 23 * 8, 15, "%04X", cr3);
+      vdp_printf(font, 9 * 8, 24 * 8, 15, "%04X", cr4);
+   }
 
    // return interrupts back to normal
    interrupt_set_level_mask(old_level_mask);
@@ -631,7 +644,7 @@ int is_cd_auth(u16 *disc_type_auth)
    // 0x02: Regular Data CD(not Saturn disc)
    // 0x03: Copied/Pirated Saturn Disc
    // 0x04: Original Saturn Disc
-   if (cd_cmd_rs.CR2 != 0x04 && cd_cmd_rs.CR2 != 0x02)
+   if (cd_cmd_rs.CR2 != 0x04 && cd_cmd_rs.CR2 != 0x02 && cd_cmd_rs.CR2 != 0x01)
       return FALSE;
 
    return TRUE;
