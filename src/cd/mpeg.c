@@ -29,6 +29,18 @@ int mpeg_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cm
    return cd_exec_command(hirq_mask, cd_cmd, cd_cmd_rs);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+int mpeg_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs)
+{
+   if (!(CDB_REG_HIRQ & HIRQ_MPCM))
+      return IAPETUS_ERR_MPEGCMD;
+
+   return cd_debug_exec_command(font, hirq_mask, cd_cmd, cd_cmd_rs);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 BOOL is_mpeg_card_present()
 {
    cd_cmd_struct cd_cmd;
@@ -56,62 +68,6 @@ BOOL is_mpeg_card_present()
        }
    }
    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-BOOL is_mpeg_auth()
-{
-   cd_cmd_struct cd_cmd;
-   cd_cmd_struct cd_cmd_rs;
-
-   cd_cmd.CR1 = 0xE100;
-   cd_cmd.CR2 = 0x0001;
-   cd_cmd.CR3 = 0x0000;
-   cd_cmd.CR4 = 0x0000;
-
-   // If command fails, assume it's not authenticated
-   if (cd_exec_command(0, &cd_cmd, &cd_cmd_rs) != IAPETUS_ERR_OK)
-      return FALSE;
-
-   // Disc type Authenticated:
-   // 0x00: No MPEG Card/Not Authenticated
-   // 0x02: Some kind of MPEG card
-   if (cd_cmd_rs.CR2 != 0x02)
-      return FALSE;
-
-   return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-int mpeg_auth()
-{
-   int ret;
-   cd_cmd_struct cd_cmd;
-   cd_cmd_struct cd_cmd_rs;
-   u16 auth;
-
-   // Clear hirq flags
-   CDB_REG_HIRQ = ~(HIRQ_MPED);
-
-   // Authenticate disc
-   cd_cmd.CR1 = 0xE000;
-   cd_cmd.CR2 = 0x0001;
-   cd_cmd.CR3 = 0x0000;
-   cd_cmd.CR4 = 0x0000;
-
-   if ((ret = cd_exec_command(HIRQ_EFLS, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
-      return ret;
-
-   // wait till operation is finished
-   while (!(CDB_REG_HIRQ & HIRQ_MPED)) {}
-
-   // Was Authentication successful?
-   if (!is_mpeg_auth(&auth))
-      return IAPETUS_ERR_AUTH;
-
-   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -152,12 +108,9 @@ int mpeg_init ()
    mpeg_status_struct mpeg_status;
    mpeg_con_struct mpeg_con_audio, mpeg_con_video;
 
-   // Make sure MPEG card is authenticated
-   if (!is_mpeg_auth())
-   {
-      if ((ret = mpeg_auth()) != IAPETUS_ERR_OK)
-         return ret;
-   }
+   // Make sure MPEG card is present and authenticated
+   if (is_mpeg_card_present())
+      return IAPETUS_ERR_OK;
 
    // Now Initialize MPEG card
    cd_cmd.CR1 = 0x9300;
@@ -167,6 +120,10 @@ int mpeg_init ()
 
    if ((ret = cd_exec_command(HIRQ_MPED, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
       return ret;
+
+   // Have to wait a bit if we're using software timer
+   if (!cd_wait_hirq(HIRQ_MPCM))
+      return IAPETUS_ERR_MPEGCMD;
 
    // Setup MPEG mode
    if ((ret = mpeg_set_mode(SMVM_MOVIE, SMDT_VSYNC, SMOM_VDP2, SMSM_NTSC)) != IAPETUS_ERR_OK)
@@ -249,8 +206,8 @@ int mpeg_set_mode(enum SMVM video_mode, enum SMDT dec_timing_mode, enum SMOM out
       cd_cmd_struct cd_cmd_rs;
 
       // Authenticate disc
-      cd_cmd.CR1 = 0x9400 | video_mode;
-      cd_cmd.CR2 = (dec_timing_mode << 8) | out_mode;
+      cd_cmd.CR1 = 0x9400 | (video_mode & 0xFF);
+      cd_cmd.CR2 = (dec_timing_mode << 8) | (out_mode & 0xFF);
       cd_cmd.CR3 = scanline_mode << 8;
       cd_cmd.CR4 = 0x0000;
 
@@ -271,10 +228,10 @@ int mpeg_set_stream(enum STM_SEL stm_sel, mpeg_stream_struct *mpeg_stream_audio,
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x9D00 | mpeg_stream_audio->mode;
-   cd_cmd.CR2 = (mpeg_stream_audio->id << 8) | mpeg_stream_audio->cn;
-   cd_cmd.CR3 = (stm_sel << 8) | mpeg_stream_video->mode;
-   cd_cmd.CR4 = (mpeg_stream_video->id << 8) | mpeg_stream_video->cn;
+   cd_cmd.CR1 = 0x9D00 | (mpeg_stream_audio->mode & 0xFF);
+   cd_cmd.CR2 = (mpeg_stream_audio->id << 8) | (mpeg_stream_audio->cn & 0xFF);
+   cd_cmd.CR3 = (stm_sel << 8) | (mpeg_stream_video->mode & 0xFF);
+   cd_cmd.CR4 = (mpeg_stream_video->id << 8) | (mpeg_stream_video->cn & 0xFF);
 
    return mpeg_exec_command(0, &cd_cmd, &cd_cmd_rs);
 }
@@ -286,7 +243,7 @@ int mpeg_set_decoding(u8 mute, u16 pause_time, u16 freeze_time)
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x9600 | mute;
+   cd_cmd.CR1 = 0x9600 | (mute & 0xFF);
    cd_cmd.CR2 = pause_time;
    cd_cmd.CR3 = 0x0000;
    cd_cmd.CR4 = freeze_time;
@@ -302,7 +259,7 @@ int mpeg_display(BOOL disp_show, u8 fb_num)
    cd_cmd_struct cd_cmd_rs;
 
    cd_cmd.CR1 = 0xA000;
-   cd_cmd.CR2 = (disp_show << 8) | fb_num;
+   cd_cmd.CR2 = (disp_show << 8) | (fb_num & 0xFF);
    cd_cmd.CR3 = 0x0000;
    cd_cmd.CR4 = 0x0000;
 
@@ -316,7 +273,7 @@ int mpeg_set_window(enum SWCT type, s16 x, s16 y)
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0xA100 | type;
+   cd_cmd.CR1 = 0xA100 | (type & 0xFF);
    cd_cmd.CR2 = (TRUE << 8);
    cd_cmd.CR3 = x;
    cd_cmd.CR4 = y;

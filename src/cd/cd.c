@@ -121,6 +121,8 @@ int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cm
 {
    int old_level_mask;
    u16 hirq_temp;
+   u16 hirq;
+   u16 cr1, cr2, cr3, cr4;
 
    // Mask any interrupts, we don't need to be interrupted
    old_level_mask = interrupt_get_level_mask();
@@ -138,27 +140,68 @@ int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cm
    // Alright, time to execute the command
    cd_write_command(cd_cmd);
 
-   // Go into an endless loop showing the HIRQ
+   if (!cd_wait_hirq(HIRQ_CMOK))
+      return IAPETUS_ERR_TIMEOUT;
+
+   // Read return data
+   cd_read_return_status(cd_cmd_rs);
+
+   hirq = CDB_REG_HIRQ;
+
+   // Go into an endless loop showing the HIRQ and CR's
    vdp_print_text(font, 2 * 8, 20 * 8, 15, "HIRQ = ");
    vdp_print_text(font, 2 * 8, 21 * 8, 15, "CR1 = ");
    vdp_print_text(font, 2 * 8, 22 * 8, 15, "CR2 = ");
    vdp_print_text(font, 2 * 8, 23 * 8, 15, "CR3 = ");
    vdp_print_text(font, 2 * 8, 24 * 8, 15, "CR4 = ");
 
+   cr1 = cd_cmd_rs->CR1;
+   cr2 = cd_cmd_rs->CR2;
+   cr3 = cd_cmd_rs->CR3;
+   cr4 = cd_cmd_rs->CR4;
+
+   interrupt_set_level_mask(old_level_mask);
    for (;;)
    {
-      u16 hirq=CDB_REG_HIRQ;
-      u16 cr1=CDB_REG_CR1, cr2=CDB_REG_CR2, cr3=CDB_REG_CR3, cr4=CDB_REG_CR4;
       vdp_vsync();
       vdp_printf(font, 9 * 8, 20 * 8, 15, "%04X", hirq);
       vdp_printf(font, 9 * 8, 21 * 8, 15, "%04X", cr1);
       vdp_printf(font, 9 * 8, 22 * 8, 15, "%04X", cr2);
       vdp_printf(font, 9 * 8, 23 * 8, 15, "%04X", cr3);
       vdp_printf(font, 9 * 8, 24 * 8, 15, "%04X", cr4);
+
+      if (per[0].but_push_once & PAD_A)
+      {
+         vdp_vsync();
+         break;
+      }
+   }
+
+   for (;;)
+   {
+      vdp_vsync();
+      vdp_printf(font, 9 * 8, 20 * 8, 15, "%04X", hirq);
+      vdp_printf(font, 9 * 8, 21 * 8, 15, "%04X", cr1);
+      vdp_printf(font, 9 * 8, 22 * 8, 15, "%04X", cr2);
+      vdp_printf(font, 9 * 8, 23 * 8, 15, "%04X", cr3);
+      vdp_printf(font, 9 * 8, 24 * 8, 15, "%04X", cr4);
+
+      if (per[0].but_push_once & PAD_A)
+      {
+         interrupt_set_level_mask(old_level_mask);
+         vdp_vsync();
+         break;
+      }
+
+      interrupt_set_level_mask(0xF);
+      hirq=CDB_REG_HIRQ;
+      cr1=CDB_REG_CR1, cr2=CDB_REG_CR2, cr3=CDB_REG_CR3, cr4=CDB_REG_CR4;
+      interrupt_set_level_mask(old_level_mask);
    }
 
    // return interrupts back to normal
    interrupt_set_level_mask(old_level_mask);
+   return IAPETUS_ERR_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -250,12 +293,14 @@ int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags)
 
    if (ret == IAPETUS_ERR_OK)
    {
+      *flags = cd_cmd_rs.CR4;
+
       // Wait for data to be ready
       if (!cd_wait_hirq(HIRQ_DRDY))
          return IAPETUS_ERR_TIMEOUT;
 
       cd_get_info_data(cd_cmd_rs.CR2, data);
-      *flags = cd_cmd_rs.CR4;
+      return cd_end_transfer();
    }
 
    return ret;
