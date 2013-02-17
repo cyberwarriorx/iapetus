@@ -32,24 +32,52 @@ typedef struct
 
 #define MPEG_NO_CHANGE -1
 
+#define MPEG_INT_VSTM_READY      (1 << 0)
+#define MPEG_INT_VSTM_CHANGE     (1 << 1)
+#define MPEG_INT_VOUT_READY      (1 << 2)
+#define MPEG_INT_VOUT_START      (1 << 3)
+#define MPEG_INT_VDEC_ERROR      (1 << 4)
+#define MPEG_INT_VSTM_ERROR      (1 << 5)
+#define MPEG_INT_VBCON_ERROR     (1 << 6)
+#define MPEG_INT_VSTM_DATA_ERROR (1 << 7)
+#define MPEG_INT_PICT_START      (1 << 8)
+#define MPEG_INT_GOP_START       (1 << 9)
+#define MPEG_INT_SEQ_END         (1 << 10)
+#define MPEG_INT_SEQ_START       (1 << 11)
+#define MPEG_INT_VSECT_TRIGGER   (1 << 12)
+#define MPEG_INT_VSECT_EOR       (1 << 13)
+#define MPEG_INT_ASECT_TRIGGER   (1 << 14)
+#define MPEG_INT_ASECT_EOR       (1 << 15)
+#define MPEG_INT_ASTM_READY      (1 << 16)
+#define MPEG_INT_ASTM_CHANGE     (1 << 17)
+#define MPEG_INT_AOUT_READY      (1 << 18)
+#define MPEG_INT_AOUT_START      (1 << 19)
+#define MPEG_INT_ADEC_ERROR      (1 << 20)
+#define MPEG_INT_ASTM_ERROR      (1 << 21)
+#define MPEG_INT_ABCON_ERROR     (1 << 22)
+#define MPEG_INT_ASTM_DATA_ERROR (1 << 23)
+
 enum SMVM
 {
    SMVM_MOVIE=0,
    SMVM_PICT=1,
    SMVM_HD_MOVIE=2,
-   SMVM_HD_PICT=3
+   SMVM_HD_PICT=3,
+   SMVM_NOCHANGE=-1
 };
 
 enum SMDT
 {
    SMDT_VSYNC=0,
-   SMDT_HOST=1
+   SMDT_HOST=1,
+   SMDT_NOCHANGE=-1
 };
 
 enum SMOM
 {
    SMOM_VDP2=0,
-   SMOM_HOST=1
+   SMOM_HOST=1,
+   SMOM_NOCHANGE=-1
 };
 
 enum SMSM

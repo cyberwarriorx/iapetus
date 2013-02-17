@@ -61,9 +61,9 @@ BOOL is_mpeg_card_present()
    // Has MPEG card been authenticated?
    if ((cd_cmd_rs.CR3 & 0xFF) == 0)
    {
-       if (!bios_is_mpeg_card_present(0))
+       if (bios_is_mpeg_card_present(0) != 0)
        {
-          if (!bios_is_mpeg_card_present(0))
+          if (bios_is_mpeg_card_present(0) != 0)
           	  return FALSE;
        }
    }
@@ -99,6 +99,21 @@ int mpeg_get_status(mpeg_status_struct *mpeg_status)
 
 //////////////////////////////////////////////////////////////////////////////
 
+int mpeg_set_interrupt_mask(u32 mask)
+{
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   cd_cmd.CR1 = 0x9200 | (mask >> 16);
+   cd_cmd.CR2 = mask;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
+
+   return mpeg_exec_command(0, &cd_cmd, &cd_cmd_rs);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 int mpeg_init ()
 {
    int ret;
@@ -125,8 +140,11 @@ int mpeg_init ()
    if (!cd_wait_hirq(HIRQ_MPCM))
       return IAPETUS_ERR_MPEGCMD;
 
+   if ((ret = mpeg_set_interrupt_mask(MPEG_INT_SEQ_END | MPEG_INT_PICT_START)) != IAPETUS_ERR_OK)
+      return ret;
+
    // Setup MPEG mode
-   if ((ret = mpeg_set_mode(SMVM_MOVIE, SMDT_VSYNC, SMOM_VDP2, SMSM_NTSC)) != IAPETUS_ERR_OK)
+   if ((ret = mpeg_set_mode(SMVM_NOCHANGE, SMDT_NOCHANGE, SMOM_NOCHANGE, SMSM_NTSC_I)) != IAPETUS_ERR_OK)
       return ret;
 
    if ((ret = mpeg_get_status(&mpeg_status)) != IAPETUS_ERR_OK)
@@ -274,7 +292,7 @@ int mpeg_set_window(enum SWCT type, s16 x, s16 y)
    cd_cmd_struct cd_cmd_rs;
 
    cd_cmd.CR1 = 0xA100 | (type & 0xFF);
-   cd_cmd.CR2 = (TRUE << 8);
+   cd_cmd.CR2 = TRUE;
    cd_cmd.CR3 = x;
    cd_cmd.CR4 = y;
 
