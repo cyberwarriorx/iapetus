@@ -371,9 +371,9 @@ int cd_set_filter_range(u8 filter_num, cd_range_struct *cd_range)
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x4000 | ((cd_range->fad >> 8) & 0xFF);
+   cd_cmd.CR1 = 0x4000 | ((cd_range->fad >> 16) & 0xFF);
    cd_cmd.CR2 = cd_range->fad;
-   cd_cmd.CR3 = (filter_num << 8) | ((cd_range->range >> 8) & 0xFF);
+   cd_cmd.CR3 = (filter_num << 8) | ((cd_range->range >> 16) & 0xFF);
    cd_cmd.CR4 = cd_range->range;
 
    ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);

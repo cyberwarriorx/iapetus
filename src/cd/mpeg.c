@@ -360,26 +360,40 @@ int mpeg_play(file_struct *file)
    mpeg_stream_struct mpeg_stream_video;
 
    // Setup CD filters
-   cd_range.fad = file->lba;
+   cd_range.fad = file->lba+150;
    cd_range.range = file->size / 2048;
 
-   cd_sh_cond.channel = CD_NO_CHANGE;
+   cd_sh_cond.channel = 0;
    cd_sh_cond.file_id = 0;
-   cd_sh_cond.ci_val = CD_NO_CHANGE;
-   cd_sh_cond.ci_mask = CD_NO_CHANGE;
+   cd_sh_cond.ci_val = 0;
+   cd_sh_cond.ci_mask = 0;
    cd_sh_cond.sm_val = SM_VIDEO;
    cd_sh_cond.sm_mask = SM_VIDEO;
 
    cd_con.connect_flags = CD_CON_TRUE | CD_CON_FALSE;
    cd_con.true_con = 0;
-   cd_con.false_con = 0xFF;
+   cd_con.false_con = 1;
 
    if ((ret = cd_set_filter(0, FM_FAD | FM_FN | FM_SM, &cd_sh_cond, &cd_range, &cd_con)) != IAPETUS_ERR_OK)
       return ret;
 
+   cd_sh_cond.channel = 0;
+   cd_sh_cond.file_id = 0;
+   cd_sh_cond.ci_val = 0;
+   cd_sh_cond.ci_mask = 0;
+   cd_sh_cond.sm_val = SM_AUDIO;
+   cd_sh_cond.sm_mask = SM_AUDIO;
+
+   cd_con.connect_flags = CD_CON_TRUE | CD_CON_FALSE;
+   cd_con.true_con = 1;
+   cd_con.false_con = 0xFF;
+
+   if ((ret = cd_set_filter(1, FM_FAD | FM_FN | FM_SM, &cd_sh_cond, &cd_range, &cd_con)) != IAPETUS_ERR_OK)
+      return ret;
+
    if ((ret = mpeg_set_window(SWCT_FB_WIN_POS, 22, 0)) != IAPETUS_ERR_OK)
       return ret;
-   if ((ret = mpeg_set_window(SWCT_FB_WIN_ZOOM, 15, 1)) != IAPETUS_ERR_OK)
+   if ((ret = mpeg_set_window(SWCT_FB_WIN_ZOOM, 15, 0x8011)) != IAPETUS_ERR_OK)
       return ret;
    if ((ret = mpeg_set_window(SWCT_DISP_WIN_POS, 0, 8)) != IAPETUS_ERR_OK)
       return ret;
@@ -405,10 +419,10 @@ int mpeg_play(file_struct *file)
    // Setup MPEG connections
    mpeg_con_audio.con_mode = SCCM_SECTOR_DEL | SCCM_SYSTEM_END;
    mpeg_con_audio.lay_search = SCLS_SYSTEM;
-   mpeg_con_audio.buf_num = 0;
+   mpeg_con_audio.buf_num = 1;
    mpeg_con_video.con_mode = SCCM_CLEAR_VBV_WBC | SCCM_SECTOR_DEL | SCCM_SYSTEM_END;
    mpeg_con_video.lay_search = SCLS_SYSTEM | SCLS_AVSEARCH;
-   mpeg_con_video.buf_num = 1;
+   mpeg_con_video.buf_num = 0;
    if ((ret = mpeg_set_con(STM_SEL_CURRENT, &mpeg_con_audio, &mpeg_con_video)) != IAPETUS_ERR_OK)
       return ret;
 
@@ -433,7 +447,7 @@ int mpeg_play(file_struct *file)
    cd_cmd.CR1 = 0x9500 | MPPM_SYNC;
    cd_cmd.CR2 = (MPTM_NO_CHANGE << 8) | MPTM_AUTO;
    cd_cmd.CR3 = 0x0000;
-   cd_cmd.CR4 = MPCS_NO_CHANGE;
+   cd_cmd.CR4 = MPCS_NO_CHANGE & 0xFF;
 
    if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
       return ret;
