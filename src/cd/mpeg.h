@@ -205,10 +205,13 @@ enum SWCT
 #define SVE_INTP_CV              (1 << 3)
 #define SVE_INTP_ALL             (SVE_INTP_YH | SVE_INTP_CH | SVE_INTP_YV | SVE_INTP_CV)
 
+int mpeg_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int mpeg_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
 BOOL is_mpeg_card_present();
 int is_mpeg_auth();
 int mpeg_auth();
 int mpeg_get_status(mpeg_status_struct *mpeg_status);
+int mpeg_set_interrupt_mask(u32 mask);
 int mpeg_init ();
 int mpeg_set_con(enum STM_SEL stm_sel, mpeg_con_struct *mpeg_con_audio, mpeg_con_struct *mpeg_con_video);
 int mpeg_get_con(enum STM_SEL stm_sel, mpeg_con_struct *mpeg_con_audio, mpeg_con_struct *mpeg_con_video);

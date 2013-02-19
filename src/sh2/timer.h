@@ -27,5 +27,6 @@
 
 int timer_setup(int type, u32 *freq);
 u32 timer_counter();
+void timer_delay(u32 freq, int ms);
 
 #endif

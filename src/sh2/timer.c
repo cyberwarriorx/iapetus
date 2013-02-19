@@ -144,8 +144,8 @@ int timer_setup(int type, u32 *freq)
          // Setup Interrupt
          bios_set_scu_interrupt(0x42, timer_hblank_increment);
          bios_change_scu_interrupt_mask(~MASK_HBLANKIN, 0);
-         freq[0] = vdp2_settings.screen_height;
-
+         freq[0] = vdp2_settings.screen_height * ((VDP2_REG_TVSTAT & 1) == 0 ? 60 : 50);
+        
          if (old_level_mask > 0xC)
             old_level_mask = 0xC;
 
@@ -179,3 +179,13 @@ void timer_stop()
 
 //////////////////////////////////////////////////////////////////////////////
 
+void timer_delay(u32 freq, int ms)
+{
+   u32 start_time = timer_counter();
+   u32 max_time = start_time + ((ms+1) * freq / 1000);
+
+   // Wait until time has elapsed
+   while (timer_counter() < max_time) {}
+}
+
+//////////////////////////////////////////////////////////////////////////////
