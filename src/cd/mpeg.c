@@ -124,8 +124,8 @@ int mpeg_init ()
    mpeg_con_struct mpeg_con_audio, mpeg_con_video;
 
    // Make sure MPEG card is present and authenticated
-   if (is_mpeg_card_present())
-      return IAPETUS_ERR_OK;
+   if (!is_mpeg_card_present())
+      return IAPETUS_ERR_AUTH;
 
    // Now Initialize MPEG card
    cd_cmd.CR1 = 0x9300;
@@ -477,7 +477,7 @@ int mpeg_unpause(file_struct *file)
 
 int mpeg_stop(file_struct *file)
 {
-   return IAPETUS_ERR_OK;
+   return cd_seek_fad(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////
