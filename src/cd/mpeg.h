@@ -30,6 +30,40 @@ typedef struct
    u16 mpeg_video_status;
 } mpeg_status_struct;
 
+#define MS_PS_VIDEO_STOPPED   (1 << 0)
+#define MS_PS_VIDEO_PREPING1  (1 << 1)
+#define MS_PS_VIDEO_PREPING2  (3 << 0)
+#define MS_PS_VIDEO_PLAYING   (1 << 2)
+#define MS_PS_VIDEO_CHANGE    (5 << 0)
+#define MS_PS_VIDEO_RECEIVE   (6 << 0)
+#define MS_PS_DEC_STOPPED     (1 << 0)
+
+#define MS_PS_AUDIO_STOPPED   (1 << 4)
+#define MS_PS_AUDIO_PREP1     (1 << 5)
+#define MS_PS_AUDIO_PREP2     (3 << 4)
+#define MS_PS_AUDIO_PREP1     (1 << 6)
+#define MS_PS_AUDIO_PLAYING   (5 << 4)
+#define MS_PS_AUDIO_STOPPED   (6 << 4)
+
+#define MS_AS_DECODE_OP       (1 << 0)
+#define MS_AS_ILLEGAL_AUDIO   (1 << 3)
+#define MS_AS_BUFFER_EMPTY    (1 << 4)
+#define MS_AS_ERROR           (1 << 5)
+#define MS_AS_LEFT_OUTPUT     (1 << 6)
+#define MS_AS_RIGHT_OUTPUT    (1 << 7)
+
+#define MS_VS_DECODE_OP       (1 << 0)
+#define MS_VS_DISPLAYING      (1 << 1)
+#define MS_VS_PAUSED          (1 << 2)
+#define MS_VS_FROZEN          (1 << 3)
+#define MS_VS_LAST_FRAME      (1 << 4)
+#define MS_VS_ODD_FIELD       (1 << 5)
+#define MS_VS_FRAME_UPDATE    (1 << 6)
+#define MS_VS_ERROR           (1 << 7)
+#define MS_VS_OUT_PREP_DONE   (1 << 8)
+#define MS_VS_FIRST_FRAME     (1 << 9)
+#define MS_VS_BUFFER_EMPTY    (1 << 10)
+
 #define MPEG_NO_CHANGE -1
 
 #define MPEG_INT_VSTM_READY      (1 << 0)

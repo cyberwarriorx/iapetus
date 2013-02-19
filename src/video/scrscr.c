@@ -477,6 +477,85 @@ void vdp_nbg3_deinit(void)
 
 int vdp_exbg_init(screen_settings_struct *settings)
 {
+   vdp2_settings.BGON.part.nbg1_enab = 1;
+
+   // Set EXBG to sane values
+
+   // Screen Scroll Value Registers: No scroll
+   VDP2_REG_SCXIN1 = 0;
+   VDP2_REG_SCXDN1 = 0;
+   VDP2_REG_SCYIN1 = 0;
+   VDP2_REG_SCYDN1 = 0;
+
+   // Coordinate Increment Registers: 1.0/1.0
+   VDP2_REG_ZMXIN1 = 1;
+   VDP2_REG_ZMXDN1 = 0;
+   VDP2_REG_ZMYIN1 = 1;
+   VDP2_REG_ZMYDN1 = 0;
+
+   // Adjust Priority(set to a default value)
+   vdp_set_priority(SCREEN_EXBG, 1);
+
+   vdp2_settings.CHCTLA.all &= 0x00FF;
+   vdp2_settings.CHCTLA.part.n1chcn = settings->color & 0x3;
+
+   // If Bitmap, set bitmap settings
+   if (settings->is_bitmap)
+   {
+      // Bitmap Enabled
+      vdp2_settings.CHCTLA.all |= (settings->bitmap_size << 9) | 0x200;
+
+      // Special/Extra settings
+      vdp2_settings.BMPNA.part.n1bmpr = settings->special_priority & 0x1;
+      vdp2_settings.BMPNA.part.n1bmcc = settings->special_color_calc & 0x1;
+      vdp2_settings.BMPNA.part.n1bmp = settings->extra_palette_num & 0x7;
+      VDP2_REG_BMPNA = vdp2_settings.BMPNA.all;
+   }
+   else
+   {
+      // Tile Enabled
+      vdp2_settings.CHCTLA.part.n1chsz |= settings->char_size & 0x1;
+
+      if (settings->pattern_name_size & 0x1)
+      {
+         // 1 Word
+         vdp2_settings.PNCN1.part.n1pnb = 1;
+         vdp2_settings.PNCN1.part.n1cnsm = settings->flip_function;
+         vdp2_settings.PNCN1.part.n1spr = settings->special_priority;
+         vdp2_settings.PNCN1.part.n1scc = settings->special_color_calc;
+         vdp2_settings.PNCN1.part.n1splt = settings->extra_palette_num;
+         vdp2_settings.PNCN1.part.n1scn = settings->extra_char_num;
+      }
+      else
+         // 2 Words
+         vdp2_settings.PNCN1.part.n1pnb = 0;
+
+      // Pattern Name Control Register
+      VDP2_REG_PNCN1 = vdp2_settings.PNCN1.all;
+
+      vdp2_settings.PLSZ.part.n1plsz = settings->plane_size & 0x3;
+      VDP2_REG_PLSZ = vdp2_settings.PLSZ.all;
+      vdp2_settings.MPABN1.part.n1mpa = settings->map[0];
+      vdp2_settings.MPABN1.part.n1mpb = settings->map[1];
+      vdp2_settings.MPCDN1.part.n1mpc = settings->map[2];
+      vdp2_settings.MPCDN1.part.n1mpd = settings->map[3];
+      VDP2_REG_MPABN1 = vdp2_settings.MPABN1.all;
+      VDP2_REG_MPCDN1 = vdp2_settings.MPCDN1.all;
+   }
+
+   vdp2_settings.BGON.part.nbg1_trans_enab = settings->transparent_bit;
+   vdp2_settings.MPOFN.part.n1mp = settings->map_offset;
+
+   // Map offset Register
+   VDP2_REG_MPOFN = vdp2_settings.MPOFN.all;
+
+   // Character Control Register
+   VDP2_REG_CHCTLA = vdp2_settings.CHCTLA.all;
+ 
+   VDP2_REG_EXTEN = 0x0001;
+
+   // Enable Screen
+   VDP2_REG_BGON = vdp2_settings.BGON.all;
    return VDP_ERR_OK;
 }
 
@@ -484,6 +563,12 @@ int vdp_exbg_init(screen_settings_struct *settings)
 
 void vdp_exbg_deinit(void)
 {
+   vdp2_settings.BGON.part.nbg1_enab = 0;
+   vdp2_settings.exbgenab = 1;
+   VDP2_REG_EXTEN = 0x0000;
+
+   // Disable Screen
+   VDP2_REG_BGON = vdp2_settings.BGON.all;
 }
 
 //////////////////////////////////////////////////////////////////////////////
