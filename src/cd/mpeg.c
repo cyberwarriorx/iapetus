@@ -120,8 +120,6 @@ int mpeg_init ()
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
    screen_settings_struct settings;
-   mpeg_status_struct mpeg_status;
-   mpeg_con_struct mpeg_con_audio, mpeg_con_video;
 
    // Make sure MPEG card is present and authenticated
    if (!is_mpeg_card_present())
@@ -140,18 +138,11 @@ int mpeg_init ()
    if (!cd_wait_hirq(HIRQ_MPCM))
       return IAPETUS_ERR_MPEGCMD;
 
-   if ((ret = mpeg_set_interrupt_mask(MPEG_INT_SEQ_END | MPEG_INT_PICT_START)) != IAPETUS_ERR_OK)
-      return ret;
+   if (!cd_wait_hirq(HIRQ_MPCM))
+      return IAPETUS_ERR_MPEGCMD;
 
    // Setup MPEG mode
    if ((ret = mpeg_set_mode(SMVM_NOCHANGE, SMDT_NOCHANGE, SMOM_NOCHANGE, SMSM_NTSC_I)) != IAPETUS_ERR_OK)
-      return ret;
-
-   if ((ret = mpeg_get_status(&mpeg_status)) != IAPETUS_ERR_OK)
-      return ret;
-
-   // Get MPEG Connection
-   if ((ret = mpeg_get_con(STM_SEL_CURRENT, &mpeg_con_audio, &mpeg_con_video)) != IAPETUS_ERR_OK)
       return ret;
 
    // Enable the external audio through SCSP
