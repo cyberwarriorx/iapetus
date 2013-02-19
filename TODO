@@ -4,9 +4,7 @@ Action Replay/Commlink
 
 CD Block
 ---------
--Add CD file system support. That way people can easily opening files by
- passing a string to a simple function.
--Setup newlib connections
+-Setup cdfs/newlib connections
 
 Backup Ram
 -----------

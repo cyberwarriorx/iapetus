@@ -61,9 +61,9 @@ BOOL is_mpeg_card_present()
    // Has MPEG card been authenticated?
    if ((cd_cmd_rs.CR3 & 0xFF) == 0)
    {
-       if (bios_is_mpeg_card_present(0) != 0)
+       if (bios_is_mpeg_card_present(1) != 0)
        {
-          if (bios_is_mpeg_card_present(0) != 0)
+          if (bios_is_mpeg_card_present(1) != 0)
           	  return FALSE;
        }
    }
@@ -129,7 +129,7 @@ int mpeg_init ()
 
    // Now Initialize MPEG card
    cd_cmd.CR1 = 0x9300;
-   cd_cmd.CR2 = 0x0001; // might have to change this
+   cd_cmd.CR2 = 0x0001;
    cd_cmd.CR3 = 0x0000;
    cd_cmd.CR4 = 0x0000;
 
@@ -451,10 +451,6 @@ int mpeg_play(file_struct *file)
 
    if ((ret = mpeg_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
       return ret;
-
-   // wait till operation is finished
-   if (!cd_wait_hirq(HIRQ_MPED))
-      return IAPETUS_ERR_TIMEOUT;   
 
    return IAPETUS_ERR_OK;
 }
