@@ -229,7 +229,7 @@ int mpeg_set_mode(enum SMVM video_mode, enum SMDT dec_timing_mode, enum SMOM out
       cd_cmd.CR3 = scanline_mode << 8;
       cd_cmd.CR4 = 0x0000;
 
-      if ((ret = mpeg_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
+      if ((ret = mpeg_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_BUSY)
          return ret;
 
       if (ret == IAPETUS_ERR_OK)
