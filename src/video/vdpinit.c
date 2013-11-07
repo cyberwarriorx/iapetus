@@ -281,6 +281,14 @@ void vdp_disable_color_offset(u16 screen)
 
 //////////////////////////////////////////////////////////////////////////////
 
+void vdp_get_scr_width_height(int *width, int *height)
+{	
+	*width=vdp2_settings.screen_width;
+	*height=vdp2_settings.screen_height;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 void vdp_enable_line_window(int screennum, int windownum, u16 mode, u32 linetbladdr)
 {
 }

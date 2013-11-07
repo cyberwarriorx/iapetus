@@ -206,12 +206,110 @@ int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cm
 
 //////////////////////////////////////////////////////////////////////////////
 
+int cd_get_hw_info(hw_info_struct *hw_info)
+{
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+   int ret;
+
+   cd_cmd.CR1 = 0x0100;
+   cd_cmd.CR2 = 0x0000;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
+
+   if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != IAPETUS_ERR_OK)
+      return ret;
+
+   hw_info->hw_flag = cd_cmd_rs.CR2 >> 8;
+   hw_info->hw_ver = cd_cmd_rs.CR2;
+   hw_info->mpeg_ver = cd_cmd_rs.CR3;
+   hw_info->drive_ver = cd_cmd_rs.CR4 >> 8;
+   hw_info->drive_rev = cd_cmd_rs.CR4;
+
+   return IAPETUS_ERR_OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+int cd_get_toc(u32 *toc)
+{
+   int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   // Get TOC
+   cd_cmd.CR1 = 0x0200;
+   cd_cmd.CR2 = 0x0000;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
+
+   if ((ret = cd_exec_command(HIRQ_DRDY, &cd_cmd, &cd_cmd_rs)) != 0)
+      return ret;
+
+   if (ret == IAPETUS_ERR_OK)
+   {
+      // Wait for data to be ready
+      if (!cd_wait_hirq(HIRQ_DRDY))
+         return IAPETUS_ERR_TIMEOUT;
+
+      cd_get_info_data(cd_cmd_rs.CR2, (u16 *)toc);
+      return cd_end_transfer();
+   }
+
+   return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+int cd_get_session_num(u8 *num)
+{
+   int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   // Get Session Info
+   cd_cmd.CR1 = 0x0300;
+   cd_cmd.CR2 = 0x0000;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
+
+   if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != 0)
+      return ret;
+
+   num[0] = cd_cmd_rs.CR3 >> 8;
+   return IAPETUS_ERR_OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+int cd_get_session_info(u8 num, u32 *lba)
+{
+   int ret;
+   cd_cmd_struct cd_cmd;
+   cd_cmd_struct cd_cmd_rs;
+
+   // Get Session Info
+   cd_cmd.CR1 = 0x0300 | num;
+   cd_cmd.CR2 = 0x0000;
+   cd_cmd.CR3 = 0x0000;
+   cd_cmd.CR4 = 0x0000;
+
+   if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != 0)
+      return ret;
+
+   lba[0] = ((cd_cmd_rs.CR3 & 0xFF) << 8) | cd_cmd_rs.CR4;
+   return IAPETUS_ERR_OK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 int cd_cdb_init(int standby)
 {
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
    // CD Init Command
+   //cd_cmd.CR1 = 0x0402; // subcode-rw flag
    cd_cmd.CR1 = 0x0400;
    cd_cmd.CR2 = standby;
    cd_cmd.CR3 = 0x0000;
@@ -278,29 +376,35 @@ int cd_seek_fad(int seekfad)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags)
+int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u8 *flags)
 {
    int ret;
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
+   int i;
 
    cd_cmd.CR1 = 0x2000 | (type & 0xFF);
    cd_cmd.CR2 = 0;
    cd_cmd.CR3 = 0;
    cd_cmd.CR4 = 0;
 
-   ret = cd_exec_command(HIRQ_DRDY, &cd_cmd, &cd_cmd_rs);
-
-   if (ret == IAPETUS_ERR_OK)
+   for (i = 0; i < 15; i++)
    {
-      *flags = cd_cmd_rs.CR4;
+      ret = cd_exec_command(HIRQ_DRDY, &cd_cmd, &cd_cmd_rs);
 
-      // Wait for data to be ready
-      if (!cd_wait_hirq(HIRQ_DRDY))
-         return IAPETUS_ERR_TIMEOUT;
+      if (ret == IAPETUS_ERR_OK)
+      {
+         *flags = cd_cmd_rs.CR4 & 0xFF;
 
-      cd_get_info_data(cd_cmd_rs.CR2, data);
-      return cd_end_transfer();
+         // Wait for data to be ready
+         if (!cd_wait_hirq(HIRQ_DRDY))
+            return IAPETUS_ERR_TIMEOUT;
+
+         cd_get_info_data(cd_cmd_rs.CR2, data);
+         return cd_end_transfer();
+      }
+      else if (ret != IAPETUS_ERR_BUSY)
+         break;
    }
 
    return ret;
@@ -323,16 +427,16 @@ int cd_connect_cd_to_filter(u8 filter_num)
 
 //////////////////////////////////////////////////////////////////////////////
 
-static int cd_set_filter_mode(u8 filter_num, u8 mode)
+int cd_set_filter_range(u8 filter_num, cd_range_struct *cd_range)
 {
    int ret;
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x4400 | mode;
-   cd_cmd.CR2 = 0;
-   cd_cmd.CR3 = (filter_num << 8);
-   cd_cmd.CR4 = 0;
+   cd_cmd.CR1 = 0x4000 | ((cd_range->fad >> 16) & 0xFF);
+   cd_cmd.CR2 = cd_range->fad;
+   cd_cmd.CR3 = (filter_num << 8) | ((cd_range->range >> 16) & 0xFF);
+   cd_cmd.CR4 = cd_range->range;
 
    ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
 
@@ -365,16 +469,16 @@ int cd_set_filter_subheader_conditions(u8 filter_num, cd_sh_cond_struct *sh_cond
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_set_filter_range(u8 filter_num, cd_range_struct *cd_range)
+static int cd_set_filter_mode(u8 filter_num, u8 mode)
 {
    int ret;
    cd_cmd_struct cd_cmd;
    cd_cmd_struct cd_cmd_rs;
 
-   cd_cmd.CR1 = 0x4000 | ((cd_range->fad >> 16) & 0xFF);
-   cd_cmd.CR2 = cd_range->fad;
-   cd_cmd.CR3 = (filter_num << 8) | ((cd_range->range >> 16) & 0xFF);
-   cd_cmd.CR4 = cd_range->range;
+   cd_cmd.CR1 = 0x4400 | mode;
+   cd_cmd.CR2 = 0;
+   cd_cmd.CR3 = (filter_num << 8);
+   cd_cmd.CR4 = 0;
 
    ret = cd_exec_command(HIRQ_ESEL, &cd_cmd, &cd_cmd_rs);
 
@@ -937,23 +1041,3 @@ int stop_cd_audio(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int cd_get_session_num(u8 *num)
-{
-   int ret;
-   cd_cmd_struct cd_cmd;
-   cd_cmd_struct cd_cmd_rs;
-
-   // Get Session Info
-   cd_cmd.CR1 = 0x0300;
-   cd_cmd.CR2 = 0x0000;
-   cd_cmd.CR3 = 0x0000;
-   cd_cmd.CR4 = 0x0000;
-
-   if ((ret = cd_exec_command(0, &cd_cmd, &cd_cmd_rs)) != 0)
-      return ret;
-
-   num[0] = cd_cmd_rs.CR3 >> 8;
-   return IAPETUS_ERR_OK;
-}
-
-//////////////////////////////////////////////////////////////////////////////

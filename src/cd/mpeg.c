@@ -43,23 +43,17 @@ int mpeg_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_
 
 BOOL is_mpeg_card_present()
 {
-   cd_cmd_struct cd_cmd;
-   cd_cmd_struct cd_cmd_rs;
+   hw_info_struct hw_info;
 
-   cd_cmd.CR1 = 0x0100;
-   cd_cmd.CR2 = 0x0000;
-   cd_cmd.CR3 = 0x0000;
-   cd_cmd.CR4 = 0x0000;
-
-   if (cd_exec_command(0, &cd_cmd, &cd_cmd_rs) != IAPETUS_ERR_OK)
+   if (cd_get_hw_info(&hw_info) != IAPETUS_ERR_OK)
       return FALSE;
-
-   // Is MPEG card available?
-   if (((cd_cmd_rs.CR2 >> 8) & 0x02) == 0)
+   
+   // Is MPEG card available?   
+   if ((hw_info.hw_flag & 0x02) == 0)
    	   return FALSE;
    
    // Has MPEG card been authenticated?
-   if ((cd_cmd_rs.CR3 & 0xFF) == 0)
+   if (hw_info.mpeg_ver == 0)
    {
        if (bios_is_mpeg_card_present(1) != 0)
        {

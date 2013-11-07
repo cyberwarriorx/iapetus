@@ -35,6 +35,28 @@
 #define VDP1_REG_COPR	(*(volatile u16 *)0x25D00014)
 #define VDP1_REG_MODR	(*(volatile u16 *)0x25D00016)
 
+
+enum VDP1_DRAW_MODE
+{
+      V1DM_AUTO, V1DM_MANUALERASE, V1DM_MANUALCHANGE, V1DM_MANUALERASECHANGE
+};
+
+enum VDP1_SCREEN_MODE
+{
+   V1SM_NORMAL=0,
+   V1SM_HIGHRES=1,
+   V1SM_ROTATE16=2,
+   V1SM_ROTATE8=3,
+   V1SM_HDTV=4,
+};
+
+enum VDP1_INT_MODE
+{
+   V1IM_NONINT=0,
+   V1IM_INTEVEN=0x8,
+   V1IM_INTODD=0xC,
+};
+
 // VDP2
 #define VDP2_RAM	0x25E00000
 #define VDP2_CRAM	0x25F00000
@@ -946,6 +968,7 @@ void vdp_disp_off(void);
 void vdp_set_color_offset(u8 num, s16 r, s16 g, s16 b);
 void vdp_enable_color_offset(u16 screen, int select);
 void vdp_disable_color_offset(u16 screen);
+void vdp_get_scr_width_height(int *width, int *height);
 
 // Window functions
 void vdp_enable_line_window(int screennum, int windownum, u16 mode, u32 linetbladdr);
@@ -959,6 +982,8 @@ int vdp_set_palette(int type, void *palette, int size);
 int vdp_set_default_palette(void);
 
 // Sprite/Polygon related
+void vdp1_set_draw_mode(enum VDP1_DRAW_MODE mode, enum VDP1_SCREEN_MODE tv_mode, enum VDP1_INT_MODE int_mode);
+void vdp1_trigger_draw();
 void vdp_system_clipping(sprite_struct *sprite);
 void vdp_user_clipping(sprite_struct *sprite);
 void vdp_local_coordinate(sprite_struct *sprite);

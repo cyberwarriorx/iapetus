@@ -85,6 +85,15 @@ typedef struct
    u32 FAD;
 } cd_stat_struct;
 
+typedef struct
+{
+   u8 hw_flag;
+   u8 hw_ver;
+   u8 mpeg_ver;
+   u8 drive_ver;
+   u8 drive_rev;
+} hw_info_struct;
+
 #define FM_FN                    (1 << 0)
 #define FM_CN                    (1 << 1)
 #define FM_SM                    (1 << 2)
@@ -138,12 +147,19 @@ enum SUBCODE_TYPE
    SC_RW = 0x1
 };
 
+#define  SCEF_PACKDATAERROR   (1 << 0)
+#define  SCEF_OVERRUNERROR    (1 << 1)
+
 int cd_wait_hirq(int flag);
 int cd_exec_command(u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
 int cd_debug_exec_command(font_struct *font, u16 hirq_mask, cd_cmd_struct *cd_cmd, cd_cmd_struct *cd_cmd_rs);
+int cd_get_hw_info(hw_info_struct *hw_info);
+int cd_get_toc(u32 *toc);
+int cd_get_session_num(u8 *num);
+int cd_get_session_info(u8 num, u32 *lba);
 int cd_play_fad(int play_mode, int start_fad, int num_sectors);
 int cd_seek_fad(int seekfad);
-int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u16 *flags);
+int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u8 *flags);
 int cd_connect_cd_to_filter(u8 filter_num);
 int cd_set_filter(u8 filter_num, u8 mode, cd_sh_cond_struct *sh_cond, cd_range_struct *cd_range, cd_con_struct *cd_con);
 int cd_init();
@@ -157,5 +173,5 @@ int is_cd_present();
 int cd_read_sector(void *buffer, u32 FAD, int sector_size, u32 num_bytes);
 int play_cd_audio(u8 audio_track, u8 repeat, u8 vol_l, u8 vol_r);
 int stop_cd_audio(void);
-int cd_get_session_num(u8 *num);
+
 #endif

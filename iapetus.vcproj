@@ -23,8 +23,8 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="cd build &amp;&amp; make"
-				ReBuildCommandLine="cd build &amp;&amp; make clean &amp;&amp; make"
+				BuildCommandLine="cd build &amp;&amp; make &amp;&amp; make install"
+				ReBuildCommandLine="cd build &amp;&amp; make clean &amp;&amp; make &amp;&amp; make install"
 				CleanCommandLine="cd build &amp;&amp; make clean"
 				Output="libiapetus.a"
 				PreprocessorDefinitions="WIN32;_DEBUG"

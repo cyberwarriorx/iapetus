@@ -20,16 +20,21 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#define SCSP_REG_MVOL   (*(volatile u8 *)0x25B00401)
-#define SCSP_REG_MIBUF  (*(volatile u8 *)0x25B00405)
+#define SCSP_REG_MVOL    (*(volatile u8 *)0x25B00401)
+#define SCSP_REG_RB      (*(volatile u16 *)0x25B00402)
+#define SCSP_REG_MIBUF   (*(volatile u8 *)0x25B00405)
 
-#define SCSP_REG_SCIEB  (*(volatile u16 *)0x25B0041E)
-#define SCSP_REG_SCIPD  (*(volatile u16 *)0x25B00420)
-#define SCSP_REG_SCIRE  (*(volatile u16 *)0x25B00422)
+#define SCSP_REG_SCIEB   (*(volatile u16 *)0x25B0041E)
+#define SCSP_REG_SCIPD   (*(volatile u16 *)0x25B00420)
+#define SCSP_REG_SCIRE   (*(volatile u16 *)0x25B00422)
 
-#define SCSP_REG_SCILV0 (*(volatile u8 *)0x25B00424)
-#define SCSP_REG_SCILV1 (*(volatile u8 *)0x25B00426)
-#define SCSP_REG_SCILV2 (*(volatile u8 *)0x25B00428)
+#define SCSP_REG_SCILV0  (*(volatile u8 *)0x25B00424)
+#define SCSP_REG_SCILV1  (*(volatile u8 *)0x25B00426)
+#define SCSP_REG_SCILV2  (*(volatile u8 *)0x25B00428)
+
+#define SCSP_REG_COEF(i) *(((volatile u16 *)0x25B00700)+(i))
+#define SCSP_REG_ADRS(i) *(((volatile u16 *)0x25B00780)+(i))
+#define SCSP_REG_MPRO(i) *(((volatile u16 *)0x25B00800)+(i))
 
 #define sound_key_off_all() (*(volatile u8 *)(0x25B00000) = 0x10)
 

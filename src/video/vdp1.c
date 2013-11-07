@@ -25,6 +25,53 @@ int command_num=0;
 
 //////////////////////////////////////////////////////////////////////////////
 
+void vdp1_set_draw_mode(enum VDP1_DRAW_MODE mode, enum VDP1_SCREEN_MODE tv_mode, enum VDP1_INT_MODE int_mode)
+{
+   u16 tvmr=0;
+   u16 fbcr=0;
+
+   switch (mode)
+   {
+      case V1DM_AUTO:
+         break;
+      case V1DM_MANUALERASE:
+         fbcr = 0x2;
+         break;
+      case V1DM_MANUALCHANGE:
+         fbcr = 0x1;
+         break;
+      case V1DM_MANUALERASECHANGE:
+         tvmr = 0x8;
+         fbcr = 0x3;
+         break;
+      default: break;
+   }
+
+   VDP1_REG_TVMR = tvmr | tv_mode;   
+   VDP1_REG_FBCR = int_mode | int_mode | fbcr;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void vdp1_trigger_draw()
+{
+   VDP1_REG_PTMR = 0x01;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void vdp1_read_fb(void *buf)
+{
+   u32 addr;
+   for (addr = 0x25C80000; addr < 0x25CC0000; addr+=4)
+   {
+      *((u32 *)buf) = *((volatile u32 *)addr);
+      buf = buf + 4;
+   }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 void vdp_system_clipping(sprite_struct *sprite)
 {
    volatile vdp1cmd_struct *tbl=(volatile vdp1cmd_struct *)(VDP1_RAM+(command_num * 0x20));
