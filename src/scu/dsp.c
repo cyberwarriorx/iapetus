@@ -27,21 +27,21 @@ int dsp_load(u32 *program, u8 offset, u8 size)
    u32 testval;
 
    // Clear out program control port
-   testval = SCUREG_PPAF;
+   testval = SCU_REG_PPAF;
 
    if (size > (256 - offset))
       return IAPETUS_ERR_SIZE;
 
    // Make sure program is stopped, etc.
-   SCUREG_PPAF = 0; 
+   SCU_REG_PPAF = 0; 
 
    // Setup DSP so we can send a program to it
-   SCUREG_PPAF = 0x8000 | offset;
+   SCU_REG_PPAF = 0x8000 | offset;
 
    // Upload our program(Probably not the fastest, but meh, it's only 1K max)
    for (i = 0; i < size; i++)
    {
-      SCUREG_PPD = program[i];
+      SCU_REG_PPD = program[i];
    }
 
    return IAPETUS_ERR_OK;
@@ -51,43 +51,43 @@ int dsp_load(u32 *program, u8 offset, u8 size)
 
 void dsp_exec(u8 PC)
 {
-   SCUREG_PPAF = 0;
-   SCUREG_PPAF = 0x18000 | PC;
+   SCU_REG_PPAF = 0;
+   SCU_REG_PPAF = 0x18000 | PC;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 int dsp_is_exec()
 {
-   return ((SCUREG_PPAF & 0x10000) >> 16);
+   return ((SCU_REG_PPAF & 0x10000) >> 16);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void dsp_stop()
 {
-   SCUREG_PPAF = 0;
+   SCU_REG_PPAF = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void dsp_pause()
 {
-   SCUREG_PPAF = SCUREG_PPAF | 0x2000000;
+   SCU_REG_PPAF = SCU_REG_PPAF | 0x2000000;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void dsp_unpause()
 {
-   SCUREG_PPAF = SCUREG_PPAF | 0x4000000;
+   SCU_REG_PPAF = SCU_REG_PPAF | 0x4000000;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 void dsp_step()
 {
-   SCUREG_PPAF = (SCUREG_PPAF & 0xFF) | 0x20000;
+   SCU_REG_PPAF = (SCU_REG_PPAF & 0xFF) | 0x20000;
 }
 
 //////////////////////////////////////////////////////////////////////////////

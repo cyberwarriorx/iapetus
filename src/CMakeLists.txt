@@ -5,9 +5,9 @@ set(iapetus_SOURCES
 	ar/arcomm.c ar/commlink.c
 	cd/cd.c cd/cdfs.c cd/mpeg.c
 	debug/debug.c debug/remoteex.s debug/localex.s
-	scu/dsp.c scu/scudma.c
+	scu/dsp.c scu/scudma.c scu/extram.c
 	peripherals/smpc.c
-	sh2/sh2dma.c sh2/sh2int.c sh2/timer.c
+	sh2/sci.c sh2/sh2dma.c sh2/sh2int.c sh2/timer.c
 	sound/sound.c
 	sys/mem/free.c sys/mem/free_r.c
 	sys/mem/malloc.c sys/mem/malloc_r.c
@@ -29,3 +29,5 @@ add_library(${PROJECT_NAME} STATIC ${iapetus_SOURCES})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION "lib")
 install(DIRECTORY "" DESTINATION "include" FILES_MATCHING PATTERN "*.h")
+
+add_subdirectory(examples)

@@ -87,6 +87,12 @@
     <Filter Include="Other Files\src">
       <UniqueIdentifier>{7407b305-0399-404a-9753-50f5fb3fb7d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Other Files\src\examples">
+      <UniqueIdentifier>{95c2059b-34c4-435e-8876-098274582e14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\examples">
+      <UniqueIdentifier>{5f0f954a-82b7-4243-a872-9419270a6bc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\iapetus.c">
@@ -218,6 +224,18 @@
     <ClCompile Include="src\ui\text.c">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\sh2\sci.c">
+      <Filter>Source Files\SH2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scu\extram.c">
+      <Filter>Source Files\SCU</Filter>
+    </ClCompile>
+    <ClCompile Include="src\examples\exhello.c">
+      <Filter>Source Files\examples</Filter>
+    </ClCompile>
+    <ClCompile Include="src\examples\exgui.c">
+      <Filter>Source Files\examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\debug\localex.s">
@@ -243,6 +261,9 @@
     </None>
     <None Include="src\CMakeLists.txt">
       <Filter>Other Files\src</Filter>
+    </None>
+    <None Include="src\examples\CMakeLists.txt">
+      <Filter>Other Files\src\examples</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -317,6 +338,15 @@
     </ClInclude>
     <ClInclude Include="src\ui\text.h">
       <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sh2\sh2regs.h">
+      <Filter>Header Files\SH2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scu\scuregs.h">
+      <Filter>Header Files\SCU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scu\extram.h">
+      <Filter>Header Files\SCU</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

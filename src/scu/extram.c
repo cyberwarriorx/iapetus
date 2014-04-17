@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007,2013 Theo Berkau
+/*  Copyright 2014 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -17,14 +17,23 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef DSP_H
+#include "../iapetus.h"
 
-int dsp_load(u32 *program, u8 offset, u8 size);
-void dsp_exec(u8 PC);
-int dsp_is_exec();
-void dsp_stop();
-void dsp_pause();
-void dsp_unpause();
-void dsp_step();
+int extram_size=0;
 
-#endif
+void extram_init()
+{
+	*((u16 *)0x257EFFFE) = 1;
+	if ((*(u8 *)0x24FFFFFF) == 0x5A)
+		extram_size = 1;
+	else if ((*(u8 *)0x24FFFFFF) == 0x5C)
+		extram_size = 4;
+	else
+		extram_size = 0;
+
+	if (extram_size != 0)
+	{
+		SCU_REG_ABUSSRCS0CS1 = 0x23301FF0;
+		SCU_REG_ABUSREFRESH = 0x00000013;
+	}
+}

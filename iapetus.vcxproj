@@ -47,9 +47,9 @@
     <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)build &amp;&amp; make install</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)build &amp;&amp; make clean &amp;&amp; make</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)build &amp;&amp; make clean</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)build &amp;&amp; mingw32-make install</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)build &amp;&amp; mingw32-make clean &amp;&amp; mingw32-make</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(SolutionDir)build &amp;&amp; mingw32-make clean</NMakeCleanCommandLine>
     <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">libiapetus.a</NMakeOutput>
     <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
@@ -60,7 +60,11 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\examples\exgui.c" />
+    <ClCompile Include="src\examples\exhello.c" />
     <ClCompile Include="src\iapetus.c" />
+    <ClCompile Include="src\scu\extram.c" />
+    <ClCompile Include="src\sh2\sci.c" />
     <ClCompile Include="src\sys\bup.c" />
     <ClCompile Include="src\sys\cd.c" />
     <ClCompile Include="src\sys\close.c" />
@@ -111,12 +115,16 @@
     <None Include="CMakeLists.txt" />
     <None Include="makefile" />
     <None Include="README.TXT" />
+    <None Include="src\examples\CMakeLists.txt" />
     <None Include="TODO" />
     <None Include="src\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\bios.h" />
     <ClInclude Include="src\iapetus.h" />
+    <ClInclude Include="src\scu\extram.h" />
+    <ClInclude Include="src\scu\scuregs.h" />
+    <ClInclude Include="src\sh2\sh2regs.h" />
     <ClInclude Include="src\types.h" />
     <ClInclude Include="src\sys\file.h" />
     <ClInclude Include="src\sys\mem\memb.h" />

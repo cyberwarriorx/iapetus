@@ -1,4 +1,4 @@
-/*  Copyright 2005-2007,2013 Theo Berkau
+/*  Copyright 2014 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -17,14 +17,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef DSP_H
+extern int extram_size;
 
-int dsp_load(u32 *program, u8 offset, u8 size);
-void dsp_exec(u8 PC);
-int dsp_is_exec();
-void dsp_stop();
-void dsp_pause();
-void dsp_unpause();
-void dsp_step();
-
-#endif
+void extram_init();

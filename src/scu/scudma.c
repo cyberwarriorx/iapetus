@@ -154,7 +154,7 @@ BOOL is_scu_dma_running(int chan)
 
 void scu_dma_stop_all(void)
 {
-   SCUREG_DSTP = 1;
+   SCU_REG_DSTP = 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -19,21 +19,6 @@
 
 #include "../iapetus.h"
 
-#define SH2_REG_WTCSR_R         (*(volatile u8 *)0xFFFFFE80)
-#define SH2_REG_WTCSR_W(val)    (*((volatile u16 *)0xFFFFFE80) = 0xA500 | (u8)(val))
-#define SH2_REG_WTCNT_R         (*(volatile u8 *)0xFFFFFE81)
-#define SH2_REG_WTCNT_W(val)    (*((volatile u16 *)0xFFFFFE80) = 0x5A00 | (u8)(val))
-                                                                          
-#define SH2_REG_IPRA            (*(volatile u16 *)0xFFFFFEE2)
-#define SH2_REG_VCRWDT          (*(volatile u16 *)0xFFFFFEE4)
-
-#define SH2_REG_RTCSR_R           (*(volatile u32 *)0xFFFFFFF0)
-#define SH2_REG_RTCSR_W(val)      (*((volatile u32 *)0xFFFFFFF0) = 0xA55A0000 | (u16)(val))
-#define SH2_REG_RTCNT_R           (*(volatile u32 *)0xFFFFFFF4)
-#define SH2_REG_RTCNT_W(val)      (*((volatile u32 *)0xFFFFFFF4) = 0xA55A0000 | (u16)(val))
-#define SH2_REG_RTCOR_R           (*(volatile u32 *)0xFFFFFFF8)
-#define SH2_REG_RTCOR_W(val)      (*((volatile u32 *)0xFFFFFFF8) = 0xA55A0000 | (u16)(val))
-
 volatile u32 timercounter;
 u32 timerfreq;
 
@@ -76,7 +61,7 @@ void timer_hblank_increment(void)
 int timer_setup(int type, u32 *freq)
 {
    u32 clock=0;
-   int old_level_mask = interrupt_get_level_mask();
+   u32 old_level_mask = interrupt_get_level_mask();
 
    if (freq == NULL)
       return IAPETUS_ERR_INVALIDPOINTER;

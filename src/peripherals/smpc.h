@@ -38,22 +38,24 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-#define SMPC_CMD_MSHON          0x00
-#define SMPC_CMD_SSHON          0x02
-#define SMPC_CMD_SSHOFF         0x03
-#define SMPC_CMD_SNDON          0x06
-#define SMPC_CMD_SNDOFF         0x07
-#define SMPC_CMD_CDON           0x08
-#define SMPC_CMD_CDOFF          0x09
-#define SMPC_CMD_SYSRES         0x0D
-#define SMPC_CMD_CKCHG352       0x0E
-#define SMPC_CMD_CKCHG320       0x0F
-#define SMPC_CMD_INTBACK        0x10
-#define SMPC_CMD_SETTIM         0x16
-#define SMPC_CMD_SETSM          0x17
-#define SMPC_CMD_NMIREQ         0x18
-#define SMPC_CMD_RESENA         0x19
-#define SMPC_CMD_RESDIS         0x1A
+#define SMPC_CMD_MSHON				0x00
+#define SMPC_CMD_SSHON				0x02
+#define SMPC_CMD_SSHOFF				0x03
+#define SMPC_CMD_SNDON				0x06
+#define SMPC_CMD_SNDOFF				0x07
+#define SMPC_CMD_CDON				0x08
+#define SMPC_CMD_CDOFF				0x09
+#define SMPC_CMD_CARTON				0x0A
+#define SMPC_CMD_CARTOFF			0x0B
+#define SMPC_CMD_SYSRES				0x0D
+#define SMPC_CMD_CKCHG352			0x0E
+#define SMPC_CMD_CKCHG320			0x0F
+#define SMPC_CMD_INTBACK			0x10
+#define SMPC_CMD_SETTIM				0x16
+#define SMPC_CMD_SETSM				0x17
+#define SMPC_CMD_NMIREQ				0x18
+#define SMPC_CMD_RESENA				0x19
+#define SMPC_CMD_RESDIS				0x1A
 
 //////////////////////////////////////////////////////////////////////////////
 
