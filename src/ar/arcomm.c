@@ -1,4 +1,4 @@
-/*  Copyright 2009, 2013 Theo Berkau
+/*  Copyright 2009, 2013-2014 Theo Berkau
     
     Flash code based on code by Ex-Cyber
 
@@ -40,39 +40,41 @@ typedef struct
 
 static flash_list_struct flash_list[] = {
    { "Silicon Storage Technology SST29EE010", 0xBFBF0707, 128, 131072 },
+	{ "Silicon Storage Technology SST29EE020", 0xBFBF1010, 128, 262144 },
    { "Atmel AT29C010", 0x1F1FD5D5, 128, 131072 },
+	{ "AMD AM29F010B", 0x01012020, 128, 131072 },
 };
 
-static int numsupportedflash=sizeof(flash_list)/sizeof(flash_list_struct);
+static int num_supported_flash=sizeof(flash_list)/sizeof(flash_list_struct);
 
-static int arpagesize=0;
-static int arromsize=0;
+static int ar_page_size=0;
+static int ar_rom_size=0;
 
-void arcl_init_handler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr)
+void arcl_init_handler(int vector, u32 patch_addr, u16 patch_inst, u32 code_addr)
 {
    int i;
 
    // Copy over AR handler from 0x02003024-0x02003147 to codeaddr+8
    for (i = 0; i < 292; i+=4)
-       *((u32 *)(codeaddr+8+i)) = *((u32 *)(0x02003024+i));
+       *((u32 *)(code_addr+8+i)) = *((u32 *)(0x02003024+i));
    
    // Patch code address+8 so the bra call is correct(fix me)
-   *((u16 *)(codeaddr+0x8)) = *((u16 *)(codeaddr+0xA));
-   *((u16 *)(codeaddr+0xA)) = 0x0009;
+   *((u16 *)(code_addr+0x8)) = *((u16 *)(code_addr+0xA));
+   *((u16 *)(code_addr+0xA)) = 0x0009;
 
    // Patch interrupt with AR handler
-   *((u32 *)(0x06000000 + (vector << 2))) = codeaddr + 0x8;
+   *((u32 *)(0x06000000 + (vector << 2))) = code_addr + 0x8;
 
    // Read patch address, write it to code address+0xC
-   *((u16 *)(codeaddr+0xC)) = *((u16 *)patchaddr);
+   *((u16 *)(code_addr+0xC)) = *((u16 *)patch_addr);
 
    // Write patch instruction to patch address
-   *((u16 *)patchaddr) = patchinst;
+   *((u16 *)patch_addr) = patch_inst;
 
    // Write a dummy code(not sure if this is needed)
-   *((u32 *)(codeaddr)) = 0x06000000;
-   *((u32 *)(codeaddr+4)) = 0x00000000; // flag to keep handler from running multiple times at the same time
-   *((u32 *)(codeaddr+0x11C)) = codeaddr;   
+   *((u32 *)(code_addr)) = 0x06000000;
+   *((u32 *)(code_addr+4)) = 0x00000000; // flag to keep handler from running multiple times at the same time
+   *((u32 *)(code_addr+0x11C)) = code_addr;   
 }
 
 void ar_command(u16 cmd)
@@ -91,57 +93,85 @@ void ar_delay_10ms()
    vdp_vsync();
 }
 
-void ar_get_product_id(u16 *vendorid, u16 *deviceid)
+void ar_get_product_id(u16 *vendor_id, u16 *device_id)
 {
-  ar_command(CMD_PID_ENTRY);
-  ar_delay_10ms();
-  *vendorid = AR_VENDOR;
-  *deviceid = AR_DEVICE;
-  ar_command(CMD_PID_EXIT);
-  ar_delay_10ms();
+	ar_command(CMD_PID_ENTRY);
+	ar_delay_10ms();
+	*vendor_id = AR_VENDOR;
+	*device_id = AR_DEVICE;
+	ar_command(CMD_PID_EXIT);
+	ar_delay_10ms();
+}
+
+int ar_get_product_index(u16 vendorid, u16 deviceid)
+{
+	int i;
+	u32 pid = (vendorid << 16) | deviceid;
+	for (i = 0; i < num_supported_flash; i++)
+	{
+		if (flash_list[i].pid == pid)
+			return i;
+	}
+	return -1;
+}
+
+int ar_get_product_name(u16 vendor_id, u16 device_id, char **name)
+{
+	int i;
+
+	if (name == NULL)
+		return IAPETUS_ERR_INVALIDARG;
+
+	i = ar_get_product_index(vendor_id, device_id);
+
+	if (i >= 0)
+	{
+		*name=flash_list[i].name;
+		return IAPETUS_ERR_OK;
+	}
+
+	if (vendor_id == 0xBFBF)
+		*name = "Unknown Silicon Storage Technology";
+
+	return IAPETUS_ERR_UNSUPPORTED;
 }
 
 int ar_init_flash_io()
 {
-   u16 vendorid, deviceid;
-   u32 pid;
+   u16 vendor_id, device_id;
    int i;
 
-   ar_get_product_id(&vendorid, &deviceid);
-   pid = (vendorid << 16) | deviceid;
+   ar_get_product_id(&vendor_id, &device_id);
 
-   if (pid == 0xFFFFFFFF)
+	i = ar_get_product_index(vendor_id, device_id);
+   // Make sure vendor id and device id are supported
+   if (i < 0)
    {
-      arpagesize = 0;
-      arromsize = 0;
-      return IAPETUS_ERR_HWNOTFOUND;
-   }
+      ar_page_size = 0;
+      ar_rom_size = 0;
 
-   // Make sure vendor id and device id are supported here
-   for (i = 0; i < numsupportedflash; i++)
-   {
-      if (flash_list[i].pid == pid)
-      {
-         arpagesize=flash_list[i].pagesize;
-         arromsize=flash_list[i].romsize;
-         return IAPETUS_ERR_OK;
-      }
+      if (vendor_id == 0xFFFF && device_id == 0xFFFF)
+         return IAPETUS_ERR_HWNOTFOUND;
+      else
+         return IAPETUS_ERR_UNSUPPORTED;
    }
-
-   arpagesize = 0;
-   arromsize = 0;
-   return IAPETUS_ERR_UNSUPPORTED;
+	else
+	{
+      ar_page_size=flash_list[i].pagesize;
+      ar_rom_size=flash_list[i].romsize;
+		return IAPETUS_ERR_OK;
+	}
 }
 
 // Untested
-void ar_erase_flash(volatile u16 *page, int numpages)
+void ar_erase_flash(volatile u16 *page, int num_pages)
 {
   int i,j;
 
-  for (i = 0; i < numpages; i++)
+  for (i = 0; i < num_pages; i++)
   {
      ar_command(CMD_PAGE_WRITE);
-     for(j = 0; j < arpagesize; j++)
+     for(j = 0; j < ar_page_size; j++)
      {
         page[0] = 0xFFFF;
         page++;
@@ -150,14 +180,14 @@ void ar_erase_flash(volatile u16 *page, int numpages)
   }
 }
 
-void ar_write_flash(volatile u16 *page, u16 *data, int numpages)
+void ar_write_flash(volatile u16 *page, u16 *data, int num_pages)
 {
   int i,j;
 
-  for (i = 0; i < numpages; i++)
+  for (i = 0; i < num_pages; i++)
   {
      ar_command(CMD_PAGE_WRITE);
-     for(j = 0; j < arpagesize; j++)
+     for(j = 0; j < ar_page_size; j++)
      {
         page[0] = data[0];
         page++;
@@ -167,12 +197,11 @@ void ar_write_flash(volatile u16 *page, u16 *data, int numpages)
   }
 }
 
-// Untested
-int ar_verify_write_flash(volatile u16 *page, u16 *data, int numpages)
+int ar_verify_write_flash(volatile u16 *page, u16 *data, int num_pages)
 {
    int i;
 
-   for (i = 0; i < (numpages * arpagesize); i++)
+   for (i = 0; i < (num_pages * ar_page_size); i++)
    {
       if (page[i] != data[i])
          return FALSE;

@@ -1,4 +1,4 @@
-/*  Copyright 2006,2013 Theo Berkau
+/*  Copyright 2006,2013-2014 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -20,6 +20,10 @@
 #ifndef COMMLINK_H
 #define COMMLINK_H
 
+u8 cl_exchange_byte(u8 val);
+u8 cl_receive_byte(void);
+void cl_send_long(u32 val);
+u32 cl_receive_long(void);
 void commlink_start_service(void);
 void commlink_stop_service(void);
 

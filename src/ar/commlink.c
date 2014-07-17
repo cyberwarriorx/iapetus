@@ -35,17 +35,19 @@ u8 cl_exchange_byte(u8 val)
    while (!(PAR_STATPORT & 0x1)) {}
    ret = PAR_INPORT;
    PAR_OUTPORT = val;
-   return ret;
+	PAR_STATPORT = 0;
+  return ret;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 u8 cl_receive_byte(void)
 {
-   u8 ret;
+   u8 ret=0;
    while (!(PAR_STATPORT & 0x1)) {}
    ret = PAR_INPORT;
    PAR_OUTPORT = ret;
+	PAR_STATPORT = 0;
    return ret;
 }
 
