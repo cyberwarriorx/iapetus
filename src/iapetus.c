@@ -41,6 +41,7 @@ void init_iapetus(int res)
    per_init();
 
    commlink_stop_service();
+   cl_set_service_func(cl_check2);
 
 #ifdef DEBUG
    debug_init();

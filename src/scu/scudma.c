@@ -19,49 +19,28 @@
 
 #include "../iapetus.h"
 
-#define SCUREG_D0R   (*(volatile u32 *)0x25FE0000)
-#define SCUREG_D0W   (*(volatile u32 *)0x25FE0004)
-#define SCUREG_D0C   (*(volatile u32 *)0x25FE0008)
-#define SCUREG_D0AD  (*(volatile u32 *)0x25FE000C)
-#define SCUREG_D0EN  (*(volatile u32 *)0x25FE0010)
-#define SCUREG_D0MD  (*(volatile u32 *)0x25FE0014)
-
-#define SCUREG_D1R   (*(volatile u32 *)0x25FE0020)
-#define SCUREG_D1W   (*(volatile u32 *)0x25FE0024)
-#define SCUREG_D1C   (*(volatile u32 *)0x25FE0028)
-#define SCUREG_D1AD  (*(volatile u32 *)0x25FE002C)
-#define SCUREG_D1EN  (*(volatile u32 *)0x25FE0030)
-#define SCUREG_D1MD  (*(volatile u32 *)0x25FE0034)
-
-#define SCUREG_D2R   (*(volatile u32 *)0x25FE0040)
-#define SCUREG_D2W   (*(volatile u32 *)0x25FE0044)
-#define SCUREG_D2C   (*(volatile u32 *)0x25FE0048)
-#define SCUREG_D2AD  (*(volatile u32 *)0x25FE004C)
-#define SCUREG_D2EN  (*(volatile u32 *)0x25FE0050)
-#define SCUREG_D2MD  (*(volatile u32 *)0x25FE0054)
-
-#define SCUREG_T0C   (*(volatile u32 *)0x25FE0090)
-#define SCUREG_T1S   (*(volatile u32 *)0x25FE0094)
-#define SCUREG_T1MD  (*(volatile u32 *)0x25FE0098)
-
-#define SCUREG_IMS   (*(volatile u32 *)0x25FE00A0)
-#define SCUREG_IST   (*(volatile u32 *)0x25FE00A4)
-
-#define SCUREG_AIACK (*(volatile u32 *)0x25FE00A8)
-#define SCUREG_ASR0  (*(volatile u32 *)0x25FE00B0)
-#define SCUREG_ASR1  (*(volatile u32 *)0x25FE00B4)
-
-#define SCUREG_RSEL  (*(volatile u32 *)0x25FE00C4)
-#define SCUREG_VER   (*(volatile u32 *)0x25FE00C8)
+#define DSTA_DSP_ACCESS		(1 << 22)
+#define DSTA_BBUS_ACCESS	(1 << 21)
+#define DSTA_ABUS_ACCESS	(1 << 20)
+#define DSTA_DMA1_INT		(1 << 17)
+#define DSTA_DMA0_INT		(1 << 16)
+#define DSTA_DMA2_STDBY		(1 << 13)
+#define DSTA_DMA2_OP			(1 << 12)
+#define DSTA_DMA1_STDBY		(1 << 9)
+#define DSTA_DMA1_OP			(1 << 8)
+#define DSTA_DMA0_STDBY		(1 << 5)
+#define DSTA_DMA0_OP			(1 << 4)
+#define DSTA_DSP_DMA_STDBY	(1 << 1)
+#define DSTA_DSP_DMA_OP		(1 << 0)
 
 //////////////////////////////////////////////////////////////////////////////
 
 int scu_dma_init(void)
 {
    scu_dma_stop_all();
-   SCUREG_D0EN = 0;
-   SCUREG_D1EN = 0;
-   SCUREG_D2EN = 0;
+   SCU_REG_D0EN = 0;
+   SCU_REG_D1EN = 0;
+   SCU_REG_D2EN = 0;
 
    return IAPETUS_ERR_OK;
 }
@@ -75,57 +54,57 @@ int scu_dma_start(int chan, void *src, void *dst, u32 size, u32 add, u32 mode)
    {
       case 0:
          // Make sure everything is disabled
-         SCUREG_D0EN = 0;
+         SCU_REG_D0EN = 0;
          // Write the read address
-         SCUREG_D0R = (u32)src;
+         SCU_REG_D0R = (u32)src;
          // Write the write address
-         SCUREG_D0W = (u32)dst;
+         SCU_REG_D0W = (u32)dst;
          // Write the transfer number
-         SCUREG_D0C = size;
+         SCU_REG_D0C = size;
 
-         SCUREG_D0AD = add;
-         SCUREG_D0MD = mode;
+         SCU_REG_D0AD = add;
+         SCU_REG_D0MD = mode;
 
          if ((mode & 0x7) == 0x7)
-            SCUREG_D0EN = 0x101;
+            SCU_REG_D0EN = 0x101;
          else
-            SCUREG_D0EN = 0x100;
+            SCU_REG_D0EN = 0x100;
          break;
       case 1:
          // Make sure everything is disabled
-         SCUREG_D1EN = 0;
+         SCU_REG_D1EN = 0;
          // Write the read address
-         SCUREG_D1R = (u32)src;
+         SCU_REG_D1R = (u32)src;
          // Write the write address
-         SCUREG_D1W = (u32)dst;
+         SCU_REG_D1W = (u32)dst;
          // Write the transfer number
-         SCUREG_D1C = size;
+         SCU_REG_D1C = size;
 
-         SCUREG_D1AD = add;
-         SCUREG_D1MD = mode;
+         SCU_REG_D1AD = add;
+         SCU_REG_D1MD = mode;
 
          if ((mode & 0x7) == 0x7)
-            SCUREG_D1EN = 0x101;
+            SCU_REG_D1EN = 0x101;
          else
-            SCUREG_D1EN = 0x100;
+            SCU_REG_D1EN = 0x100;
          break;
       case 2:
          // Make sure everything is disabled
-         SCUREG_D2EN = 0;
+         SCU_REG_D2EN = 0;
          // Write the read address
-         SCUREG_D2R = (u32)src;
+         SCU_REG_D2R = (u32)src;
          // Write the write address
-         SCUREG_D2W = (u32)dst;
+         SCU_REG_D2W = (u32)dst;
          // Write the transfer number
-         SCUREG_D2C = size;
+         SCU_REG_D2C = size;
 
-         SCUREG_D2AD = add;
-         SCUREG_D2MD = mode;
+         SCU_REG_D2AD = add;
+         SCU_REG_D2MD = mode;
 
          if ((mode & 0x7) == 0x7)
-            SCUREG_D2EN = 0x101;
+            SCU_REG_D2EN = 0x101;
          else
-            SCUREG_D2EN = 0x100;
+            SCU_REG_D2EN = 0x100;
          break;
       default:
          return IAPETUS_ERR_INVALIDARG;
@@ -141,10 +120,14 @@ BOOL is_scu_dma_running(int chan)
    switch (chan)
    {
       case 0:
-//         if (SCUREG_DSTA & ?)
-//            return IAPETUS_ERR_BUSY;
+         if (SCU_REG_DSTA & DSTA_DMA0_STDBY || SCU_REG_DSTA & DSTA_DMA0_OP)
+            return TRUE;
       case 1:
+         if (SCU_REG_DSTA & DSTA_DMA1_STDBY || SCU_REG_DSTA & DSTA_DMA1_OP)
+            return TRUE;
       case 2:
+         if (SCU_REG_DSTA & DSTA_DMA2_STDBY || SCU_REG_DSTA & DSTA_DMA2_OP)
+            return TRUE;
       default:
          return FALSE;
    }

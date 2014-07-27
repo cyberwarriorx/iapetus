@@ -236,6 +236,15 @@
     <ClCompile Include="src\examples\exgui.c">
       <Filter>Source Files\examples</Filter>
     </ClCompile>
+    <ClCompile Include="src\ar\usbdev.c">
+      <Filter>Source Files\Action Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ar\crc.c">
+      <Filter>Source Files\Action Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cd\cdsect.c">
+      <Filter>Source Files\CD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\debug\localex.s">
@@ -347,6 +356,15 @@
     </ClInclude>
     <ClInclude Include="src\scu\extram.h">
       <Filter>Header Files\SCU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ar\crc.h">
+      <Filter>Header Files\Action Replay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ar\usbdev.h">
+      <Filter>Header Files\Action Replay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cd\cdsect.h">
+      <Filter>Header Files\CD</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

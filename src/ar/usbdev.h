@@ -1,4 +1,6 @@
-/*  Copyright 2006,2013-2014 Theo Berkau
+/*  Copyright 2014 Theo Berkau
+    
+    Flash code based on code by cafe-alpha, who based his code on antime's
 
     This file is part of Iapetus.
 
@@ -17,17 +19,17 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef COMMLINK_H
-#define COMMLINK_H
+#ifndef USBDEV_H
+#define USBDEV_H
 
-u8 cl_exchange_byte(u8 val);
-u8 cl_receive_byte(void);
-void cl_send_long(u32 val);
-u32 cl_receive_long(void);
-void cl_check1(u8 unused);
-void cl_check2(u8 val);
-void commlink_start_service(void);
-void commlink_stop_service(void);
-void cl_set_service_func(void (*func)(u8));
+#include "../iapetus.h"
+#include "crc.h"
+
+void ud_send_byte(u8 val);
+u8 ud_receive_byte(void);
+void ud_send_long(u32 val);
+u32 ud_receive_long(void);
+void ud_check(u8 unused);
+int ud_detect(void);
 
 #endif

@@ -21,8 +21,8 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void cl_check2(u8 val);
 extern volatile int commlink_service;
+extern void (*commlink_func)(u8);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -238,7 +238,7 @@ void vdp_vsync(void)
    // Wait for Vblank-in
    while(!(VDP2_REG_TVSTAT & 8)) {
       if (commlink_service)
-         cl_check2(0x01); // Heh, I may change this
+         commlink_func(0x01);
    }
 
    // Wait for Vblank-out

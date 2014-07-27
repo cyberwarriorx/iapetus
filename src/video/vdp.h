@@ -58,8 +58,8 @@ enum VDP1_INT_MODE
 };
 
 // VDP2
-#define VDP2_RAM	0x25E00000
-#define VDP2_CRAM	0x25F00000
+#define VDP2_RAM						0x25E00000
+#define VDP2_CRAM						0x25F00000
 
 #define VDP2_REG_TVMD           (*(volatile u16 *)0x25F80000)
 #define VDP2_REG_EXTEN          (*(volatile u16 *)0x25F80002)
@@ -667,6 +667,48 @@ typedef struct
       } part;
       u16 all;
    } MPOPRB;
+	union
+	{
+		struct
+		{
+			u16 unused1:6;
+			u16 n1zm:2;
+			u16 unused2:6;
+			u16 n0zm:2;
+		} part;
+		u16 all;
+	} ZMCTL;
+	union
+	{
+		struct
+		{
+			u16 unused1:2;
+			u16 n1lss:2;
+			u16 n1lzmx:1;
+			u16 n1lzmy:1;
+			u16 n1lscx:1;
+			u16 n1vcsc:1;
+			u16 unused2:2;
+			u16 n0lss:2;
+			u16 n0lzmx:1;
+			u16 n0lzmy:1;
+			u16 n0lscx:1;
+			u16 n0vcsc:1;
+		} part;
+		u16 all;
+	} SCRCTL;
+	union
+	{
+		union
+		{
+			u32 unused1:13;
+			u32 vcstau:3;
+			u32 vcstal:15;
+			u32 unused2:1;
+		} part;
+		u32 all;
+	} VCSTA;
+	
    u32 RPTA;
    union
    {
@@ -962,6 +1004,10 @@ int vdp_rbg1_init(screen_settings_struct *settings);
 void vdp_rbg1_deinit(void);
 int vdp_exbg_init(screen_settings_struct *settings);
 void vdp_exbg_deinit(void);
+void vdp_wait_hblankin(void);
+void vdp_wait_hblankout(void);
+void vdp_wait_vblankin(void);
+void vdp_wait_vblankout(void);
 void vdp_vsync(void);
 void vdp_disp_on(void);
 void vdp_disp_off(void);

@@ -20,12 +20,26 @@
 #ifndef ARCOMM_H
 #define ARCOMM_H
 	
+struct fi_struct
+{
+	char *name;
+	u32 pid;
+	int page_size; // in words
+	int num_pages; 
+	int rom_size; // in words
+	void (*erase_flash_all)(struct fi_struct *flash_info);
+	void (*erase_flash)(struct fi_struct *flash_info, volatile u16 *page, int num_pages);
+	void (*write_flash)(struct fi_struct *flash_info, volatile u16 *page, u16 *data, int num_pages);
+};
+
+typedef struct fi_struct flash_info_struct;
+
 void arcl_init_handler(int vector, u32 patchaddr, u16 patchinst, u32 codeaddr);
 
 void ar_get_product_id(u16 *vendorid, u16 *deviceid);
-int ar_init_flash_io(void);
-void ar_erase_flash(volatile u16 *page, int numpages);
-void ar_write_flash(volatile u16 *page, u16 *data, int numpages);
-int ar_verify_write_flash(volatile u16 *page, u16 *data, int numpages);
-
+int ar_init_flash_io(flash_info_struct *flash_info);
+void ar_erase_flash_all(flash_info_struct *flash_info);
+void ar_erase_flash(flash_info_struct *flash_info, volatile u16 *page, int num_pages);
+void ar_write_flash(flash_info_struct *flash_info, volatile u16 *page, u16 *data, int num_pages);
+int ar_verify_write_flash(flash_info_struct *flash_info, volatile u16 *page, u16 *data, int num_pages);
 #endif

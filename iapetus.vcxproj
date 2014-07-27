@@ -60,6 +60,9 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ar\crc.c" />
+    <ClCompile Include="src\ar\usbdev.c" />
+    <ClCompile Include="src\cd\cdsect.c" />
     <ClCompile Include="src\examples\exgui.c" />
     <ClCompile Include="src\examples\exhello.c" />
     <ClCompile Include="src\iapetus.c" />
@@ -120,7 +123,10 @@
     <None Include="src\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ar\crc.h" />
+    <ClInclude Include="src\ar\usbdev.h" />
     <ClInclude Include="src\bios.h" />
+    <ClInclude Include="src\cd\cdsect.h" />
     <ClInclude Include="src\iapetus.h" />
     <ClInclude Include="src\scu\extram.h" />
     <ClInclude Include="src\scu\scuregs.h" />

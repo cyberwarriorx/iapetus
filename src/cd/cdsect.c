@@ -1,4 +1,4 @@
-/*  Copyright 2006,2013-2014 Theo Berkau
+/*  Copyright 2014 Theo Berkau
 
     This file is part of Iapetus.
 
@@ -17,17 +17,30 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef COMMLINK_H
-#define COMMLINK_H
+#include "../iapetus.h"
 
-u8 cl_exchange_byte(u8 val);
-u8 cl_receive_byte(void);
-void cl_send_long(u32 val);
-u32 cl_receive_long(void);
-void cl_check1(u8 unused);
-void cl_check2(u8 val);
-void commlink_start_service(void);
-void commlink_stop_service(void);
-void cl_set_service_func(void (*func)(u8));
+int cd_put_sector_data(u8 sel_num, u16 num_sectors)
+{
+	cd_cmd_struct cd_cmd;
+	cd_cmd_struct cd_cmd_rs;
 
-#endif
+	cd_cmd.CR1 = 0x6400;
+	cd_cmd.CR2 = 0x0000;
+	cd_cmd.CR3 = sel_num << 8;
+	cd_cmd.CR4 = num_sectors;
+
+	return cd_exec_command(HIRQ_EHST, &cd_cmd, &cd_cmd_rs);
+}
+
+int cd_move_sector_data(u8 dst_filter, u16 sector_pos, u8 sel_num, u16 num_sectors)
+{
+	cd_cmd_struct cd_cmd;
+	cd_cmd_struct cd_cmd_rs;
+
+	cd_cmd.CR1 = 0x6600 | dst_filter;
+	cd_cmd.CR2 = sector_pos;
+	cd_cmd.CR3 = sel_num << 8;
+	cd_cmd.CR4 = num_sectors;
+
+	return cd_exec_command(0, &cd_cmd, &cd_cmd_rs);
+}

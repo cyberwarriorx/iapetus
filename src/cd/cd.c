@@ -999,7 +999,7 @@ int play_cd_audio(u8 audio_track, u8 repeat, u8 vol_l, u8 vol_r)
 
    sound_external_audio_enable(vol_l, vol_r);
 
-   if ((ret = cd_set_sector_size(2048)) != 0)
+   if ((ret = cd_set_sector_size(SECT_2048)) != 0)
       return ret;
 
    // Clear partition 0
