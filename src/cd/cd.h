@@ -162,6 +162,7 @@ int cd_seek_fad(int seekfad);
 int cd_get_subcode(enum SUBCODE_TYPE type, u16 *data, u8 *flags);
 int cd_connect_cd_to_filter(u8 filter_num);
 int cd_set_filter(u8 filter_num, u8 mode, cd_sh_cond_struct *sh_cond, cd_range_struct *cd_range, cd_con_struct *cd_con);
+int cd_reset_selector_all();
 int cd_init();
 int cd_end_transfer();
 int cd_get_stat(cd_stat_struct *cd_status);

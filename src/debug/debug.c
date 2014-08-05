@@ -15,17 +15,6 @@
 #define BDMRB       (*(volatile u32 *)0xFFFFFF74)
 #define BRCR        (*(volatile u16 *)0xFFFFFF78)
 
-#if 0
-extern u32 RemoteDebugStart;
-extern u32 RemoteDebugSize;
-extern u32 remoteex_general_illegal_instruction;
-extern u32 remoteex_slot_illegal_instruction;
-extern u32 remoteex_cpu_address_error;
-extern u32 remoteex_dma_address_error;
-extern u32 RemoteUBCHandler;
-//void RemoteUBCHandler(void) __attribute__ ((interrupt_handler)); 
-#endif
-
 void ex_general_illegal_instruction(void);
 void ex_slot_illegal_instruction(void);
 void ex_cpu_address_error(void);
@@ -33,30 +22,6 @@ void ex_dma_address_error(void);
 void UBCHandler(void) __attribute__ ((interrupt_handler));
 
 #if 0
-/*
-//////////////////////////////////////////////////////////////////////////////
-
-// This will be move to asm
-void RemoteUBCHandler(void)
-{
-   // Let's establish which interrupt was triggered
-   if (BRCR & 0x8000)
-   {
-      // Channel A(Code Breakpoint)
-      // Send data back to computer notifying it that we're in a breakpoint(use 0x02 return command)
-
-   }
-   else if (BRCR & 0x80)
-   {
-      // Channel B(Memory Breakpoint)
-      // Send data back to computer notifying it that we're in a breakpoint(use 0x02 return command)
-   }
-
-   // Clear A and B condition matches
-   BRCR = BRCR & 0x3F3F;
-}
-*/
-
 //////////////////////////////////////////////////////////////////////////////
 
 int RemoteDebuggerStart(void *addr)
