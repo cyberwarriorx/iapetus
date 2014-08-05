@@ -44,6 +44,8 @@ int main()
 		gui_translate_message(&msg);
 		gui_dispatch_message(&msg);
 	}
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
