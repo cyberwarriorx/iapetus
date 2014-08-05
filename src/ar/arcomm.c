@@ -43,9 +43,9 @@ void ar_write_flash_AM29F010B(flash_info_struct *flash_info, volatile u16 *page,
 static flash_info_struct flash_info_list[] = {
    { "Silicon Storage Technology SST29EE010", 0xBFBF0707, 128, 1024, 131072, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
 	{ "Silicon Storage Technology SST29EE020", 0xBFBF1010, 128, 2048, 262144, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
-	/* { "Silicon Storage Technology SST39SF010A", 0xBFBFB5B5, 4096, 32, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B }, */
+	{ "Silicon Storage Technology SST39SF010A", 0xBFBFB5B5, 4096, 32, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
    { "Atmel AT29C010", 0x1F1FD5D5, 128, 1024, 131072, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
-	/* { "AMD AM29F010B", 0x01012020, 16384, 8, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B }, */
+	{ "AMD AM29F010B", 0x01012020, 16384, 8, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
 };
 
 static int num_supported_flash=sizeof(flash_info_list)/sizeof(flash_info_struct);
@@ -250,17 +250,23 @@ void ar_write_flash_AM29F010B(flash_info_struct *flash_info, volatile u16 *page,
 
 void ar_erase_flash_all(flash_info_struct *flash_info)
 {
+	int old_mask=interrupt_get_level_mask();
 	flash_info->erase_flash_all(flash_info);
+	interrupt_set_level_mask(old_mask);
 }
 
 void ar_erase_flash(flash_info_struct *flash_info, volatile u16 *page, int num_pages)
 {
+	int old_mask=interrupt_get_level_mask();
 	flash_info->erase_flash(flash_info, page, num_pages);
+	interrupt_set_level_mask(old_mask);
 }
 
 void ar_write_flash(flash_info_struct *flash_info, volatile u16 *page, u16 *data, int num_pages)
 {
+	int old_mask=interrupt_get_level_mask();
 	flash_info->write_flash(flash_info, page, data, num_pages);
+	interrupt_set_level_mask(old_mask);
 }
 
 int ar_verify_write_flash(flash_info_struct *flash_info, volatile u16 *page, u16 *data, int num_pages)

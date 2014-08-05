@@ -186,6 +186,10 @@ void ud_check(u8 unused)
 	default:
 		break;
 	}
+
+	// Restore A-bus settings
+	SCU_REG_ABUSREFRESH = 0x1F;
+	SCU_REG_ABUSSRCS0CS1 = 0x1FF01FF0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

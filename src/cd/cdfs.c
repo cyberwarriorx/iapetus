@@ -228,7 +228,7 @@ int cdfs_open(const char *path, file_struct *file)
 
       strncpy(dir_name, path, size);
       dir_name[size] = '\0';
-      path += size;
+      path += size+1;
 
       // Now that we've got the current subdirectory's name, let's find its
       // table.
