@@ -46,4 +46,5 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "iapetus-${IAPETUS_VERSION}")
 include(CPack)
 
 SET(CMAKE_CONFIGURATION_TYPES Release)
+add_subdirectory(doc)
 add_subdirectory(src)

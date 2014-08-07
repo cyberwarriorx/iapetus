@@ -108,6 +108,7 @@ enum IAPETUS_ERR gui_dispatch_message(gui_msg_buf_struct *msg)
 
 int gui_message_box(char *title, char *text, u32 butmask)
 {
+	// stub
 	return TRUE;
 }
 
