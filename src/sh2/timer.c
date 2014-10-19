@@ -70,7 +70,7 @@ int timer_setup(int type, u32 *freq)
 
    interrupt_set_level_mask(0xF);
 
-   if (bios_get_clock_speed == 0)
+   if (bios_get_clock_speed() == 0)
       clock = 26846587;
    else
       clock = 28636360;

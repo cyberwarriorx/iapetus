@@ -174,5 +174,8 @@ int is_cd_present();
 int cd_read_sector(void *buffer, u32 FAD, int sector_size, u32 num_bytes);
 int play_cd_audio(u8 audio_track, u8 repeat, u8 vol_l, u8 vol_r);
 int stop_cd_audio(void);
+int cd_set_sector_size(int size);
+int cd_abort_file(void);
+int cd_end_transfer(void);
 
 #endif
