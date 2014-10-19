@@ -20,10 +20,40 @@
 #ifndef SCI_H
 #define SCI_H
 
-#define SERIALMODE_ASYNC        0x00000000
-#define SERIALMODE_CLOCKEDSYNC  0x00800000
+#define SCI_REG_SMR     *((volatile u8 *)0xFFFFFE00)
+#define SCI_REG_BRR     *((volatile u8 *)0xFFFFFE01)
+#define SCI_REG_SCR     *((volatile u8 *)0xFFFFFE02)
+#define SCI_REG_TDR     *((volatile u8 *)0xFFFFFE03)
+#define SCI_REG_SSR     *((volatile u8 *)0xFFFFFE04)
+#define SCI_REG_RDR     *((volatile u8 *)0xFFFFFE05)
 
-int sci_init(u32 settings);
+#define SCR_TIE         0x80
+#define SCR_RIE         0x40
+#define SCR_TE          0x20
+#define SCR_RE          0x10
+#define SCR_MPIE        0x08
+#define SCR_TEIE        0x04
+
+#define SSR_TDRE        0x80
+#define SSR_RDRF        0x40
+#define SSR_ORER        0x20
+#define SSR_FER         0x10
+#define SSR_PER         0x08
+#define SSR_TEND        0x04
+#define SSR_MPB         0x02
+#define SSR_MPBT        0x01
+
+#define IPRB *((volatile u16 *)0xFFFFFE60)
+#define VCRA *((volatile u16 *)0xFFFFFE62)
+
+enum SCI_SM
+{
+   SERIALMODE_ASYNC=0x00000000,
+   SERIALMODE_CLOCKEDSYNC=0x00800000
+};
+
+
+int sci_init(enum SCI_SM settings);
 u8 sci_transfer_byte_no_wait(u8 val, BOOL *success);
 void sci_send_byte(u8 val);
 u8 sci_receive_byte();
