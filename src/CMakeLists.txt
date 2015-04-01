@@ -19,7 +19,7 @@ set(iapetus_SOURCES
 	sys/write.c sys/read.c sys/fstat.c sys/lseek.c 
 	sys/sys.c
 	ui/font.c ui/font8x8.c ui/font8x16.c ui/gui.c ui/text.c
-	video/vdpinit.c video/scrscr.c video/rotscr.c video/vdp1.c video/pal.c
+	video/vdpinit.c video/coloffset.c video/scrscr.c video/rotscr.c video/vdp1.c video/pal.c
 	iapetus.c)
 
 set(CMAKE_C_FLAGS "-O2 -Wall -m2 -DREENTRANT_SYSCALLS_PROVIDED")

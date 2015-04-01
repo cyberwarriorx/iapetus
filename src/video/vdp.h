@@ -928,6 +928,7 @@ typedef struct
 #define SPRITE_16BPP                    0x00000028
 
 #define RGB16(r, g, b) (0x8000 | (((b) & 0x1F) << 10) | (((g) & 0x1F) << 5) | ((r) & 0x1F))
+#define RGB555(r,g,b) ((r) | ((g) << 5) | ((b) << 10))
 
 typedef struct
 {
@@ -1011,10 +1012,14 @@ void vdp_wait_vblankout(void);
 void vdp_vsync(void);
 void vdp_disp_on(void);
 void vdp_disp_off(void);
+void vdp_get_scr_width_height(int *width, int *height);
+
+// Color Offset functions
 void vdp_set_color_offset(u8 num, s16 r, s16 g, s16 b);
 void vdp_enable_color_offset(u16 screen, int select);
 void vdp_disable_color_offset(u16 screen);
-void vdp_get_scr_width_height(int *width, int *height);
+void vdp_fade_in(u16 screen, int num, int increment);
+void vdp_fade_out(u16 screen, int num, int increment);
 
 // Window functions
 void vdp_enable_line_window(int screennum, int windownum, u16 mode, u32 linetbladdr);

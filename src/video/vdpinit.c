@@ -261,54 +261,6 @@ void vdp_disp_off(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void vdp_set_color_offset(u8 num, s16 r, s16 g, s16 b)
-{
-   if (num == 0)
-   {
-      // Offset A
-      VDP2_REG_COAR = r & 0x1FF;
-      VDP2_REG_COAG = g & 0x1FF;
-      VDP2_REG_COAB = b & 0x1FF;
-   }          
-   else
-   {
-      // Offset B
-      VDP2_REG_COBR = r & 0x1FF;
-      VDP2_REG_COBG = g & 0x1FF;
-      VDP2_REG_COBB = b & 0x1FF;
-   }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-void vdp_enable_color_offset(u16 screen, int select)
-{
-   // Adjust select first
-   screen = 1 << screen;
-
-   if (select == 0)
-      vdp2_settings.CLOFSL &= ~screen;
-   else
-      vdp2_settings.CLOFSL |= screen;
-
-   // Adjust enable
-   vdp2_settings.CLOFEN |= screen;
-
-   // Write the new values to registers
-   VDP2_REG_CLOFSL = vdp2_settings.CLOFSL;
-   VDP2_REG_CLOFEN = vdp2_settings.CLOFEN;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-void vdp_disable_color_offset(u16 screen)
-{
-   vdp2_settings.CLOFEN &= ~screen;
-   VDP2_REG_CLOFEN = vdp2_settings.CLOFEN;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
 void vdp_get_scr_width_height(int *width, int *height)
 {	
 	*width=vdp2_settings.screen_width;
