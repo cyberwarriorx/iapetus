@@ -32,9 +32,9 @@
 #define SCSP_REG_SCILV1  (*(volatile u8 *)0x25B00426)
 #define SCSP_REG_SCILV2  (*(volatile u8 *)0x25B00428)
 
-#define SCSP_REG_COEF(i) *(((volatile u16 *)0x25B00700)+(i))
-#define SCSP_REG_ADRS(i) *(((volatile u16 *)0x25B00780)+(i))
-#define SCSP_REG_MPRO(i) *(((volatile u16 *)0x25B00800)+(i))
+#define SCSP_REG_COEF(i) *(((volatile u16 *)(0x25B00700+((i)<<1))))
+#define SCSP_REG_ADRS(i) *(((volatile u16 *)(0x25B00780+((i)<<1))))
+#define SCSP_REG_MPRO(i) *(((volatile u16 *)(0x25B00800+((i)<<1))))
 
 #define sound_key_off_all() (*(volatile u8 *)(0x25B00000) = 0x10)
 

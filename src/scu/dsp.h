@@ -18,6 +18,7 @@
 */
 
 #ifndef DSP_H
+#define DSP_H
 
 int dsp_load(u32 *program, u8 offset, u8 size);
 void dsp_exec(u8 PC);
