@@ -42,6 +42,16 @@
 #define SH2_REG_IPRA					(*(volatile u16 *)0xFFFFFEE2)
 #define SH2_REG_VCRWDT				(*(volatile u16 *)0xFFFFFEE4)
 
+#define SH2_REG_BARA        (*(volatile u32 *)0xFFFFFF40)
+#define SH2_REG_BAMRA       (*(volatile u32 *)0xFFFFFF44)
+#define SH2_REG_BBRA        (*(volatile u16 *)0xFFFFFF48)
+#define SH2_REG_BARB        (*(volatile u32 *)0xFFFFFF60)
+#define SH2_REG_BAMRB       (*(volatile u32 *)0xFFFFFF64)
+#define SH2_REG_BBRB        (*(volatile u16 *)0xFFFFFF68)
+#define SH2_REG_BDRB        (*(volatile u32 *)0xFFFFFF70)
+#define SH2_REG_BDMRB       (*(volatile u32 *)0xFFFFFF74)
+#define SH2_REG_BRCR        (*(volatile u16 *)0xFFFFFF78)
+
 #define SH2_REG_RTCSR_R				(*(volatile u32 *)0xFFFFFFF0)
 #define SH2_REG_RTCSR_W(val)		(*((volatile u32 *)0xFFFFFFF0) = 0xA55A0000 | (u16)(val))
 #define SH2_REG_RTCNT_R				(*(volatile u32 *)0xFFFFFFF4)
