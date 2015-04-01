@@ -27,6 +27,7 @@
 #define _SLOB_H_
 
 #include <stddef.h>
+#include <inttypes.h>
 
 /*-
  * Restrictions
@@ -54,5 +55,6 @@
 void slob_init(void);
 void *slob_alloc(size_t);
 void slob_free(void *);
+void *slob_realloc(void *, size_t);
 
 #endif /* _SLOB_H_ */

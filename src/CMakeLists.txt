@@ -12,7 +12,7 @@ set(iapetus_SOURCES
 	sys/mem/free.c sys/mem/free_r.c
 	sys/mem/malloc.c sys/mem/malloc_r.c
 	sys/mem/memb.c
-	sys/mem/realloc_r.c
+	sys/mem/realloc.c sys/mem/realloc_r.c
 	sys/mem/slob.c sys/mem/slob.h
 	sys/stdin.c sys/stdout.c sys/stderr.c sys/cd.c
 	sys/bup.c sys/open.c sys/close.c

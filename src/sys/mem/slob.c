@@ -3,6 +3,8 @@
  *
  * Israel Jacquez <mrkotfw@gmail.com>
  *
+ * realloc code added by Theo Berkau <cwx@cyberwarriorx.com>
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -29,6 +31,7 @@
 #include <sys/queue.h>
 
 #include <inttypes.h>
+#include <string.h>
 
 #include "slob.h"
 
@@ -370,6 +373,16 @@ slob_block_alloc(struct slob_page *sp, int16_t bunits)
 /*
  * Return the the size of SB.
  */
+int16_t
+	slob_block_units_ptr(void *addr)
+{
+	struct slob_block *sb = (struct slob_block *)addr - 1;
+	return slob_block_units(sb);
+}
+
+/*
+ * Return the the size of SB.
+ */
 static int16_t
 slob_block_units(struct slob_block *sb)
 {
@@ -471,4 +484,29 @@ slob_page_free(struct slob_page_list *spl, struct slob_page *sp)
                 TAILQ_REMOVE(spl, sp, sp_list);
 
         return 0;
+}
+
+void *
+slob_realloc(void *old, size_t new_len)
+{
+	size_t real_len, new_real_len;
+
+	if (old == NULL)
+		return slob_alloc(new_len);
+
+	// Get sizes
+	real_len = slob_block_units_ptr(old);
+	new_real_len = SLOB_BLOCK_UNITS(new_len) + 1;
+
+	if (new_real_len > real_len)
+	{
+		void *result=slob_alloc(new_len);
+		if (result == NULL)
+			return NULL;
+		memcpy(result, old, (real_len-1)*SLOB_BLOCK_UNIT);
+		slob_free(old);
+		return result;
+	}
+
+	return old;
 }

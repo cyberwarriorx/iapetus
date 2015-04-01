@@ -1,10 +1,10 @@
 #include <sys/reent.h>
 #include <stddef.h>
+#include "../../iapetus.h"
 
-void *
-_realloc_r(struct _reent *r __attribute__ ((unused)),
-    void *old __attribute__ ((unused)),
-    size_t new_len __attribute__ ((unused)))
+extern font_struct main_font;
+
+void *_realloc_r(struct _reent *r __attribute__ ((unused)), void *old, size_t new_len)
 {
-        return NULL;
+	return realloc(old, new_len);
 }
