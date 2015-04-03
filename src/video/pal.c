@@ -21,8 +21,6 @@
 
 #include "../iapetus.h"
 
-#define VDP_RGB555(r,g,b) ((r) | ((g) << 5) | ((b) << 10))
-
 u16 defaultpalette[256] =
 {
    RGB555(0,0,0),    RGB555(0,0,21),   RGB555(0,21,0),   RGB555(0,21,21),

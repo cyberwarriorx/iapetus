@@ -130,6 +130,7 @@ static void ud_upload(void)
 static void ud_execute(void)
 {
 	u32 addr=ud_receive_long();
+	interrupt_set_level_mask(0xF);
 	((void (*)())addr)();
 }
 
