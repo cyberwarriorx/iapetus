@@ -65,7 +65,7 @@ void vdp_enable_color_offset(u16 screen, int select)
 
 void vdp_disable_color_offset(u16 screen)
 {
-	vdp2_settings.CLOFEN &= ~screen;
+	vdp2_settings.CLOFEN &= ~(1 << screen);
 	VDP2_REG_CLOFEN = vdp2_settings.CLOFEN;
 }
 
@@ -85,6 +85,7 @@ void vdp_fade_in(u16 screen, int num, int increment)
 		vdp_set_color_offset(num, offset, offset, offset);
 	}
 	vdp_vsync();
+	vdp_disable_color_offset(screen);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,6 @@ void vdp_fade_out(u16 screen, int num, int increment)
 		vdp_set_color_offset(num, offset, offset, offset);
 	}
 	vdp_vsync();
-	vdp_disable_color_offset(screen);
 }
 
 //////////////////////////////////////////////////////////////////////////////
