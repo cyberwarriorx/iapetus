@@ -5,6 +5,7 @@ set(iapetus_SOURCES
 	ar/arcomm.c ar/commlink.c ar/crc.c ar/usbdev.c
 	cd/cd.c cd/cdfs.c cd/mpeg.c cd/cdsect.c
 	debug/debug.c debug/remoteex.s debug/localex.s
+	file/pcx.c file/image.c
 	scu/dsp.c scu/scudma.c scu/extram.c
 	peripherals/smpc.c
 	sh2/sci.c sh2/sh2dma.c sh2/sh2int.c sh2/timer.c

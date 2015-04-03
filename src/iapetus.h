@@ -30,6 +30,8 @@
 #include "cd/mpeg.h"
 #include "cd/cdsect.h"
 #include "debug/debug.h"
+#include "file/image.h"
+#include "file/pcx.h"
 #include "modem/netlink.h"
 #include "peripherals/smpc.h"
 #include "scu/dsp.h"
@@ -64,6 +66,7 @@ enum IAPETUS_ERR
    IAPETUS_ERR_TIMEOUT=-10,         // Operation timed out
    IAPETUS_ERR_UNEXPECTDATA=-11,    // Unexpected data
    IAPETUS_ERR_OUTOFMEMORY=-12,     // Ran out of memory
+	IAPETUS_ERR_BADHEADER=-13,       // Bad Header
 
    // CD/MPEG Related
    IAPETUS_ERR_AUTH=-100,            // Disc/MPEG card authentication error
