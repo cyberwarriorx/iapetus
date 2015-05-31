@@ -42,10 +42,11 @@ void ar_write_flash_AM29F010B(flash_info_struct *flash_info, volatile u16 *page,
 
 static flash_info_struct flash_info_list[] = {
    { "Silicon Storage Technology SST29EE010", 0xBFBF0707, 128, 1024, 131072, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
-	{ "Silicon Storage Technology SST29EE020", 0xBFBF1010, 128, 2048, 262144, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
+	{ "Silicon Storage Technology SST29LE010", 0xBFBF0808, 128, 1024, 131072, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
+	{ "Silicon Storage Technology SST29EE020", 0xBFBF1010, 128, 2048, 131072, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
 	{ "Silicon Storage Technology SST39SF010A", 0xBFBFB5B5, 4096, 32, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
-	{ "Silicon Storage Technology SST39SF020" , 0xBFBFB6B6, 4096, 32, 262144, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
-	{ "Silicon Storage Technology SST39SF040" , 0xBFBFB7B7, 4096, 32, 524288, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
+	{ "Silicon Storage Technology SST39SF020" , 0xBFBFB6B6, 4096, 32, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
+	{ "Silicon Storage Technology SST39SF040" , 0xBFBFB7B7, 4096, 32, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
    { "Atmel AT29C010", 0x1F1FD5D5, 128, 1024, 131072, ar_erase_flash_all_SST29EE010, ar_erase_flash_SST29EE010, ar_write_flash_SST29EE010 },
 	{ "AMD AM29F010B", 0x01012020, 16384, 8, 131072, ar_erase_flash_all_AM29F010B, ar_erase_flash_AM29F010B, ar_write_flash_AM29F010B },
 };
