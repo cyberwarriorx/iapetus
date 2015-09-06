@@ -1,4 +1,4 @@
-project(iapetus-doc)
+project(iapetus-doc C)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)

@@ -1,4 +1,4 @@
-project(iapetus)
+project(iapetus C)
 
 enable_language(ASM)
 set(iapetus_SOURCES
