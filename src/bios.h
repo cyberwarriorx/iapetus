@@ -73,4 +73,200 @@
  */
 #define bios_loadcd_boot                INDIRECT_CALL(0x06000288, int,      void                            )
 
+
+typedef struct
+{
+	u16 dev_id;					// ID of device
+	u16 part;					// Number of Partitions
+} bup_cfg_struct;
+
+typedef struct
+{
+	u32 total_bytes;			// Size of Backup Ram (in bytes)
+	u32 total_blocks;			// Size of Backup Ram (in blocks)
+	u32 block_size;			// Size of Block(in bytes)
+	u32 free_bytes;			// Free Space(in bytes)
+	u32 free_blocks;			// Free Space(in blocks)
+	u32 write_block_size;	// Writable block size
+} bup_stat_struct;
+
+typedef struct
+{
+	u8 filename[12];			// File name
+	u8 comment[11];			// Comment
+	u8 language;				// Language of Comment
+	u32 date;					// Date Stamp of File
+	u32 byte_size;				// Size of Data(in bytes)
+	u16 block_size;			// Size of Data(in blocks)
+} bup_dir_struct;
+
+typedef struct
+{
+	u8 year;						// Year minus 1980
+	u8 month;					// Month
+	u8 day;						// Day
+	u8 hour;						// Hour
+	u8 min;						// Minute
+	u8 week;						// Week
+} bup_date_struct;
+
+#define bios_bup_vect_addr *(volatile u32 *)(0x6000354))
+
+//! Initialize Bios Backup Library code
+/*!
+ *  bios_bup_init():
+ *      - Copies bios backup library code to address specified in lib_addr
+ *      - Detects whether cartridge and floppy disk drive are connected
+ *      - Fills cfg with detected device information
+ *      - cfg must an array bup_cfg_struct[3]
+ */
+#define bios_bup_init                   INDIRECT_CALL(0x6000358,             void,    volatile u32 *lib_addr, u32 *work_addr, bup_cfg_struct *cfg)
+
+//! Backup Ram Select Partition. Only used for the floppy disk drive.
+/*!
+ *  bios_bup_sel_part():
+ *      - Selects partition for the specified device
+ *  Return values include:
+ *      0 = No error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_sel_part               INDIRECT_CALL(bios_bup_vect_addr+4,  s32,     u32 dev, u16 num)
+
+//! Backup Ram Format.
+/*!
+ *  bios_bup_format():
+ *      - Erases and formats specified device
+ *  Return values include:
+ *      0 = No error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_format                 INDIRECT_CALL(bios_bup_vect_addr+8,  s32,     u32 dev)
+
+//! Backup Ram Status.
+/*!
+ *  bios_bup_stat():
+ *      - Fetches the used and free space of the current device
+ *  Return values include:
+ *      0 = No error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_stat                   INDIRECT_CALL(bios_bup_vect_addr+12, s32,     u32 dev, u32 stat_size, bup_stat_struct *stat)
+
+//! Backup Ram Write.
+/*!
+ *  bios_bup_write():
+ *      - Checks to see if filename already exists. If overwrite is set to 1 it continues with next step
+ *      - Writes data specified in data variable to specified device
+ *  Return values include:
+ *      0 = No error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_write                  INDIRECT_CALL(bios_bup_vect_addr+16, s32,     u32 dev, bup_dir_struct *dir, volatile u8 *data, u8 overwrite)
+
+//! Backup Ram Read.
+/*!
+ *  bios_bup_read():
+ *      - Checks to see if filename exists
+ *      - Reads data from specified device and filename to memory pointed to by data
+ *  Return values include:
+ *      0 = No error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ *
+ */
+#define bios_bup_read                   INDIRECT_CALL(bios_bup_vect_addr+20, s32,     u32 dev, u8 *filename, volatile u8 *data)
+
+//! Backup Ram Delete.
+/*!
+ *  bios_bup_del():
+ *      - Checks to see if filename exists
+ *      - Deletes data associated with filename and frees blocks
+ *  Return values include:
+ *      0 = No error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_del                    INDIRECT_CALL(bios_bup_vect_addr+24, s32,     u32 dev, u8 *filename)
+
+//! Backup Ram Get Directory List.
+/*!
+ *  bios_bup_dir():
+ *      - Looks for saves based on specified device and filename
+ *      - Stores results in memory pointed to by dir pointer
+ *  Return values include:
+ *      0 = No Error
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_dir                    INDIRECT_CALL(bios_bup_vect_addr+28, s32,     u32 dev, u8 *filename, u16 dir_size, bup_dir_struct *dir)
+
+//! Backup Ram Verify.
+/*!
+ *  bios_bup_verify:
+ *      - Compares data specified in data variable to data already stored on specified device and filename
+ *  Return values include:
+ *      0 = Match
+ *      1 - Device Error or doesn't exist
+ *      2 - Not formatted
+ *      3 - Write protected
+ *      4 - Not enough memory
+ *      5 - Not Found
+ *      7 - No Match
+ *      8 - Broken
+ */
+#define bios_bup_verify                 INDIRECT_CALL(bios_bup_vect_addr+32, s32,     u32 dev, u8 *filename, volatile u8 *data)
+
+//! Backup Ram Convert Date Stamp variable to structure.
+/*!
+ *  bios_bup_get_date:
+ *      - Converts value specified in date(also see date variable in bup_dir_struct) to bup_date_struct format
+ */
+#define bios_bup_get_date               INDIRECT_CALL(bios_bup_vect_addr+36, void,    u32 date, bup_date_struct *date_data)
+
+//! Backup Ram Convert structure to Date Stamp variable.
+/*!
+ *  bios_bup_set_date:
+ *      - Converts data in date_data and returns 32-bit date stamp value(see date variable in bup_dir_struct).
+ */
+#define bios_bup_set_date               INDIRECT_CALL(bios_bup_vect_addr+40, u32,     bup_date_struct *date_data)
+
 #endif

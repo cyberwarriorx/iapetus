@@ -20,8 +20,8 @@
 #ifndef LAPETUS_H
 #define LAPETUS_H
 
-#include "bios.h"
 #include "types.h"
+#include "bios.h"
 #include "ar/arcomm.h"
 #include "ar/commlink.h"
 #include "ar/usbdev.h"
