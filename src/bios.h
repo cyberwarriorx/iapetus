@@ -127,7 +127,7 @@ typedef struct
  *  bios_bup_sel_part():
  *      - Selects partition for the specified device
  *  Return values include:
- *      0 = No error
+ *      0 - No error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -143,7 +143,7 @@ typedef struct
  *  bios_bup_format():
  *      - Erases and formats specified device
  *  Return values include:
- *      0 = No error
+ *      0 - No error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -159,7 +159,7 @@ typedef struct
  *  bios_bup_stat():
  *      - Fetches the used and free space of the current device
  *  Return values include:
- *      0 = No error
+ *      0 - No error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -176,7 +176,7 @@ typedef struct
  *      - Checks to see if filename already exists. If overwrite is set to 1 it continues with next step
  *      - Writes data specified in data variable to specified device
  *  Return values include:
- *      0 = No error
+ *      0 - No error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -193,7 +193,7 @@ typedef struct
  *      - Checks to see if filename exists
  *      - Reads data from specified device and filename to memory pointed to by data
  *  Return values include:
- *      0 = No error
+ *      0 - No error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -211,7 +211,7 @@ typedef struct
  *      - Checks to see if filename exists
  *      - Deletes data associated with filename and frees blocks
  *  Return values include:
- *      0 = No error
+ *      0 - No error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -228,7 +228,7 @@ typedef struct
  *      - Looks for saves based on specified device and filename
  *      - Stores results in memory pointed to by dir pointer
  *  Return values include:
- *      0 = No Error
+ *      0 - No Error
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
@@ -244,7 +244,7 @@ typedef struct
  *  bios_bup_verify:
  *      - Compares data specified in data variable to data already stored on specified device and filename
  *  Return values include:
- *      0 = Match
+ *      0 - Match
  *      1 - Device Error or doesn't exist
  *      2 - Not formatted
  *      3 - Write protected
