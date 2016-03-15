@@ -1,4 +1,18 @@
 project(iapetus)
+include(ExternalProject)
+
+if (IAP_WANT_SNDDRV)
+	# Build 68K Sound Driver code
+	ExternalProject_Add(sound_driver
+		DOWNLOAD_COMMAND ""
+		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sound/driver
+		CMAKE_GENERATOR "Unix Makefiles"
+        CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${68K_CMAKE_PLATFORM}
+                   -D68K_PATHS=${68K_PATHS}
+                   -DCMAKE_BIN2C=${CMAKE_BIN2C} 
+		INSTALL_COMMAND ${CMAKE_BIN2C} ${CMAKE_CURRENT_BINARY_DIR}/sound/driver/sound_driver.bin ${CMAKE_CURRENT_SOURCE_DIR}/sound/driver.c sound_driver
+		BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/sound/driver)
+endif()
 
 enable_language(ASM)
 set(iapetus_SOURCES
@@ -23,10 +37,19 @@ set(iapetus_SOURCES
 	video/vdpinit.c video/coloffset.c video/scrscr.c video/rotscr.c video/vdp1.c video/pal.c
 	iapetus.c)
 
-set(CMAKE_C_FLAGS "-O2 -Wall -m2 -DREENTRANT_SYSCALLS_PROVIDED")
+if (IAP_WANT_SNDDRV)
+	set(iapetus_SOURCES ${iapetus_SOURCES}
+		sound/driver.c)
+endif()
+
+set(CMAKE_C_FLAGS "-O2 -Wall -m2")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(${PROJECT_NAME} STATIC ${iapetus_SOURCES})
+
+if (IAP_WANT_SNDDRV)
+    add_dependencies(${PROJECT_NAME} sound_driver)
+endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION "lib")
 install(DIRECTORY "" DESTINATION "include" FILES_MATCHING PATTERN "*.h")

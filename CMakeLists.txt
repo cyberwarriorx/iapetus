@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 include(CMakeForceCompiler)
+include(ExternalProject)
 
 SET(CMAKE_SYSTEM_NAME SegaSaturn)
 
@@ -27,6 +28,18 @@ CMAKE_FORCE_C_COMPILER(${SH_ELF_GCC} GNU)
 CMAKE_FORCE_CXX_COMPILER(${SH_ELF_GPP} GNU)
 SET(CMAKE_FIND_ROOT_PATH /usr/local/share/sh-elf/bin)
 
+option(IAP_WANT_SNDDRV "Build Sound Driver and include in library")
+
+if (IAP_WANT_SNDDRV)
+	ExternalProject_Add(bin2c
+		DOWNLOAD_COMMAND ""
+		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/bin2c
+		CMAKE_GENERATOR "${CMAKE_GENERATOR}"
+		INSTALL_COMMAND ""
+		BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin2c)
+	set(CMAKE_BIN2C "${CMAKE_CURRENT_BINARY_DIR}/bin2c/bin2c")
+endif()
+
 PROJECT(iapetus)
 
 #CONFIGURE_FILE(config.h.cmake config.h)
@@ -46,5 +59,8 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "iapetus-${IAPETUS_VERSION}")
 include(CPack)
 
 SET(CMAKE_CONFIGURATION_TYPES Release)
+
+set(68K_CMAKE_PLATFORM "${CMAKE_CURRENT_SOURCE_DIR}/Platform/SegaSaturn68K")
+
 add_subdirectory(doc)
 add_subdirectory(src)

@@ -1,0 +1,83 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+include(CMakeForceCompiler)
+
+SET(CMAKE_SYSTEM_NAME SegaSaturn68K)
+
+message(STATUS "68K_PATHS:" ${68K_PATHS})
+if (NOT EXISTS ${68K_PATHS})
+	message(FATAL_ERROR "Could not find 68k compiler. Make sure 68K_PATHS variable is set")
+endif()
+
+find_program(M68K_GCC
+	NAMES m68k-coff-gcc m68k-elf-gcc
+	PATHS
+	${68K_PATHS})
+
+find_program(M68K_GPP
+	NAMES m68k-coff-g++ m68k-elf-g++
+	PATHS
+	${68K_PATHS})
+
+find_program(CMAKE_MAKE_PROGRAM
+	NAMES make
+	PATHS
+	${68K_PATHS})
+
+message(STATUS "PCMAKE_TOOLCHAIN_FILE:" ${CMAKE_TOOLCHAIN_FILE})
+message(STATUS "M68K_GCC:" ${M68K_GCC})
+message(STATUS "M68K_GPP:" ${M68K_GPP})
+		
+# Specify the cross compiler.
+CMAKE_FORCE_C_COMPILER(${M68K_GCC} GNU)
+CMAKE_FORCE_CXX_COMPILER(${M68K_GPP} GNU)
+SET(CMAKE_FIND_ROOT_PATH ${68K_PATHS})
+#SET(CMAKE_ASM_COMPILER ${M68K_GCC})
+
+PROJECT(sound_driver)
+
+set(SOUND_DRIVER_VERSION_MAJOR 0)
+set(SOUND_DRIVER_VERSION_MINOR 1)
+set(SOUND_DRIVER_VERSION_PATCH 0)
+set(SOUND_DRIVER_VERSION "${SOUND_DRIVER_VERSION_MAJOR}.${SOUND_DRIVER_VERSION_MINOR}.${SOUND_DRIVER_VERSION_PATCH}")
+
+set(CPACK_SOURCE_GENERATOR TGZ)
+set(CPACK_PACKAGE_VERSION_MAJOR ${SOUND_DRIVER_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${SOUND_DRIVER_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${SOUND_DRIVER_VERSION_PATCH})
+set(CPACK_PACKAGE_VENDOR "Theo Berkau")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "soundriver-${SOUND_DRIVER_VERSION}")
+include(CPack)
+
+SET(CMAKE_CONFIGURATION_TYPES Release)
+
+enable_language(ASM)
+set(sound_driver_SOURCES
+	crt0.s main.c vectors.c)
+
+message(STATUS "driver suffix: " ${CMAKE_EXECUTABLE_SUFFIX})
+
+set(CMAKE_C_FLAGS "-O2 -Wall -m68000")
+set(CMAKE_EXE_LINKER_FLAGS "-nostartfiles -Wl,--script,${CMAKE_SOURCE_DIR}/driver.lk")
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_executable(${PROJECT_NAME} ${sound_driver_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} ${sound_driver_LIBRARIES} )
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.coff)
+
+add_custom_command(TARGET ${PROJECT_NAME}
+	POST_BUILD
+	DEPENDS ${PROJECT_NAME}
+    COMMAND ${CMAKE_OBJCOPY}
+    ARGS --output-format=binary ${PROJECT_NAME}.coff ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.BIN
+	COMMENT "Generating binary file" )
+
+if (DEFINED ${CMAKE_BIN2C})
+	add_custom_command(TARGET ${PROJECT_NAME}
+		POST_BUILD
+		DEPENDS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.BIN
+		COMMAND ${CMAKE_BIN2C} 
+		ARGS ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.BIN ${CMAKE_SOURCE_DIR}../driver.c sound_driver
+		COMMENT "Generating source file out of binary file")
+ endif()
