@@ -1,4 +1,4 @@
-project(exhello)
+project(exhello C)
 set(exhello_SOURCES exhello.c)
 set(CMAKE_C_FLAGS "-O2 -Wall -m2 -DREENTRANT_SYSCALLS_PROVIDED")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -9,7 +9,7 @@ install(TARGETS ${PROJECT_NAME} DESTINATION "examples")
 install(DIRECTORY "" DESTINATION "examples" FILES_MATCHING PATTERN "*.c")
 
 
-project(exgui)
+project(exgui C)
 set(exgui_SOURCES exgui.c)
 set(CMAKE_C_FLAGS "-O2 -Wall -m2 -DREENTRANT_SYSCALLS_PROVIDED")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

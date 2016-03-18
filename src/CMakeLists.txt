@@ -1,4 +1,4 @@
-project(iapetus)
+project(iapetus C)
 include(ExternalProject)
 
 if (IAP_WANT_SNDDRV)

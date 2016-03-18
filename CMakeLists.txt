@@ -40,7 +40,7 @@ if (IAP_WANT_SNDDRV)
 	set(CMAKE_BIN2C "${CMAKE_CURRENT_BINARY_DIR}/bin2c/bin2c")
 endif()
 
-PROJECT(iapetus)
+PROJECT(iapetus C)
 
 #CONFIGURE_FILE(config.h.cmake config.h)
 
