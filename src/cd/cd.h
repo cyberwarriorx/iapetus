@@ -60,6 +60,7 @@
 #define CDB_REG_CR3         *((volatile u16 *)0x25890020)
 #define CDB_REG_CR4         *((volatile u16 *)0x25890024)
 #define CDB_REG_DATATRNS    *((volatile u32 *)0x25818000)
+#define CDB_REG_DATATRNSW   *((volatile u16 *)0x25898000)
 
 #define CD_CON_TRUE             (1 << 0)
 #define CD_CON_FALSE            (1 << 1)
