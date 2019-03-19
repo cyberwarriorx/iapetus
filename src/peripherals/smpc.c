@@ -138,8 +138,8 @@ void smpc_handler()
                         }
                         oreg_counter += 2;
                         break;
-                     case 0x5: // Analog Pad
-                        oreg_counter += 3;
+                     case 0x6: // Analog Pad
+                        oreg_counter += 4;
                         break;
                      default: break;
                   }
